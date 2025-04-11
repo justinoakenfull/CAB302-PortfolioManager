@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.javarepowizards.portfoliomanager.HelloController">
-  <padding>
-    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-  </padding>
 
-  <Label fx:id="welcomeText"/>
-  <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<BorderPane xmlns="http://javafx.com/javafx"
+             xmlns:fx="http://javafx.com/fxml"
+             fx:controller="com.javarepowizards.portfoliomanager.MainController">
+
+<top>
+  <HBox spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 10;" alignment="CENTER_LEFT">
+    <Button text="Dashboard" onAction="#showDashboard"/>
+    <Button text="Watchlist" onAction="#showWatchlist"/>
+    <Button text="Portfolio" onAction="#showPortfolio"/>
+    <Button text="Stocks" onAction="#showStocks"/>
+    <Button text="Simulation" onAction="#showSimulation"/>
+
+    <!-- Push the settings button to the right -->
+    <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
+    <Button text="⚙" onAction="#showSettings"/>
+  </HBox>
+</top>
+
+<center>
+  <StackPane fx:id="contentArea"/>
+</center>
+</BorderPane>

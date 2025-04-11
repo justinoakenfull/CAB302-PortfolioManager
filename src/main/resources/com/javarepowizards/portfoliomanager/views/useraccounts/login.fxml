@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.LoginController">
+
+    <center>
+        <VBox alignment="CENTER" spacing="15" style="-fx-padding: 40;">
+            <Label text="Login to Trading Simulator" style="-fx-font-size: 18px;"/>
+            <TextField fx:id="emailField" promptText="Email" prefWidth="250"/>
+            <PasswordField fx:id="passwordField" promptText="Password" prefWidth="250"/>
+            <Button text="Login" onAction="#handleLogin"/>
+        </VBox>
+    </center>
+
+</BorderPane>
