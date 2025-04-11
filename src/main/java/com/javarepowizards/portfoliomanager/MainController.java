@@ -8,14 +8,18 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import java.io.IOException;
 import javafx.scene.Parent;
-
+import javafx.scene.layout.BorderPane;
 
 public class MainController {
     @FXML
     private StackPane contentArea;
 
     @FXML
-    private void showDashboard() {
+    private BorderPane rootLayout;
+
+
+    @FXML
+    public void showDashboard() {
         loadPage("dashboard/dashboard.fxml");
     }
 
@@ -46,15 +50,11 @@ public class MainController {
 
     private void loadPage(String page) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/" + page));
-            Parent root = loader.load(); // Load the FXML file into the root
-
-            // Clear the current content and add the new loaded page
+            Parent fxml = FXMLLoader.load(getClass().getResource("/com/javarepowizards/portfoliomanager/views/" + page));
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(root);
-
+            contentArea.getChildren().add(fxml);
         } catch (IOException e) {
-            e.printStackTrace();  // Handle exceptions (e.g., file not found)
+            e.printStackTrace();
         }
     }
 }
