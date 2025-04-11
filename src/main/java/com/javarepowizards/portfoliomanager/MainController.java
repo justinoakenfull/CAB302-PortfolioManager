@@ -2,47 +2,59 @@ package com.javarepowizards.portfoliomanager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import java.io.IOException;
+import javafx.scene.Parent;
+
 
 public class MainController {
+    @FXML
+    private StackPane contentArea;
 
-    //Placeholder buttons for nav bar
     @FXML
     private void showDashboard() {
-        System.out.println("Dashboard clicked");
+        loadPage("dashboard/dashboard.fxml");
     }
 
     @FXML
     private void showWatchlist() {
-        System.out.println("Watchlist clicked");
+        loadPage("watchlist/watchlist.fxml");
     }
 
     @FXML
     private void showPortfolio() {
-        System.out.println("Portfolio clicked");
+        loadPage("portfolio/portfolio.fxml");
     }
 
     @FXML
     private void showStocks() {
-        System.out.println("Stocks clicked");
+        loadPage("stockspage/stocks.fxml");
     }
 
     @FXML
     private void showSimulation() {
-        System.out.println("Simulation clicked");
+        loadPage("simulation/simulation.fxml");
     }
 
     @FXML
     private void showSettings() {
-        System.out.println("Settings clicked");
+        loadPage("settings.fxml"); // need to be implemented
     }
 
+    private void loadPage(String page) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/" + page));
+            Parent root = loader.load(); // Load the FXML file into the root
 
+            // Clear the current content and add the new loaded page
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(root);
 
-    @FXML
-    private Label welcomeText;
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
+        } catch (IOException e) {
+            e.printStackTrace();  // Handle exceptions (e.g., file not found)
+        }
     }
 }

@@ -11,16 +11,16 @@
              fx:controller="com.javarepowizards.portfoliomanager.MainController">
 
 <top>
-  <HBox spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 10;" alignment="CENTER_LEFT">
-    <Button text="Dashboard" onAction="#showDashboard"/>
-    <Button text="Watchlist" onAction="#showWatchlist"/>
-    <Button text="Portfolio" onAction="#showPortfolio"/>
-    <Button text="Stocks" onAction="#showStocks"/>
-    <Button text="Simulation" onAction="#showSimulation"/>
+  <HBox spacing="15" style="-fx-background-color: #000000; -fx-padding: 10;" alignment="CENTER_LEFT">
+    <Button text="Dashboard" onAction="#showDashboard" style="-fx-background-color: #3A3632; -fx-text-fill: white;"/>
+    <Button text="Watchlist" onAction="#showWatchlist" style="-fx-background-color: #3A3632; -fx-text-fill: white;"/>
+    <Button text="Portfolio" onAction="#showPortfolio" style="-fx-background-color: #3A3632; -fx-text-fill: white;"/>
+    <Button text="Stocks" onAction="#showStocks" style="-fx-background-color: #3A3632; -fx-text-fill: white;"/>
+    <Button text="Simulation" onAction="#showSimulation" style="-fx-background-color: #3A3632; -fx-text-fill: white;"/>
 
     <!-- Push the settings button to the right -->
     <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
-    <Button text="⚙" onAction="#showSettings"/>
+    <Button text="⚙" onAction="#showSettings" style="-fx-background-color: #656565; -fx-text-fill: white;"/>
   </HBox>
 </top>
 
