@@ -97,12 +97,22 @@
       <version>8.0.33</version>
     </dependency>
 
-    <!-- For password hashing -->
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-crypto</artifactId>
-      <version>6.4.4</version>
-    </dependency>
+      <!-- Spring Security -->
+      <dependency>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-core</artifactId>
+          <version>6.4.4</version>
+      </dependency>
+
+
+
+
+      <!-- BCrypt for password encoding -->
+      <dependency>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-crypto</artifactId>
+          <version>6.4.4</version>
+      </dependency>
 
   </dependencies>
 

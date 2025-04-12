@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
@@ -14,6 +15,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.control.Button;
 import com.javarepowizards.portfoliomanager.MainController;
 import java.io.IOException;
+import com.javarepowizards.portfoliomanager.services.AuthService;
+
 
 
 public class LoginController {
@@ -27,10 +30,21 @@ public class LoginController {
     private Button loginButton;
     @FXML
     private void handleLogin() {
+        AuthService service = new AuthService();
+        String username = emailField.getText();
+        String password = passwordField.getText();
+        try {
+
+            service.loginUser(username, password);
+
+            // Successful login - navigate to dashboard view.
+            loadDashboard();
+
+        } catch (Exception e) {
+            System.out.println(1);
+        }
 
 
-        // Once login is "successful," switch to the dashboard page
-        loadDashboard();
     }
     private void loadDashboard() {
         try {
