@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      style="-fx-background-color: #B1B3BE;"
+      alignment="CENTER"
+      spacing="20"
+      prefWidth="600"
+      prefHeight="400">
+
+    <Label text="Simulation Page" style="-fx-font-size: 24px;"/>
+</VBox>

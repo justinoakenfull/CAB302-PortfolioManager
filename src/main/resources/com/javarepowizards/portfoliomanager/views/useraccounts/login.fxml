@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.LoginController">
+
+    <center>
+        <VBox alignment="CENTER" spacing="20" style="-fx-background-color: #B1B3BE; -fx-padding: 20;">
+            <TextField fx:id="emailField" promptText="Enter Email" prefWidth="200"/>
+            <PasswordField fx:id="passwordField" promptText="Enter Password" prefWidth="200"/>
+            <Button fx:id="loginButton" text="Login" onAction="#handleLogin" style="-fx-background-color: #656565; -fx-text-fill: white;"/>
+        </VBox>
+    </center>
+
+</BorderPane>
