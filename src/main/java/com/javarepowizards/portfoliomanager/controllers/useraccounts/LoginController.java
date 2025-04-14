@@ -1,16 +1,13 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
-import javafx.event.ActionEvent;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.control.Button;
 import com.javarepowizards.portfoliomanager.MainController;
 import java.io.IOException;
@@ -38,10 +35,8 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/hello-view.fxml"));
             Parent root = loader.load();
 
-
             MainController mainController = loader.getController();
             mainController.showDashboard();
-
 
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(new Scene(root));
