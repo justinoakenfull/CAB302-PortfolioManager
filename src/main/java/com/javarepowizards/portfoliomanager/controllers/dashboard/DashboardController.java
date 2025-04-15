@@ -12,7 +12,7 @@ public class DashboardController implements Initializable {
        System.out.println("DashboardController initialized");
 
         // Run simulation after dashboard loads
-        SimulationTestRunner testRunner = new SimulationTestRunner();
-        testRunner.runTestSimulation();
+        //SimulationTestRunner testRunner = new SimulationTestRunner();
+        //testRunner.runTestSimulation();
     }
 }
