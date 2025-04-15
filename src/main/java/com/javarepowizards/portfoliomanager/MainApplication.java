@@ -1,6 +1,9 @@
 package com.javarepowizards.portfoliomanager;
 
+import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
+import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
+import com.javarepowizards.portfoliomanager.models.StockData;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +13,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainApplication extends Application {
@@ -51,13 +55,13 @@ public class MainApplication extends Application {
 
         // Retrieve a list of all StockData entries associated with the stock WES.AX.
         // The getStockData method uses the StockName enum (in this case, StockName.WES_AX) to filter the data.
-        List<StockDAO.StockData> wesData = stockDAO.getStockData(StockName.WES_AX);
+        List<StockData> wesData = stockDAO.getStockData(StockName.WES_AX);
 
         // Output a header message to the console showing which stock's dates are about to be printed.
         System.out.println("All dates for " + StockName.WES_AX.getSymbol() + ":");
         // Iterate over each StockData record for WES.AX and print its date.
         // This is useful for verifying which dates have been loaded from the CSV.
-        for (StockDAO.StockData data : wesData) {
+        for (StockData data : wesData) {
             System.out.println(data.getDate());
         }
 
@@ -73,7 +77,7 @@ public class MainApplication extends Application {
 
             // Retrieve the stock data for the current stock on the specified date.
             // This call uses a DAO method that returns a single StockData object for the given StockName and date.
-            StockDAO.StockData stockData = stockDAO.getStockData(stock, date);
+            StockData stockData = stockDAO.getStockData(stock, date);
 
             // Check if a StockData record was found for the current stock on that date.
             if (stockData != null) {
@@ -88,6 +92,29 @@ public class MainApplication extends Application {
             // Print a separator line to clearly delineate output for each stock.
             System.out.println("------------------------------------------------");
         }
+
+        //Current holdings
+        List<PortfolioEntry> holdings = new ArrayList<>();
+        // New portfolio
+        PortfolioDAO portfolio = new PortfolioDAO(holdings, 10000);
+        StockData stock1 = stockDAO.getStockData(StockName.WES_AX, date);
+        StockData stock2 = stockDAO.getStockData(StockName.TLS_AX, date);
+        StockData stock3 = stockDAO.getStockData(StockName.AMC_AX, date);
+        PortfolioEntry entry1 = new PortfolioEntry(StockName.WES_AX,stock1.getClose(), 1000);
+        PortfolioEntry entry2 = new PortfolioEntry(StockName.TLS_AX,stock1.getClose(), 1000);
+        PortfolioEntry entry3 = new PortfolioEntry(StockName.AMC_AX,stock1.getClose(), 1000);
+        portfolio.addToHoldings(entry1);
+        portfolio.addToHoldings(entry2);
+        portfolio.addToHoldings(entry3);
+
+        // Output a header indicating the portfolio is updated.
+        System.out.println("\nPortfolio:");
+        // Loop through each stock holding again and print its details.
+        for (PortfolioEntry holding : portfolio.getHoldings()) {
+            System.out.println(holding);
+        }
+        // Finally, recalculate and print the total portfolio value with the new holdings.
+        System.out.println("Total Portfolio Value: $" + portfolio.getTotalPortfolioValue());
     }
 
     public static void main(String[] args) {
