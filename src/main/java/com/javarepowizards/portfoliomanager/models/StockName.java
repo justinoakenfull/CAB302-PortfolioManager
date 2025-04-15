@@ -24,7 +24,14 @@ public enum StockName {
     RIO_AX("RIO.AX"),
     NXT_AX("NXT.AX"),
     MQG_AX("MQG.AX"),
-    AXJO_AX("^AXJO.AX");
+    AXJO_AX("^AXJO.AX"),
+    REA_AX("REA.AX"),
+    COH_AX("COH.AX"),
+    GMG_AX("GMG.AX"),
+    JBH_AX("JBH.AX"),
+    ALL_AX("ALL.AX"),
+    WOW_AX("WOW.AX");
+
 
     /**
      * The symbol field stores the string representation of the stock symbol for each enum constant.

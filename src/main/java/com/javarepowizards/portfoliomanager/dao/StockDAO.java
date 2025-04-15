@@ -98,6 +98,7 @@ public class StockDAO {
                         stockName = StockName.fromString(symbolStr);
                     } catch (IllegalArgumentException e) {
                         // If conversion fails (symbol not recognized), skip this token.
+                        System.err.println("Error parsing value \"" + symbolStr);
                         continue;
                     }
                     // Get the field name (e.g., "Price", "Open", etc.) from the second header row.
