@@ -17,6 +17,7 @@ public class MainController {
 
     @FXML
     public void showDashboard() {
+        System.out.println("Showing dashboard");
         loadPage("dashboard/dashboard.fxml");
     }
 
@@ -54,4 +55,7 @@ public class MainController {
             e.printStackTrace();
         }
     }
+
+
+
 }

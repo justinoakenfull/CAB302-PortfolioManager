@@ -9,6 +9,7 @@ module com.javarepowizards.portfoliomanager {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
+    requires com.opencsv;
 
     opens com.javarepowizards.portfoliomanager to javafx.fxml;
     exports com.javarepowizards.portfoliomanager;
@@ -16,5 +17,9 @@ module com.javarepowizards.portfoliomanager {
     exports com.javarepowizards.portfoliomanager.controllers.useraccounts to javafx.fxml;
 
     opens com.javarepowizards.portfoliomanager.controllers.useraccounts to javafx.fxml;
+
+    exports com.javarepowizards.portfoliomanager.controllers.dashboard;
+
+
 
 }
