@@ -3,15 +3,32 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
-      style="-fx-background-color: #B1B3BE;"
-      alignment="CENTER"
-      spacing="20"
-      prefWidth="600"
-      prefHeight="400">
+<VBox
+    xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          style="-fx-background-color: #B1B3BE;"
+          alignment="TOP_LEFT"
+          spacing="20"
+          prefWidth="100"
+          prefHeight="300">
+<StackPane alignment = "TOP_LEFT" prefHeight = "400">
+    <VBox style ="-fx-background-color: #FFFFFF;
+                  -fx-border-color: #333333;
+                   -fx-border-width: 2;
+                   -fx-border-radius: 10;
+                   -fx-background-radius: 10;
+                   -fx-padding: 15;"
+          spacing="10"
+          alignment = "TOP_LEFT"
+          prefWidth = "120"
+          prefHeight="350">
 
-    <Label text="Dashboard Page" style="-fx-font-size: 24px;"/>
+        <Label fx:id="watchListLabel"
+               text="WatchList Widget"
+               style="-fx-font-size: 18px; -fx-text-fill: #000000;" />
+
+    </VBox>
+</StackPane>
+
 </VBox>
 
