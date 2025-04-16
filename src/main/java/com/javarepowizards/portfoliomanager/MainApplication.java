@@ -1,7 +1,14 @@
 package com.javarepowizards.portfoliomanager;
 
+import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
+import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
+import com.javarepowizards.portfoliomanager.models.StockData;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.operations.simulation.MarketSimulator;
+import com.javarepowizards.portfoliomanager.services.StockDataFilter;
+import com.javarepowizards.portfoliomanager.services.StockStatistics;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,6 +17,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainApplication extends Application {
@@ -51,13 +59,13 @@ public class MainApplication extends Application {
 
         // Retrieve a list of all StockData entries associated with the stock WES.AX.
         // The getStockData method uses the StockName enum (in this case, StockName.WES_AX) to filter the data.
-        List<StockDAO.StockData> wesData = stockDAO.getStockData(StockName.WES_AX);
+        List<StockData> wesData = stockDAO.getStockData(StockName.WES_AX);
 
         // Output a header message to the console showing which stock's dates are about to be printed.
         System.out.println("All dates for " + StockName.WES_AX.getSymbol() + ":");
         // Iterate over each StockData record for WES.AX and print its date.
         // This is useful for verifying which dates have been loaded from the CSV.
-        for (StockDAO.StockData data : wesData) {
+        for (StockData data : wesData) {
             System.out.println(data.getDate());
         }
 
@@ -73,13 +81,13 @@ public class MainApplication extends Application {
 
             // Retrieve the stock data for the current stock on the specified date.
             // This call uses a DAO method that returns a single StockData object for the given StockName and date.
-            StockDAO.StockData stockData = stockDAO.getStockData(stock, date);
+            StockData stockData = stockDAO.getStockData(stock, date);
 
             // Check if a StockData record was found for the current stock on that date.
             if (stockData != null) {
                 // If data is found, print out the "Open" price. Price is currently null.
                 // #TODO Decide which price to use.
-                System.out.println("Open for " + stock.getSymbol() + " on " + date + ": " + stockData.getOpen());
+                System.out.println("Close for " + stock.getSymbol() + " on " + date + ": " + stockData.getClose());
             } else {
                 // If no matching data is available, print a message indicating that.
                 System.out.println("No data available for " + stock.getSymbol() + " on " + date);
@@ -88,6 +96,72 @@ public class MainApplication extends Application {
             // Print a separator line to clearly delineate output for each stock.
             System.out.println("------------------------------------------------");
         }
+
+        // #TODO Add Holdings to User Account Feild, so we can go user.Holdings.
+        //Current holdings
+        List<PortfolioEntry> holdings = new ArrayList<>();
+        // New portfolio
+        PortfolioDAO portfolio = new PortfolioDAO(holdings, 10000);
+        StockData stock1 = stockDAO.getStockData(StockName.WES_AX, date);
+        StockData stock2 = stockDAO.getStockData(StockName.TLS_AX, date);
+        StockData stock3 = stockDAO.getStockData(StockName.AMC_AX, date);
+        PortfolioEntry entry1 = new PortfolioEntry(StockName.WES_AX,stock1.getClose(), 1000);
+        PortfolioEntry entry2 = new PortfolioEntry(StockName.TLS_AX,stock1.getClose(), 1000);
+        PortfolioEntry entry3 = new PortfolioEntry(StockName.AMC_AX,stock1.getClose(), 1000);
+        portfolio.addToHoldings(entry1);
+        portfolio.addToHoldings(entry2);
+        portfolio.addToHoldings(entry3);
+
+        // Output a header indicating the portfolio is updated.
+        System.out.println("\nPortfolio:");
+        // Loop through each stock holding again and print its details.
+        for (PortfolioEntry holding : portfolio.getHoldings()) {
+            System.out.println(holding);
+        }
+        // Finally, recalculate and print the total portfolio value with the new holdings.
+        System.out.println("Total Portfolio Value: $" + portfolio.getTotalPortfolioValue());
+
+        // Filter stock data based on a specific date range.
+        StockDataFilter stockDataFilter = new StockDataFilter();
+
+        List<StockData> filteredData = stockDataFilter.getDataFromLastYear(wesData, date);
+        System.out.println("Filtered Stock Data for " + StockName.WES_AX.getSymbol() + "from" + date.minusYears(1) + "to" + date + ":");
+        for (StockData data : filteredData){
+            System.out.println(data.getDate() + " -> Close:" + data.getClose());
+        }
+
+        StockStatistics stats = new StockStatistics(filteredData);
+        // Output the computed statistics to verify correctness.
+        System.out.println("----- Stock Statistics for " + StockName.WES_AX.getSymbol() + " (Last Year) -----");
+        System.out.println("Average Daily Return (Drift): " + stats.getAverageDailyReturn());
+        System.out.println("Volatility (Standard Deviation): " + stats.getVolatility());
+        System.out.println("Momentum (Baseline): " + stats.getMomentum());
+
+        // Print a separator line to clearly delineate output for each stock.
+
+        StockData latestData = stockDAO.getStockData(StockName.WES_AX, date);
+        double initialPrice = latestData.getClose();
+
+        MarketSimulator engine = new MarketSimulator(
+                initialPrice,
+                stats.getAverageDailyReturn(),  // drift from StockStatistics.
+                stats.getVolatility(),            // volatility.
+                stats.getMomentum(),              // baseline momentum (not dynamically updated here).
+                2.0,                              // kMultiplier.
+                0.05                              // maxDailyMovement.
+        );
+
+// Define number of days to simulate (e.g., 30 days).
+        int simulationDays = 30;
+        List<Double> simulatedPrices = engine.simulate(simulationDays);
+
+// Print simulated prices to command line.
+        System.out.println("----- Simulated Prices for " + StockName.WES_AX.getSymbol() + " -----");
+        for (int day = 0; day < simulatedPrices.size(); day++) {
+            System.out.println("Day " + day + ": " + simulatedPrices.get(day));
+        }
+
+
     }
 
     public static void main(String[] args) {
