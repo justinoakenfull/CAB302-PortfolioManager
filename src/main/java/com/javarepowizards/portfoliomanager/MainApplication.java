@@ -6,6 +6,7 @@ import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockData;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.operations.simulation.MarketSimulator;
+import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
 import com.javarepowizards.portfoliomanager.services.StockDataFilter;
 import com.javarepowizards.portfoliomanager.services.StockStatistics;
 
@@ -151,14 +152,28 @@ public class MainApplication extends Application {
                 0.05                              // maxDailyMovement.
         );
 
-// Define number of days to simulate (e.g., 30 days).
+        // Define number of days to simulate (e.g., 30 days).
         int simulationDays = 30;
         List<Double> simulatedPrices = engine.simulate(simulationDays);
 
-// Print simulated prices to command line.
+        // Print simulated prices to command line.
         System.out.println("----- Simulated Prices for " + StockName.WES_AX.getSymbol() + " -----");
         for (int day = 0; day < simulatedPrices.size(); day++) {
             System.out.println("Day " + day + ": " + simulatedPrices.get(day));
+        }
+
+        double drift = stats.getAverageDailyReturn();
+        double volatility = stats.getVolatility();
+        double momentum = stats.getMomentum();
+        double kMultiplier = 2.0;        // For dynamic boundaries.
+        double maxDailyMovement = 0.05;  // Max allowed daily change (+/- 5%).
+
+        PortfolioSimulation portfolioEngine = new PortfolioSimulation(portfolio, simulationDays, kMultiplier, maxDailyMovement);
+        List<Double> simulatedPortfolioValues = portfolioEngine.simulatePortfolio(drift, volatility, momentum);
+
+        System.out.println("----- Simulated Portfolio Values -----");
+        for (int day = 0; day < simulatedPortfolioValues.size(); day++) {
+            System.out.println("Day " + day + ": " + simulatedPortfolioValues.get(day));
         }
 
 
