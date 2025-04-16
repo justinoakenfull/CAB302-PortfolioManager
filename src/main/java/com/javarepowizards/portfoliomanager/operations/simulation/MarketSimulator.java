@@ -2,73 +2,84 @@ package com.javarepowizards.portfoliomanager.operations.simulation;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class MarketSimulator {
 
-    private final Random random = new Random();
+    private final double initialPrice;
+    private final double drift;
+    private final double volatility;
+    private final double momentum;
 
-    public List<Double> simulateStock(StockProfile profile, double initialPrice, int days) {
+    // additional params for boundries
+    private final double kMultiplier; // e.g. 2 or 3 to set upper/lower bounds
+    private final double maxDailyMovement; // maximum allowed daily movement.
+
+    private final Random random; // for generating random shocks
+
+    public MarketSimulator(double initialPrice, double drift, double volatility, double momentum, double kMultiplier, double maxDailyMovement) {
+        this.initialPrice = initialPrice;
+        this.drift = drift;
+        this.volatility = volatility;
+        this.momentum = momentum;
+        this.kMultiplier = kMultiplier;
+        this.maxDailyMovement = maxDailyMovement;
+        this.random = new Random();
+    }
+
+    /**
+     * Simulates the market for a given number of days.
+     *
+     * @param days The number of days to simulate.
+     * @return A list of simulated prices. (starting with initial price
+     */
+    public List<Double> simulate(int days){
+
         List<Double> prices = new ArrayList<>();
-        double price = initialPrice;
-        double previousReturn = 0.0;
+        double currentPrice = initialPrice;
+        prices.add(currentPrice);
 
         for (int i = 0; i < days; i++) {
-            double randomShock = random.nextGaussian() * profile.getBaseVolatility();
-            double momentumEffect = profile.getMomentumWeight() * previousReturn;
-            double dailyReturn = profile.getAvgDailyReturn() + randomShock + momentumEffect;
+            // Generate a random shock from a standard normal distribution.
+            double epsilon = random.nextGaussian();
 
-            // Cap return (max daily movement ±10%)
-            dailyReturn = Math.max(-0.1, Math.min(0.1, dailyReturn));
+            // For now, we use a static drift; later can update this using dynamic momentum.
+            double effectiveDrift = drift; // + momentum adjustment if needed.
 
-            // Apply dynamic upper/lower bounds (±2.5×volatility as a base)
-            double upperBound = 1 + 2.5 * profile.getBaseVolatility();
-            double lowerBound = 1 - 2.5 * profile.getBaseVolatility();
+            // Calculate the new price using the GBM formula (Δt = 1 day).
+            double simulatedFactor = Math.exp((effectiveDrift - (volatility * volatility / 2)) + volatility * epsilon);
+            double newPrice = currentPrice * simulatedFactor;
 
-            double nextPrice = price * (1 + dailyReturn);
-            nextPrice = Math.min(price * upperBound, Math.max(price * lowerBound, nextPrice));
+            // Compute dynamic boundaries.
+            double upperBound = currentPrice * (1 + kMultiplier * volatility);
+            double lowerBound = currentPrice * (1 - kMultiplier * volatility);
 
-            prices.add(nextPrice);
-            previousReturn = dailyReturn;
-            price = nextPrice;
+            // Enforce boundaries.
+            if (newPrice > upperBound) {
+                newPrice = upperBound;
+            } else if (newPrice < lowerBound) {
+                newPrice = lowerBound;
+            }
+
+            // Cap maximum daily movement if necessary.
+            double maxIncrease = currentPrice * (1 + maxDailyMovement);
+            double maxDecrease = currentPrice * (1 - maxDailyMovement);
+            if (newPrice > maxIncrease) {
+                newPrice = maxIncrease;
+            } else if (newPrice < maxDecrease) {
+                newPrice = maxDecrease;
+            }
+
+            // Update currentPrice and add to list.
+            currentPrice = newPrice;
+            prices.add(currentPrice);
         }
 
         return prices;
+
     }
 
-    public void runSimulation(Map<String, List<StockBar>> stockData) {
-        int simulationDays = 5;
 
-        for (String ticker : stockData.keySet()) {
-            List<StockBar> bars = stockData.get(ticker);
-            if (bars.isEmpty()) continue;
-
-            StockBar lastBar = bars.get(bars.size() - 1);
-            double initialPrice = lastBar.getClose();
-            LocalDate startDate = lastBar.getDate();
-
-            StockProfile profile = new StockProfile("BHP", 0.001, 0.02, 0.3);
-            List<Double> simulatedPrices = simulateStock(profile, initialPrice, simulationDays);
-
-            List<StockBar> simulatedBars = new ArrayList<>();
-            for (int i = 0; i < simulatedPrices.size(); i++) {
-                LocalDate date = startDate.plusDays(i + 1);
-                double close = simulatedPrices.get(i);
-
-                // Mocking open/high/low/volume for now
-                double open = close * (1 + random.nextDouble() * 0.01 - 0.005);
-                double high = Math.max(open, close) * (1 + random.nextDouble() * 0.01);
-                double low = Math.min(open, close) * (1 - random.nextDouble() * 0.01);
-                double volume = 100000 + random.nextInt(100000);
-
-                StockBar bar = new StockBar(date, ticker, open, high, low, close, volume);
-                simulatedBars.add(bar);
-            }
-
-            // Output or use simulatedBars as needed
-            System.out.println("Simulated bars for " + ticker + ":");
-            for (StockBar bar : simulatedBars) {
-                System.out.println(bar);
-            }
-        }
-    }
 }
