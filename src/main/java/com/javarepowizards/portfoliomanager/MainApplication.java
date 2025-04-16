@@ -106,75 +106,41 @@ public class MainApplication extends Application {
         StockData stock1 = stockDAO.getStockData(StockName.WES_AX, date);
         StockData stock2 = stockDAO.getStockData(StockName.TLS_AX, date);
         StockData stock3 = stockDAO.getStockData(StockName.AMC_AX, date);
+
         PortfolioEntry entry1 = new PortfolioEntry(StockName.WES_AX,stock1.getClose(), 1000);
-        PortfolioEntry entry2 = new PortfolioEntry(StockName.TLS_AX,stock1.getClose(), 1000);
-        PortfolioEntry entry3 = new PortfolioEntry(StockName.AMC_AX,stock1.getClose(), 1000);
+        PortfolioEntry entry2 = new PortfolioEntry(StockName.TLS_AX,stock2.getClose(), 1000);
+        PortfolioEntry entry3 = new PortfolioEntry(StockName.AMC_AX,stock3.getClose(), 1000);
         portfolio.addToHoldings(entry1);
         portfolio.addToHoldings(entry2);
         portfolio.addToHoldings(entry3);
 
-        // Output a header indicating the portfolio is updated.
-        System.out.println("\nPortfolio:");
-        // Loop through each stock holding again and print its details.
+        System.out.println("----- Portfolio Holdings -----");
         for (PortfolioEntry holding : portfolio.getHoldings()) {
             System.out.println(holding);
         }
-        // Finally, recalculate and print the total portfolio value with the new holdings.
-        System.out.println("Total Portfolio Value: $" + portfolio.getTotalPortfolioValue());
+        System.out.println("Initial Portfolio Value: $" + portfolio.getTotalPortfolioValue());
 
-        // Filter stock data based on a specific date range.
-        StockDataFilter stockDataFilter = new StockDataFilter();
-
-        List<StockData> filteredData = stockDataFilter.getDataFromLastYear(wesData, date);
-        System.out.println("Filtered Stock Data for " + StockName.WES_AX.getSymbol() + "from" + date.minusYears(1) + "to" + date + ":");
-        for (StockData data : filteredData){
-            System.out.println(data.getDate() + " -> Close:" + data.getClose());
-        }
-
-        StockStatistics stats = new StockStatistics(filteredData);
-        // Output the computed statistics to verify correctness.
-        System.out.println("----- Stock Statistics for " + StockName.WES_AX.getSymbol() + " (Last Year) -----");
-        System.out.println("Average Daily Return (Drift): " + stats.getAverageDailyReturn());
-        System.out.println("Volatility (Standard Deviation): " + stats.getVolatility());
-        System.out.println("Momentum (Baseline): " + stats.getMomentum());
-
-        // Print a separator line to clearly delineate output for each stock.
-
-        StockData latestData = stockDAO.getStockData(StockName.WES_AX, date);
-        double initialPrice = latestData.getClose();
-
-        MarketSimulator engine = new MarketSimulator(
-                initialPrice,
-                stats.getAverageDailyReturn(),  // drift from StockStatistics.
-                stats.getVolatility(),            // volatility.
-                stats.getMomentum(),              // baseline momentum (not dynamically updated here).
-                2.0,                              // kMultiplier.
-                0.05                              // maxDailyMovement.
-        );
-
-        // Define number of days to simulate (e.g., 30 days).
+        // Simulation settings.
         int simulationDays = 30;
-        List<Double> simulatedPrices = engine.simulate(simulationDays);
+        double kMultiplier = 2.0;
+        double maxDailyMovement = 0.05;
+        double smoothingFactor = 0.3;
+        LocalDate mostRecentDate = date; // Re-use our defined date.
 
-        // Print simulated prices to command line.
-        System.out.println("----- Simulated Prices for " + StockName.WES_AX.getSymbol() + " -----");
-        for (int day = 0; day < simulatedPrices.size(); day++) {
-            System.out.println("Day " + day + ": " + simulatedPrices.get(day));
-        }
+        // Create and run the PortfolioSimulationEngine.
+        PortfolioSimulation portfolioEngine = new PortfolioSimulation(
+                portfolio, stockDAO, mostRecentDate,
+                simulationDays, kMultiplier, maxDailyMovement, smoothingFactor
+        );
+        List<Double> portfolioSimValues = portfolioEngine.simulatePortfolio();
 
-        double drift = stats.getAverageDailyReturn();
-        double volatility = stats.getVolatility();
-        double momentum = stats.getMomentum();
-        double kMultiplier = 2.0;        // For dynamic boundaries.
-        double maxDailyMovement = 0.05;  // Max allowed daily change (+/- 5%).
-
-        PortfolioSimulation portfolioEngine = new PortfolioSimulation(portfolio, simulationDays, kMultiplier, maxDailyMovement);
-        List<Double> simulatedPortfolioValues = portfolioEngine.simulatePortfolio(drift, volatility, momentum);
-
+        // Print the simulated portfolio values.
         System.out.println("----- Simulated Portfolio Values -----");
-        for (int day = 0; day < simulatedPortfolioValues.size(); day++) {
-            System.out.println("Day " + day + ": " + simulatedPortfolioValues.get(day));
+        for (int day = 0; day < portfolioSimValues.size(); day++) {
+            System.out.println("Day " + day + ": " + portfolioSimValues.get(day));
         }
+
+
 
 
     }
