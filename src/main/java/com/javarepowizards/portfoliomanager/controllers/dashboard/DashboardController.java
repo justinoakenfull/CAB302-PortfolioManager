@@ -5,5 +5,5 @@ import javafx.scene.control.Label;
 public class DashboardController {
 
     @FXML
-    private Label watchlistLabel;
+    private Label watchListLabel;
 }

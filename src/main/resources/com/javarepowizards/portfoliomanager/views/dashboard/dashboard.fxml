@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.*?>
@@ -5,13 +6,13 @@
 
 <VBox
     xmlns="http://javafx.com/javafx"
-          xmlns:fx="http://javafx.com/fxml"
-          style="-fx-background-color: #B1B3BE;"
-          alignment="TOP_LEFT"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
+    style="-fx-background-color: #B1B3BE;"
           spacing="20"
           prefWidth="100"
           prefHeight="300">
-<StackPane alignment = "TOP_LEFT" prefHeight = "400">
+
     <VBox style ="-fx-background-color: #FFFFFF;
                   -fx-border-color: #333333;
                    -fx-border-width: 2;
@@ -19,16 +20,33 @@
                    -fx-background-radius: 10;
                    -fx-padding: 15;"
           spacing="10"
-          alignment = "TOP_LEFT"
-          prefWidth = "120"
-          prefHeight="350">
+          alignment="TOP_LEFT"
+          maxWidth="400"
+          maxHeight="300">
 
         <Label fx:id="watchListLabel"
-               text="WatchList Widget"
+               text="Watchlist"
                style="-fx-font-size: 18px; -fx-text-fill: #000000;" />
 
+        <GridPane hgap = "15" vgap = "8">
+            <!-- Header Row -->
+            <Label text = "Stock" GridPane.columnIndex="0" style = "-fx-text-fill: white;"  />
+            <Label text = "Open" GridPane.columnIndex="1" style = "-fx-text-fill: white;"  />
+            <Label text = "High" GridPane.columnIndex="2" style = "-fx-text-fill: white;"  />
+            <Label text = "Low" GridPane.columnIndex="3" style = "-fx-text-fill: white;"  />
+            <Label text = "Change" GridPane.columnIndex="4" style = "-fx-text-fill: white;"  />
+
+            <!-- Row 1 -->
+            <Label text = "CBA" GridPane.rowIndex = "1" GridPane.columnIndex="0" style = "-fx-text-fill: white;"  />
+            <Label text = "&#36;112.5" GridPane.rowIndex = "1" GridPane.columnIndex="1" style = "-fx-text-fill: white;"  />
+            <Label text = "&#36;113.3" GridPane.rowIndex = "1" GridPane.columnIndex="2" style = "-fx-text-fill: white;"  />
+            <Label text = "&#36;110.7" GridPane.rowIndex = "1" GridPane.columnIndex="3" style = "-fx-text-fill: white;"  />
+            <Label text = "&#36;+0.45" GridPane.rowIndex = "1" GridPane.columnIndex="4" style = "-fx-text-fill: white;"  />
+
+
+        </GridPane>
+
     </VBox>
-</StackPane>
 
 </VBox>
 
