@@ -22,9 +22,12 @@ import java.util.Optional;
 
 @Component
 public class LoginController {
-    @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private Button loginButton;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Button loginButton;
 
     @Autowired
     private AuthService authService = new AuthService();
@@ -58,6 +61,8 @@ public class LoginController {
             showAlert("Database Error", "Could not verify credentials: " + e.getMessage());
             e.printStackTrace();
         }
+
+
     }
 
     private void showAlert(String title, String message) {
@@ -74,10 +79,8 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/hello-view.fxml"));
             Parent root = loader.load();
 
-
             MainController mainController = loader.getController();
             mainController.showDashboard();
-
 
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -88,5 +91,5 @@ public class LoginController {
             e.printStackTrace();
         }
     }
-
 }
+
