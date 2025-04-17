@@ -8,7 +8,7 @@ public class DatabaseConnection {
     private static Connection instance = null;
 
     private DatabaseConnection() throws SQLException {
-        String url = "jdbc:mysql:database.db";
+        String url = "jdbc:sqlite:database.db";
         try {
             instance = DriverManager.getConnection(url);
         } catch (SQLException sqlEx) {

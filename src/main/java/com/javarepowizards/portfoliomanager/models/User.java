@@ -1,68 +1,39 @@
-
 package com.javarepowizards.portfoliomanager.models;
 
 public class User {
     private int userId;
     private String username;
+    private String email;
+    private String passwordHash; // BCrypt includes salt in the hash
 
-    private String passwordHash;
-    private String salt;
+    // Remove salt field since BCrypt handles it internally
+    // Add other profile fields as needed
 
     public User() { }
 
-    // Constructors
-
-
-    public User(String username, String passwordHash, String salt) {
+    public User(String username, String email, String passwordHash) {
         this.username = username;
-
-        this.passwordHash = passwordHash;
-        this.salt = salt;
-
-    }
-
-    // Getters
-    public int getUserId() {
-        return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    // Setters
-    public void setId(int userId) {
-        this.userId = userId;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPasswordHash(String passwordHash) {
+        this.email = email;
         this.passwordHash = passwordHash;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
+    // Getters and setters (remove getSalt/setSalt)
+    public int getUserId() { return userId; }
+    public void setId(int userId) { this.userId = userId; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
-    // Optional: toString() for debugging
     @Override
     public String toString() {
         return "User{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
                 ", passwordHash='[PROTECTED]'" +
-                ", salt='[PROTECTED]'" +
                 '}';
     }
 }

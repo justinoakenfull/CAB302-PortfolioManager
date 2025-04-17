@@ -1,32 +1,23 @@
 package com.javarepowizards.portfoliomanager.services;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
-
-import com.javarepowizards.portfoliomanager.dao.UserDAO;
-import com.javarepowizards.portfoliomanager.models.User;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-
+@Service
 public class AuthService {
-    public User registerUser(String username, String password) throws Exception {
-        String salt = BCrypt.gensalt();
-        String hashedPassword = BCrypt.hashpw(password, salt);
+    private final BCryptPasswordEncoder passwordEncoder;
 
-        User newUser = new User(username, hashedPassword, salt);
-        UserDAO.createUser(newUser);
-        return newUser;
+    public AuthService() {
+        this.passwordEncoder = new BCryptPasswordEncoder();
+        // You can customize the strength (4-31, default is 10)
+        // this.passwordEncoder = new BCryptPasswordEncoder(12);
     }
 
-    public User loginUser(String username, String password) throws Exception {
-        User user = UserDAO.findUserByUsername(username);
-        if (user == null) {
-            throw new Exception("User not found");
-        }
+    public String hashPassword(String password) {
+        return passwordEncoder.encode(password);
+    }
 
-        String hashedPassword = BCrypt.hashpw(password, user.getSalt());
-        if (hashedPassword.equals(user.getPasswordHash())) {
-            return user;
-        } else {
-            throw new Exception("Invalid credentials");
-        }
+    public boolean verifyPassword(String password, String storedHash) {
+        return passwordEncoder.matches(password, storedHash);
     }
 }

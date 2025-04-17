@@ -12,7 +12,8 @@ module com.javarepowizards.portfoliomanager {
     requires java.sql;
     requires spring.security.crypto;
     requires spring.context;
-    requires mysql.connector.j;
+    requires java.desktop;
+    requires spring.beans;
 
     opens com.javarepowizards.portfoliomanager to javafx.fxml;
     exports com.javarepowizards.portfoliomanager;
