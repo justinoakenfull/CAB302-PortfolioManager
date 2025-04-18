@@ -103,8 +103,8 @@ public class LoginController {
 
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setWidth(800);  // or whatever width you want
-            stage.setHeight(600); // or your desired height
+            stage.setWidth(1920);  // or whatever width you want
+            stage.setHeight(1080); // or your desired height
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
