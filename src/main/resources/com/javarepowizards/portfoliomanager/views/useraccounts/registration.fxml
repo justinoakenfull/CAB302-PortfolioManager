@@ -30,6 +30,9 @@
             <!-- Register Button -->
             <Button text="Register" onAction="#handleRegister"
                     GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+            <Button text="Login" onAction="#switchToLogin"
+                    GridPane.rowIndex="5" GridPane.columnIndex="1"/>
         </GridPane>
     </center>
 </BorderPane>

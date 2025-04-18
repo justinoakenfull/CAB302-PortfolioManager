@@ -60,12 +60,18 @@ public class RegisterController {
     @FXML
     private void switchToLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            Scene loginScene = new Scene(root, 1920, 1080); // Set scene size
+
+            stage.setScene(loginScene);
             stage.setTitle("Login");
+
+
+            // Center the window on screen (optional)
+            stage.centerOnScreen();
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not load login page");
         }

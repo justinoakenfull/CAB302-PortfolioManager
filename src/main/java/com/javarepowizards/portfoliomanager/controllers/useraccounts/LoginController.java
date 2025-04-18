@@ -23,6 +23,8 @@ import java.util.Optional;
 @Component
 public class LoginController {
     @FXML
+    public Button registerButton;
+    @FXML
     private TextField emailField;
     @FXML
     private PasswordField passwordField;
@@ -71,6 +73,23 @@ public class LoginController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void switchToRegister() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/registration.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            Scene registrationScene = new Scene(root, 1920, 1080);
+
+            stage.setScene(registrationScene);
+            stage.setTitle("Register");
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            System.err.println(e);
+        }
     }
 
     private void loadDashboard() {

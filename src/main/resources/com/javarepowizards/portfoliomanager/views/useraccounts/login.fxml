@@ -13,6 +13,7 @@
             <TextField fx:id="emailField" promptText="Enter Email" prefWidth="200"/>
             <PasswordField fx:id="passwordField" promptText="Enter Password" prefWidth="200"/>
             <Button fx:id="loginButton" text="Login" onAction="#handleLogin" style="-fx-background-color: #656565; -fx-text-fill: white;"/>
+            <Button fx:id="registerButton" text="Register" onAction="#switchToRegister" style="-fx-background-color: #656565; -fx-text-fill: white;"/>
         </VBox>
     </center>
 
