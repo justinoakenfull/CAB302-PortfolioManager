@@ -1,10 +1,7 @@
 package com.javarepowizards.portfoliomanager;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import java.io.IOException;
 import javafx.scene.Parent;
