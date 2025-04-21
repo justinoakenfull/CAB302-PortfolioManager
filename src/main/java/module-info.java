@@ -26,6 +26,8 @@ module com.javarepowizards.portfoliomanager {
     // Open the controllers.simulation package for reflection by javafx.fxml
     opens com.javarepowizards.portfoliomanager.controllers.simulation to javafx.fxml;
 
+    opens com.javarepowizards.portfoliomanager.controllers.watchlist to javafx.fxml;
+
 
 
 }
