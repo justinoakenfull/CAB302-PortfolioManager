@@ -5,11 +5,12 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
       style="-fx-background-color: #B1B3BE;"
       alignment="CENTER"
       spacing="20"
-      prefWidth="600"
-      prefHeight="400">
+      prefWidth="1200"
+      prefHeight="800">
 
     <Label text="Dashboard Page" style="-fx-font-size: 24px;"/>
 </VBox>

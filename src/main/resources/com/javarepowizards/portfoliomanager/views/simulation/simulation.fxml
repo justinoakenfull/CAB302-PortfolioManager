@@ -1,15 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.javarepowizards.portfoliomanager.controllers.simulation.SimulationController"
+            prefWidth="1200.0" prefHeight="800.0"
+            style="-fx-background-color: #3A3632;">
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      style="-fx-background-color: #B1B3BE;"
-      alignment="CENTER"
-      spacing="20"
-      prefWidth="600"
-      prefHeight="400">
+    <!-- CENTER: VBox containing chart, simulation settings, and output box -->
+    <center>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <!-- LineChart with solid border -->
+            <LineChart fx:id="portfolioLineChart" prefWidth="900" prefHeight="500"
+                       style="-fx-background-color: #656565; -fx-border-color: #FFFFFF; -fx-border-width: 2px;">
+                <xAxis>
+                    <NumberAxis fx:id="xAxis" label="Simulation Day"
+                                style="-fx-tick-label-fill: #FFFFFF;"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis fx:id="yAxis" label="Portfolio Value ($)"
+                                style="-fx-tick-label-fill: #FFFFFF;"/>
+                </yAxis>
+            </LineChart>
 
-    <Label text="Simulation Page" style="-fx-font-size: 24px;"/>
-</VBox>
+            <!-- Simulation Settings: HBox with slider and Run Simulation button -->
+            <HBox spacing="15" alignment="CENTER"
+                  style="-fx-background-color: #656565; -fx-border-color: #FFFFFF; -fx-border-width: 2px; -fx-padding: 10;">
+                <Label text="Simulation Days:" style="-fx-text-fill: #FFFFFF;"/>
+                <Slider fx:id="sliderSimulationDays" min="1" max="365" value="30"
+                        showTickLabels="true" showTickMarks="true" majorTickUnit="30" minorTickCount="4" blockIncrement="1" prefWidth="600"/>
+                <Button fx:id="btnRunSimulation" text="Run Simulation"
+                        style="-fx-background-color: #656565; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-padding: 8 16;"/>
+            </HBox>
+
+            <!-- Output Box: HBox divided into two parts -->
+            <HBox spacing="10" style="-fx-background-color: #656565; -fx-border-color: #FFFFFF; -fx-border-width: 2px; -fx-padding: 10;" prefHeight="120">
+                <!-- Left side: Metrics VBox -->
+                <VBox spacing="5" alignment="TOP_LEFT" prefWidth="450">
+                    <Label text="Sharpe Ratio:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+                    <Label fx:id="labelSharpeRatio" style="-fx-text-fill: #FFFFFF;"/>
+                    <Label text="Volatility:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+                    <Label fx:id="labelVolatility" style="-fx-text-fill: #FFFFFF;"/>
+                    <Label text="Cumulative Return:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+                    <Label fx:id="labelCumulativeReturn" style="-fx-text-fill: #FFFFFF;"/>
+                </VBox>
+                <!-- Right side: Placeholder -->
+                <VBox alignment="CENTER" prefWidth="450">
+                    <Label text="Complete Simulation to receive results" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px;"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- RIGHT: Portfolio Overview Panel -->
+    <right>
+        <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: #656565; -fx-border-color: #FFFFFF; -fx-border-width: 2px;" prefWidth="300">
+            <Label text="Holdings:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+            <ListView fx:id="listHoldings" prefHeight="200"
+                      style="-fx-background-color: #656565; -fx-control-inner-background: #656565; -fx-text-fill: #FFFFFF;"/>
+            <Label text="Balance:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+            <Label fx:id="labelBalance" style="-fx-text-fill: #FFFFFF;"/>
+            <Label text="Portfolio:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+            <Label fx:id="labelPortfolioValue" style="-fx-text-fill: #FFFFFF;"/>
+        </VBox>
+    </right>
+
+</BorderPane>

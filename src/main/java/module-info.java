@@ -9,11 +9,6 @@ module com.javarepowizards.portfoliomanager {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
-    requires java.sql;
-    requires spring.security.crypto;
-    requires spring.context;
-    requires java.desktop;
-    requires spring.beans;
 
     opens com.javarepowizards.portfoliomanager to javafx.fxml;
     exports com.javarepowizards.portfoliomanager;
