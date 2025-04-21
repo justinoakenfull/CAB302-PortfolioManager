@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Component
 public class LoginController {
@@ -30,6 +31,9 @@ public class LoginController {
     private PasswordField passwordField;
     @FXML
     private Button loginButton;
+
+    @FXML
+    private Button dummyLogin;
 
     @Autowired
     private AuthService authService = new AuthService();
@@ -47,14 +51,14 @@ public class LoginController {
 
         try {
             UserDAO userDAO = new UserDAO();
-            Optional<User> userOpt = userDAO.getUserByEmail(email);
-
+            Optional<User> userOpt = (IsEmail(emailField.getText())) ?
+                    userDAO.getUserByEmail(email) : userDAO.getUserByUsername(email);
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
                 if (authService.verifyPassword(password, user.getPasswordHash())) {
                     loadDashboard();
                 } else {
-                    showAlert("Login Failed", "Invalid email or password");
+                    showAlert("Login Failed", "Invalid username/email or password");
                 }
             } else {
                 showAlert("Login Failed", "User not found");
@@ -92,6 +96,7 @@ public class LoginController {
         }
     }
 
+    @FXML
     private void loadDashboard() {
         try {
 
@@ -109,6 +114,11 @@ public class LoginController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean IsEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        return Pattern.compile(emailRegex).matcher(emailField.getText()).matches();
     }
 }
 

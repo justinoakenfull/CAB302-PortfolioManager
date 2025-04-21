@@ -138,4 +138,33 @@ public class UserDAO {
         }
         return Optional.empty();
     }
+
+    public Optional<User> getUserByUsername(String username) throws SQLException {
+        String sql = """
+            SELECT ua.user_id, ua.username, ua.email, ua.password_hash,
+                   up.first_name, up.last_name, up.phone,
+                   ub.balance, ub.currency
+            FROM user_auth ua
+            LEFT JOIN users up ON ua.user_id = up.user_id
+            LEFT JOIN user_balances ub ON ua.user_id = ub.user_id
+            WHERE ua.username = ?
+            """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                User user = new User(
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password_hash")
+                );
+                user.setId(rs.getInt("user_id"));
+                // Set additional profile and balance info if needed
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
 }
