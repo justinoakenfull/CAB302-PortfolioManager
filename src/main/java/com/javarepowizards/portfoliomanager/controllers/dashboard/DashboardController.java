@@ -6,4 +6,11 @@ public class DashboardController {
 
     @FXML
     private Label watchListLabel;
+
+    @FXML
+    public void initialize() {
+        System.out.println("▶ DashboardController.initialize() called");
+    }
 }
+
+
