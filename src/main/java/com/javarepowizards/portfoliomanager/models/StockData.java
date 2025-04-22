@@ -11,6 +11,8 @@ public class StockData {
     // This field is declared final since the date associated with this record is immutable once created.
     private final LocalDate date;
 
+    private StockName stockName; //CHECK!!!!
+
     // The current price of the stock. #TODO Decide which open/close to use for price.
     private Double price;
 
@@ -38,9 +40,11 @@ public class StockData {
      * Constructs a new StockData instance associated with the given date.
      * @param date the LocalDate representing the day this data corresponds to.
      */
-    public StockData(LocalDate date) {
-        this.date = date;  // Assign the provided date to the immutable 'date' field.
+    public StockData(LocalDate date, StockName stockName) {
+        this.date = date;
+        this.stockName = stockName;
     }
+
 
     /**
      * Returns the date for which this stock data applies.
@@ -49,6 +53,9 @@ public class StockData {
     public LocalDate getDate() {
         return date;
     }
+
+    public StockName getStockName() {return stockName;}
+    public void setStockName (StockName s) {this.stockName = s;}
 
     /**
      * Returns the stock's general price (can be used as a current or closing price).
