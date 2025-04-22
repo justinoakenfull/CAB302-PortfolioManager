@@ -1,18 +1,16 @@
 package com.javarepowizards.portfoliomanager.controllers.dashboard;
 
-import javafx.fxml.Initializable;
-import java.net.URL;
-import java.util.ResourceBundle;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+public class DashboardController {
 
+    @FXML
+    private Label watchListLabel;
 
-public class DashboardController implements Initializable {
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-       System.out.println("DashboardController initialized");
-
-        // Run simulation after dashboard loads
-        //SimulationTestRunner testRunner = new SimulationTestRunner();
-        //testRunner.runTestSimulation();
+    @FXML
+    public void initialize() {
+        System.out.println("▶ DashboardController.initialize() called");
     }
 }
+
+
