@@ -4,6 +4,7 @@ import com.javarepowizards.portfoliomanager.MainController;
 import com.javarepowizards.portfoliomanager.dao.UserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
 import com.javarepowizards.portfoliomanager.services.AuthService;
+import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -56,6 +57,7 @@ public class LoginController {
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
                 if (authService.verifyPassword(password, user.getPasswordHash())) {
+                    Session.setCurrentUser(user);
                     loadDashboard();
                 } else {
                     showAlert("Login Failed", "Invalid username/email or password");

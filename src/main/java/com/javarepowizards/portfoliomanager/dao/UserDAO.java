@@ -32,6 +32,7 @@ public class UserDAO {
                 phone VARCHAR(20),
                 first_name VARCHAR(255),
                 last_name VARCHAR(255),
+                simulation_difficulty TEXT CHECK (Simulation_Difficulty IN ('Easy', 'Medium', 'Hard')) DEFAULT 'Easy',
                 FOREIGN KEY (user_id) REFERENCES user_auth(user_id) ON DELETE CASCADE
             )
             """,
@@ -166,5 +167,14 @@ public class UserDAO {
             }
         }
         return Optional.empty();
+    }
+
+    public void updateSimulationDifficulty(int userId, String difficulty) throws SQLException {
+        String sql = "UPDATE users SET Simulation_Difficulty = ? WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, difficulty);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        }
     }
 }
