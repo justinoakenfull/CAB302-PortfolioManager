@@ -2,18 +2,49 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.LoginController">
+<BorderPane stylesheets="@login.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.LoginController">
+   <center>
+        <GridPane alignment="CENTER" hgap="10" vgap="10" BorderPane.alignment="CENTER">
+            <TextField fx:id="emailField" prefHeight="25.0" prefWidth="180.0" promptText="Enter Username/Email" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <font>
+               <Font name="Arial" size="12.0" />
+            </font></TextField>
+            <PasswordField fx:id="passwordField" prefHeight="25.0" prefWidth="180.0" promptText="Enter Password" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <font>
+               <Font name="Arial" size="12.0" />
+            </font></PasswordField>
 
-    <center>
-        <VBox alignment="CENTER" spacing="20" style="-fx-background-color: #B1B3BE; -fx-padding: 20;">
-            <TextField fx:id="emailField" promptText="Enter Email" prefWidth="200"/>
-            <PasswordField fx:id="passwordField" promptText="Enter Password" prefWidth="200"/>
-            <Button fx:id="loginButton" text="Login" onAction="#handleLogin" style="-fx-background-color: #656565; -fx-text-fill: white;"/>
-        </VBox>
-    </center>
+            <!-- Buttons -->
+            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                </rowConstraints>
+                <!--SKIP BUTTON CHANGE THIS LATER-->
+            <Button fx:id="dummyLogin" onAction="#loadDashboard" prefHeight="25.0" prefWidth="65.0" text="Skip" GridPane.halignment="CENTER" />
+                <!--SKIP BUTTON CHANGE THIS LATER-->
+                <Button fx:id="registerButton" onAction="#switchToRegister" prefHeight="25.0" prefWidth="65.0" text="Register" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+               <font>
+                  <Font name="Arial" size="12.0" />
+               </font></Button>
+            </GridPane>
+             <Button fx:id="loginButton" onAction="#handleLogin" prefHeight="25.0" prefWidth="60.0" text="Login" GridPane.columnIndex="2" GridPane.rowIndex="1" />
 
+            <columnConstraints>
+                <ColumnConstraints />
+                <ColumnConstraints />
+            <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
+        </GridPane>
+   </center>
 </BorderPane>

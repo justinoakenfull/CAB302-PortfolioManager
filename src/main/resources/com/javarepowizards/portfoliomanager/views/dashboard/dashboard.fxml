@@ -3,6 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
+
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
@@ -30,7 +31,6 @@
 
         <Label text = "Watchlist"
                style ="fx-font-size: 24px; -fx-text-fill: black;"/>
-
 </VBox>
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex = "0"
