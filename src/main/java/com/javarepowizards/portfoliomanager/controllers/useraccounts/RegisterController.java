@@ -61,21 +61,21 @@ public class RegisterController {
     private void switchToLogin() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
-            Parent root = loader.load();
+            Parent newRoot = loader.load();
 
-            Stage stage = (Stage) usernameField.getScene().getWindow();
-            Scene loginScene = new Scene(root, 1920, 1080); // Set scene size
+            // Get current scene from a known node (usernameField)
+            Scene currentScene = usernameField.getScene();
+            currentScene.setRoot(newRoot);
 
-            stage.setScene(loginScene);
+            // Optional: update window title
+            Stage stage = (Stage) currentScene.getWindow();
             stage.setTitle("Login");
-
-
-            // Center the window on screen (optional)
             stage.centerOnScreen();
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not load login page");
         }
     }
+
 
     private boolean validateInputs() {
         // Check empty fields

@@ -83,12 +83,14 @@ public class LoginController {
     private void switchToRegister() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/registration.fxml"));
-            Parent root = loader.load();
+            Parent newRoot = loader.load();
 
-            Stage stage = (Stage) emailField.getScene().getWindow();
-            Scene registrationScene = new Scene(root, 1920, 1080);
+            // Get current scene from a known node (emailField)
+            Scene currentScene = emailField.getScene();
+            currentScene.setRoot(newRoot);
 
-            stage.setScene(registrationScene);
+            // Optional: update title, but window (Stage) remains the same
+            Stage stage = (Stage) currentScene.getWindow();
             stage.setTitle("Register");
             stage.centerOnScreen();
         } catch (IOException e) {
@@ -99,22 +101,29 @@ public class LoginController {
     @FXML
     private void loadDashboard() {
         try {
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/hello-view.fxml"));
-            Parent root = loader.load();
+            Parent newRoot = loader.load();
 
+            // Get and use current scene
+            Scene currentScene = loginButton.getScene();
+            currentScene.setRoot(newRoot);
+
+            // Access controller and invoke showDashboard
             MainController mainController = loader.getController();
             mainController.showDashboard();
 
-            Stage stage = (Stage) loginButton.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setWidth(1920);  // or whatever width you want
-            stage.setHeight(1080); // or your desired height
-            stage.show();
+            // Update stage properties if needed
+            Stage stage = (Stage) currentScene.getWindow();
+            stage.setTitle("Dashboard");
+            stage.setWidth(1920);
+            stage.setHeight(1080);
+            stage.centerOnScreen(); // Optional
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     private boolean IsEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
