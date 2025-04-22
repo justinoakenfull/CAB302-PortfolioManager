@@ -93,7 +93,7 @@ public class MainController {
 
     @FXML
     private void showSettings() {
-        loadPage("settings.fxml"); // need to be implemented
+        loadPage("userAccountsProfile.fxml");
     }
 
     private void loadPage(String page) {
