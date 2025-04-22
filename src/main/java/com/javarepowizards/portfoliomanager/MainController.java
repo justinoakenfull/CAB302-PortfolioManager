@@ -93,38 +93,47 @@ public class MainController {
 
     }
 
+    /* MUST BE LOGGED IN TO UPDATE SIMULATION DIFFICULTY*/
     @FXML
     private void showSettings() {
+        // Set the default selected difficulty (first enum value, "Easy" by default)
         SimulationDifficulty defaultDifficulty = SimulationDifficulty.values()[0];
+
+        // Create a choice dialog with all difficulty levels as options
         ChoiceDialog<SimulationDifficulty> dlg = new ChoiceDialog<>(defaultDifficulty,
                 List.of(SimulationDifficulty.values()));
+
+        // Set dialog window title and content
         dlg.setTitle("User Settings");
         dlg.setHeaderText("Select your desired Simulation Difficulty.");
         dlg.setContentText("Difficulty:");
 
+        // Load and apply external CSS styling to the dialog
         DialogPane pane = dlg.getDialogPane();
         String css = getClass()
                 .getResource(
                         "/com/javarepowizards/portfoliomanager/views/useraccounts/settings.css"
                 )
                 .toExternalForm();
-
         pane.getStylesheets().add(css);
         pane.getStyleClass().add("dialog-pane");
 
+        // Show the dialog and wait for user input
         dlg.showAndWait().ifPresent(diff -> {
-                try {
-                    UserDAO userDAO = new UserDAO();
-                    int userId = Session.getCurrentUser().getUserId();
-                    userDAO.updateSimulationDifficulty(userId, diff.name());
+            try {
+                // Create a DAO instance to interact with the database
+                UserDAO userDAO = new UserDAO();
 
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+                // Retrieve the current logged-in user's ID from the session
+                int userId = Session.getCurrentUser().getUserId();
+
+                // Update the user's selected simulation difficulty in the database
+                userDAO.updateSimulationDifficulty(userId, diff.name());
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         });
-
-
-
     }
 
     private void loadPage(String page) {
