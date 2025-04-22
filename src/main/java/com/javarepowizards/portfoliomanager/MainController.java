@@ -1,15 +1,17 @@
 package com.javarepowizards.portfoliomanager;
 
-import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
-import com.javarepowizards.portfoliomanager.models.StockData;
-import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.dao.UserDAO;
+import com.javarepowizards.portfoliomanager.models.SimulationDifficulty;
 
+import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.layout.StackPane;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.Parent;
@@ -93,7 +95,36 @@ public class MainController {
 
     @FXML
     private void showSettings() {
-        loadPage("userAccountsProfile.fxml");
+        SimulationDifficulty defaultDifficulty = SimulationDifficulty.values()[0];
+        ChoiceDialog<SimulationDifficulty> dlg = new ChoiceDialog<>(defaultDifficulty,
+                List.of(SimulationDifficulty.values()));
+        dlg.setTitle("User Settings");
+        dlg.setHeaderText("Select your desired Simulation Difficulty.");
+        dlg.setContentText("Difficulty:");
+
+        DialogPane pane = dlg.getDialogPane();
+        String css = getClass()
+                .getResource(
+                        "/com/javarepowizards/portfoliomanager/views/useraccounts/settings.css"
+                )
+                .toExternalForm();
+
+        pane.getStylesheets().add(css);
+        pane.getStyleClass().add("dialog-pane");
+
+        dlg.showAndWait().ifPresent(diff -> {
+                try {
+                    UserDAO userDAO = new UserDAO();
+                    int userId = Session.getCurrentUser().getUserId();
+                    userDAO.updateSimulationDifficulty(userId, diff.name());
+
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+        });
+
+
+
     }
 
     private void loadPage(String page) {
