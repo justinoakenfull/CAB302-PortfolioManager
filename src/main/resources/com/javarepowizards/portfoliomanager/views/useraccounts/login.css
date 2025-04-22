@@ -1,0 +1,53 @@
+.root {
+    -fx-background-color: #121212;
+}
+
+.label {
+    -fx-text-fill: white;
+}
+
+.text-field, .password-field {
+    -fx-background-color: #2A2A2A;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #AAAAAA;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0), 0, 0, 0, 0);
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-background-radius: 3px;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-effect: dropshadow(gaussian, #0d89d1, 10, 0.5, 0, 0);
+}
+
+.button {
+    -fx-background-color: #2A2A2A;
+    -fx-text-fill: white;
+    -fx-background-radius: 3px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0), 0, 0, 0, 0);
+}
+
+.button:hover {
+    -fx-background-color: #3A3A3A;
+    -fx-effect: dropshadow(gaussian, #0d89d1, 10, 0.5, 0, 0);
+}
+
+.button:pressed {
+    -fx-background-color: #1A1A1A;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0), 0, 0, 0, 0);
+}
+
+/* Special style for the dummyLogin button */
+#dummyLogin {
+    -fx-effect: dropshadow(gaussian, #0d89d1, 10, 0.5, 0, 0);
+    -fx-underline: true;
+}
+
+#dummyLogin:hover {
+    -fx-background-color: #3A3A3A;
+    -fx-effect: dropshadow(gaussian, #0d89d1, 15, 0.7, 0, 0);
+}
+
+#dummyLogin:pressed {
+    -fx-background-color: ⁠1A1A1A;
+    -fx-effect: dropshadow(gaussian, #0d89d1, 10, 0.5, 0, 0);
+}

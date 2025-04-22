@@ -12,6 +12,7 @@ import com.javarepowizards.portfoliomanager.services.StockStatistics;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -25,9 +26,11 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 800, 600);
+        Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         stage.setTitle("Login");
         stage.setScene(scene);
+        stage.setMinWidth(1200);
+        stage.setMinHeight(800);
         stage.show();
 
         // Attempt to retrieve the CSV file as a resource using an absolute path.
@@ -121,7 +124,7 @@ public class MainApplication extends Application {
         System.out.println("Initial Portfolio Value: $" + portfolio.getTotalPortfolioValue());
 
         // Simulation settings.
-        int simulationDays = 30;
+        int simulationDays = 100;
         double kMultiplier = 2.0;
         double maxDailyMovement = 0.05;
         double smoothingFactor = 0.3;
