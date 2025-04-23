@@ -31,6 +31,16 @@
         <Label text = "Watchlist"
                style ="fx-font-size: 24px; -fx-text-fill: black;"/>
 
+        <TableView fx:id ="watchlistTable" VBox.vgrow = "ALWAYS">
+            <columns>
+                <TableColumn fx:id="stockColumn"  text="Stock"  prefWidth="100"/>
+                <TableColumn fx:id="openColumn"   text="Open"   prefWidth="75"/>
+                <TableColumn fx:id="closeColumn"  text="Close"  prefWidth="75"/>
+                <TableColumn fx:id="highColumn"   text="High"   prefWidth="75"/>
+                <TableColumn fx:id="lowColumn"    text="Low"    prefWidth="75"/>
+                <TableColumn fx:id="changeColumn" text="Change" prefWidth="100"/>
+            </columns>
+        </TableView>
 </VBox>
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex = "0"
