@@ -111,7 +111,7 @@ public class StockDAO {
                         continue;
                     }
                     // Retrieve (or create) a StockData object for this stock for the current date.
-                    StockData sd = rowStockData.computeIfAbsent(stockName, k -> new StockData(date));
+                    StockData sd = rowStockData.computeIfAbsent(stockName, k -> new StockData(date, stockName));
                     try {
                         // Depending on the field name, parse the value as Double or Long and set it in the StockData object.
                         switch (field) {

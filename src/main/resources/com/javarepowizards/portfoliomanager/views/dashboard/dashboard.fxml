@@ -4,34 +4,24 @@
 <?import javafx.scene.control.*?>
 
 
+
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
 
           hgap="20" vgap="20"
           style = "-fx-padding: 20;">
-
-            <columnConstraints>
-                <ColumnConstraints percentWidth="60"/>
-                <ColumnConstraints percentWidth = "40"/>
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints percentHeight="60"/>
-                <RowConstraints percentHeight = "40"/>
-            </rowConstraints>
-
-    <VBox GridPane.columnIndex="0" GridPane.rowIndex = "0" GridPane.rowSpan = "2"
-          style ="-fx-background-color: white;
-                  -fx-border-color: #333;
-                  -fx-border-width: 2;
-                  -fx-border-radius: 10;
-                  -fx-background-radius: 1-;
-                  -fx-padding: 15;"
+<VBox
+          fx:id="watchlistBox"
+          GridPane.columnIndex = "0"
+          GridPane.rowIndex="0"
+          GridPane.rowSpan="2"
           spacing = "10">
-
         <Label text = "Watchlist"
                style ="fx-font-size: 24px; -fx-text-fill: black;"/>
+    <fx:include source="../stocklisttable/StockListTable.fxml"/>
 </VBox>
+
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex = "0"
           style ="-fx-background-color: white;

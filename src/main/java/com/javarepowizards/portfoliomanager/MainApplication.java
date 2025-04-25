@@ -143,9 +143,6 @@ public class MainApplication extends Application {
             System.out.println("Day " + day + ": " + portfolioSimValues.get(day));
         }
 
-
-
-
     }
 
     public static void main(String[] args) {

@@ -14,6 +14,8 @@ public class StockData {
     // The current price of the stock. #TODO Decide which open/close to use for price.
     private Double price;
 
+    private StockName stockName;
+
     // The opening price of the stock on the recorded day.
     private Double open;
 
@@ -34,12 +36,19 @@ public class StockData {
     // This field is optional and may be null if not provided in the data source.
     private Double adjClose;
 
+
+
     /**
      * Constructs a new StockData instance associated with the given date.
      * @param date the LocalDate representing the day this data corresponds to.
      */
-    public StockData(LocalDate date) {
+    public StockData(LocalDate date, StockName stockName) {
         this.date = date;  // Assign the provided date to the immutable 'date' field.
+        this.stockName = stockName;
+    }
+
+    public StockData(LocalDate date){
+        this(date,null);
     }
 
     /**
@@ -48,6 +57,14 @@ public class StockData {
      */
     public LocalDate getDate() {
         return date;
+    }
+
+    public StockName getStockName(){
+        return stockName;
+    }
+
+    public void setStockName(StockName stockName){
+        this.stockName = stockName;
     }
 
     /**

@@ -25,6 +25,10 @@ module com.javarepowizards.portfoliomanager {
 
     exports com.javarepowizards.portfoliomanager.controllers.dashboard;
 
+    opens com.javarepowizards.portfoliomanager.controllers.stocks;
+
+    exports com.javarepowizards.portfoliomanager.controllers.stocks;
+
     // Open the controllers.simulation package for reflection by javafx.fxml
     opens com.javarepowizards.portfoliomanager.controllers.simulation to javafx.fxml;
 

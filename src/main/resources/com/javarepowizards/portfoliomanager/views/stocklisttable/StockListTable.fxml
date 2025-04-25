@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.javarepowizards.portfoliomanager.controllers.stocks.StockListTableController"
+          prefWidth="600" prefHeight="400">
+
+    <children>
+        <TableView fx:id="tableView" layoutX = "10" layoutY="10"
+                   prefWidth = "580" prefHeight = "380">
+            <columns>
+                <TableColumn fx:id="symbolCol"         text="Stock"/>
+                <TableColumn fx:id="openCol"           text="Open"  style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="closeCol"          text="Close" style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="changeCol"         text="Change" style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="changePercentCol"  text="Change %" style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="priceCol"          text="Price" style="-fx-alignment:CENTER;"/>
+            </columns>
+        </TableView>
+    </children>
+</GridPane>
+
+
+
+
