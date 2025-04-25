@@ -59,7 +59,7 @@ public class MainController {
     @FXML
     private void showSimulation() {
 
-        StockDAO stockDAO = new StockDAO();
+        StockDAO stockDAO = StockDAO.getInstance();
 
         // Define the date for which you want to simulate.
         LocalDate date = LocalDate.of(2023, 12, 29);

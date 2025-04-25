@@ -2,6 +2,11 @@ package com.javarepowizards.portfoliomanager;
 
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
+import com.javarepowizards.portfoliomanager.domain.stock.IStock;
+import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
+import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
+import com.javarepowizards.portfoliomanager.infrastructure.OpenCsvAsxLoader;
+import com.javarepowizards.portfoliomanager.infrastructure.PriceHistoryLoader;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockData;
 import com.javarepowizards.portfoliomanager.models.StockName;
@@ -10,6 +15,7 @@ import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimul
 import com.javarepowizards.portfoliomanager.services.StockDataFilter;
 import com.javarepowizards.portfoliomanager.services.StockStatistics;
 
+import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,14 +23,18 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainApplication extends Application {
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws IOException, URISyntaxException, CsvValidationException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         stage.setTitle("Login");
@@ -49,7 +59,7 @@ public class MainApplication extends Application {
 
         // Instantiate the StockDAO, which is responsible for reading and parsing the CSV file
         // into a collection of StockData objects mapped by StockName.
-        StockDAO stockDAO = new StockDAO();
+        StockDAO stockDAO = StockDAO.getInstance();
 
         // Attempt to load the CSV data using the loadCSV method of the DAO.
         // If an I/O error occurs during file reading, catch the exception, print the error,
@@ -143,12 +153,29 @@ public class MainApplication extends Application {
             System.out.println("Day " + day + ": " + portfolioSimValues.get(day));
         }
 
+        //-----------------------------------------------------------------------------------------//
+
+        // 1) Locate the CSV on the classpath
+        URL csvUrl = MainApplication.class.getResource(
+                "/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv"
+        );
+        if (csvUrl == null) {
+            throw new IllegalStateException("CSV not found");
+        }
+
+        // 2) URL -> URI -> Path
+        Path csvPath = Paths.get(csvUrl.toURI());
+
+        // 3) Construct the repository directly with the Path
 
 
+        StockRepository repo = new InMemoryStockRepository(csvPath);
+        AppContext.initStockRepository(repo);
 
     }
 
     public static void main(String[] args) {
+
         launch();
     }
 }
