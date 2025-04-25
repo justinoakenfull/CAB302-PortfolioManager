@@ -13,6 +13,7 @@ module com.javarepowizards.portfoliomanager {
     requires spring.context;
     requires java.sql;
     requires spring.security.crypto;
+    requires com.opencsv;
 
     opens com.javarepowizards.portfoliomanager to javafx.fxml;
     exports com.javarepowizards.portfoliomanager;
