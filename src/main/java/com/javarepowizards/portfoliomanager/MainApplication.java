@@ -2,6 +2,7 @@ package com.javarepowizards.portfoliomanager;
 
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
+import com.javarepowizards.portfoliomanager.dao.WatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
@@ -10,6 +11,7 @@ import com.javarepowizards.portfoliomanager.infrastructure.PriceHistoryLoader;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockData;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.models.Watchlist;
 import com.javarepowizards.portfoliomanager.operations.simulation.MarketSimulator;
 import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
 import com.javarepowizards.portfoliomanager.services.StockDataFilter;
@@ -27,6 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +37,7 @@ import java.util.Map;
 
 public class MainApplication extends Application {
     @Override
-    public void start(Stage stage) throws IOException, URISyntaxException, CsvValidationException {
+    public void start(Stage stage) throws IOException, URISyntaxException, CsvValidationException, SQLException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         stage.setTitle("Login");
@@ -171,11 +174,19 @@ public class MainApplication extends Application {
 
         StockRepository repo = new InMemoryStockRepository(csvPath);
         AppContext.initStockRepository(repo);
-
+        RegisterWatchlist();
     }
 
     public static void main(String[] args) {
 
         launch();
+    }
+
+    private static void RegisterWatchlist() throws SQLException {
+        WatchlistDAO watchlistDAO = new WatchlistDAO();
+        Watchlist watchlistModel = new Watchlist(AppContext.getStockRepository(), watchlistDAO, 1);
+        watchlistModel.refresh();
+        AppContext.registerService(Watchlist.class, watchlistModel);
+        AppContext.registerService(WatchlistDAO.class, watchlistDAO);
     }
 }

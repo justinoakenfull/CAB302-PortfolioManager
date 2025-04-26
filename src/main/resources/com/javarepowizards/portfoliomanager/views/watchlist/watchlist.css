@@ -32,8 +32,9 @@
     -fx-border-color: #3a3f44;
     -fx-border-width: 1px;
     -fx-background-insets: 0 0 0 0;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0, 0, 2);
-    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0.1, 0, 2);
+    -fx-padding: 0px;
+    -fx-font-size: 16px;
 }
 
 /* Header row: darker background, light text */
@@ -42,13 +43,14 @@
 }
 .watchlist-table .column-header,
 .watchlist-table .column-header .label {
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: #e0e0e0;
 }
 
 /* Zebra striping: two shades of dark grey */
 .watchlist-table .table-row-cell:odd {
-    -fx-background-color: #23272a;
+    -fx-background-color: #0093ff;
 }
 .watchlist-table .table-row-cell:even {
     -fx-background-color: #2b2f33;
@@ -56,13 +58,17 @@
 
 /* Selection highlight: a subtle lighter grey */
 .watchlist-table .table-row-cell:selected {
-    -fx-background-color: #3a3f44;
+    -fx-background-color: #4e565a;
 }
 
 /* Center‑align and ensure cell text is light */
 .watchlist-table .table-cell {
-    -fx-alignment: CENTER_RIGHT;
+    -fx-alignment: CENTER;
     -fx-text-fill: #e0e0e0;
+}
+
+.watchlist-table .button {
+    -fx-font-size: 16px;
 }
 
 .company-snapshot-title {
@@ -70,7 +76,7 @@
     -fx-font-weight: normal;
 }
 .company-snapshot-text {
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-fill: white;
 }
 
