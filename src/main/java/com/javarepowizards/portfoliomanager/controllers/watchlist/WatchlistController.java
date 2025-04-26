@@ -6,11 +6,15 @@ import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
+import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
+import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -23,17 +27,10 @@ import java.util.*;
 
 public class WatchlistController implements Initializable {
 
+    public DropShadow dropShadow;
+    @FXML private VBox      tableContainer;
     @FXML private TableView<WatchlistRow> tableView;
-    @FXML private TableColumn<WatchlistRow, String> shortStockColumn;
-    @FXML private TableColumn<WatchlistRow, String> stockColumn;
-    @FXML private TableColumn<WatchlistRow, Double> openColumn;
-    @FXML private TableColumn<WatchlistRow, Double> closeColumn;
-    @FXML private TableColumn<WatchlistRow, Double> changeColumn;
-    @FXML private TableColumn<WatchlistRow, Double> changePercentColumn;
-    @FXML private TableColumn<WatchlistRow, Double> priceColumn;
-    @FXML private TableColumn<WatchlistRow, Long>   volumeColumn;
-    @FXML private TableColumn<WatchlistRow, Button> removeColumn;
-    @FXML private Button addStockButton;
+    @FXML private Button    addStockButton;
 
     private WatchlistDAO watchlistDAO;
     private StockRepository repo;
@@ -41,119 +38,97 @@ public class WatchlistController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialize DAOs and repository
-        try {
-            watchlistDAO = new WatchlistDAO();
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to init WatchlistDAO", e);
-        }
+
+        watchlistDAO = AppContext.getService(WatchlistDAO.class);
+
         repo = AppContext.getService(StockRepository.class);
 
-        // 1) Wire up cell value factories
-        shortStockColumn.setCellValueFactory(c -> c.getValue().shortNameProperty());
-        stockColumn.setCellValueFactory(c -> c.getValue().displayNameProperty());
-        openColumn.setCellValueFactory(c -> c.getValue().openProperty().asObject());
-        closeColumn.setCellValueFactory(c -> c.getValue().closeProperty().asObject());
-        changeColumn.setCellValueFactory(c -> c.getValue().changeProperty().asObject());
-        changePercentColumn.setCellValueFactory(c -> c.getValue().changePercentProperty().asObject());
-        priceColumn.setCellValueFactory(c -> c.getValue().priceProperty().asObject());
-        volumeColumn.setCellValueFactory(c -> c.getValue().volumeProperty().asObject());
-        removeColumn.setCellValueFactory(c -> c.getValue().removeProperty());
-
-        HBox.setHgrow(tableView, Priority.ALWAYS);
-        VBox.setVgrow(tableView, Priority.ALWAYS);
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        // 2) Custom cell formatting
-        configureCellFactories();
-
-        // 3) Load initial rows
-        refreshTable();
-    }
-
-    private void configureCellFactories() {
-        // change: red/green
-        changeColumn.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(Double v, boolean empty) {
-                super.updateItem(v, empty);
-                if (empty || v == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(String.format("%.2f", v));
-                    setStyle(v >= 0
-                            ? "-fx-text-fill: green; -fx-alignment: CENTER;"
-                            : "-fx-text-fill: red;   -fx-alignment: CENTER;");
-                }
-            }
-        });
-
-        // change%: fmt + sign
-        changePercentColumn.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(Double v, boolean empty) {
-                super.updateItem(v, empty);
-                if (empty || v == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(String.format("%+2.2f%%", v));
-                    setStyle(v >= 0
-                            ? "-fx-text-fill: green; -fx-alignment: CENTER;"
-                            : "-fx-text-fill: red;   -fx-alignment: CENTER;");
-                }
-            }
-        });
-
-        // price: AUD currency
-        priceColumn.setCellFactory(col -> new TableCell<>() {
-            private final NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("en","AU"));
-            @Override protected void updateItem(Double v, boolean empty) {
-                super.updateItem(v, empty);
-                setText((empty || v == null) ? null : fmt.format(v));
-            }
-        });
-
-        // volume: thousands separator
-        volumeColumn.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(Long v, boolean empty) {
-                super.updateItem(v, empty);
-                setText((empty || v == null) ? null : String.format("%,d", v));
-            }
-        });
-
-        // remove button: handled in WatchlistRow constructor
-    }
-
-    private void refreshTable() {
         try {
-            List<StockName> symbols = watchlistDAO.listForUser(currentUserId);
-            ObservableList<WatchlistRow> rows = FXCollections.observableArrayList();
-
-            StockRepository repo = AppContext.getStockRepository();
-            Set<String> available = repo.availableTickers();
-
-            for (StockName sym : symbols) {
-                String ticker = sym.getSymbol();    // <-- use getSymbol(), not sym.name()
-                if (!available.contains(ticker)) {
-                    System.err.println("No CSV history for " + ticker + ", skipping");
-                    continue;
-                }
-                IStock stock = repo.getByTicker(ticker);
-                rows.add(new WatchlistRow(stock, () -> {
-                    try {
-                        watchlistDAO.removeForUser(currentUserId, sym);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    refreshTable();
-                }));
-            }
-            tableView.setItems(rows);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+            refreshTable();
+        } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void refreshTable() throws IOException, SQLException {
+
+        List<StockName> symbols = watchlistDAO.listForUser(currentUserId);
+        List<WatchlistRow> rows = new ArrayList<>();
+
+        Set<String> available = repo.availableTickers();
+
+        for (StockName sym : symbols) {
+            String ticker = sym.getSymbol();
+            if (!available.contains(ticker)) {
+                System.err.println("No CSV history for " + ticker + ", skipping");
+                continue;
+            }
+            IStock stock = repo.getByTicker(ticker);
+            rows.add(new WatchlistRow(stock, () -> {
+                try {
+                    watchlistDAO.removeForUser(currentUserId, sym);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    refreshTable();
+                } catch (IOException | SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
+        }
+        ObservableList<WatchlistRow> model = FXCollections.observableArrayList(rows);
+        // 2) describe columns
+        List<ColumnConfig<WatchlistRow,?>> cols = List.of(
+                new ColumnConfig<>("Ticker",
+                        WatchlistRow::shortNameProperty),
+                new ColumnConfig<>("Name",
+                        WatchlistRow::displayNameProperty),
+                new ColumnConfig<>("Open",
+                        r -> r.openProperty().asObject(),
+                        TableCellFactories.numericFactory(2,false)),
+                new ColumnConfig<>("Close",
+                        r -> r.closeProperty().asObject(),
+                        TableCellFactories.numericFactory(2,false)),
+                new ColumnConfig<>("Change",
+                        r -> r.changeProperty().asObject(),
+                        TableCellFactories.numericFactory(2,true)),
+                new ColumnConfig<>("Change %",
+                        r -> r.changePercentProperty().asObject(),
+                        TableCellFactories.numericFactory(2,true)),
+                new ColumnConfig<>("Price",
+                        r -> r.priceProperty().asObject(),
+                        TableCellFactories.currencyFactory(new Locale("en","AU"), 2)),
+                new ColumnConfig<>("Volume",
+                        r -> r.volumeProperty().asObject(),
+                        TableCellFactories.longFactory()),
+                new ColumnConfig<>("Remove",
+                        WatchlistRow::removeProperty)
+        );
+
+
+        TableView<WatchlistRow> table = TableViewFactory.create(cols);
+
+        // 1) copy over the style class from FXML
+        table.getStyleClass().add("watchlist-table");
+
+        // 2) re-apply the drop shadow (if you want it)
+        table.setEffect(tableView.getEffect());
+
+        // 3) preserve the layout constraints
+        HBox.setHgrow(table, Priority.ALWAYS);
+        VBox.setVgrow(table, Priority.ALWAYS);
+
+        // 4) swap it in
+        tableContainer.getChildren().setAll(table);
+        tableView = table;
+        table.setItems(model);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        table.getColumns().forEach(col ->
+                col.getStyleClass().add("column-header-background")
+        );
+
     }
 
 
@@ -169,7 +144,11 @@ public class WatchlistController implements Initializable {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-            refreshTable();
+            try {
+                refreshTable();
+            } catch (IOException | SQLException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 }
