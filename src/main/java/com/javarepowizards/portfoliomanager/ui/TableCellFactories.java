@@ -30,9 +30,9 @@ public final class TableCellFactories {
                 } else {
                     setText(String.format(fmt, v));
                     if (colourIfPositive) {
-                        setTextFill(v >= 0 ? Color.valueOf("green") : Color.valueOf("red"));
-                    } else {
-                        setTextFill(null);
+                        String colour = v>=0 ? "green" : "red";
+                        setStyle(String.format(
+                                "-fx-text-fill: %s;", colour));
                     }
                 }
             }
