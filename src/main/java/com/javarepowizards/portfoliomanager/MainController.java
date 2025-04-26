@@ -19,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class MainController {
     @FXML
@@ -26,6 +27,9 @@ public class MainController {
 
     @FXML
     private BorderPane rootLayout;
+
+    @Autowired
+    private UserDAO userDAO;
 
     private PortfolioDAO portfolioDAO;
     private StockDAO stockDAO;
@@ -111,9 +115,7 @@ public class MainController {
         // Load and apply external CSS styling to the dialog
         DialogPane pane = dlg.getDialogPane();
         String css = getClass()
-                .getResource(
-                        "/com/javarepowizards/portfoliomanager/views/useraccounts/settings.css"
-                )
+                .getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/settings.css")
                 .toExternalForm();
         pane.getStylesheets().add(css);
         pane.getStyleClass().add("dialog-pane");
@@ -121,13 +123,10 @@ public class MainController {
         // Show the dialog and wait for user input
         dlg.showAndWait().ifPresent(diff -> {
             try {
-                // Create a DAO instance to interact with the database
-                UserDAO userDAO = new UserDAO();
-
                 // Retrieve the current logged-in user's ID from the session
                 int userId = Session.getCurrentUser().getUserId();
 
-                // Update the user's selected simulation difficulty in the database
+                // Use the injected userDAO to update the user's selected simulation difficulty
                 userDAO.updateSimulationDifficulty(userId, diff.name());
 
             } catch (SQLException e) {
@@ -135,6 +134,7 @@ public class MainController {
             }
         });
     }
+
 
     private void loadPage(String page) {
         try {

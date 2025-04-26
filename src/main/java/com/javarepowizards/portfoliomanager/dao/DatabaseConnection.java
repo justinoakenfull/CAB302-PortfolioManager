@@ -1,29 +1,23 @@
 package com.javarepowizards.portfoliomanager.dao;
 
+import org.springframework.stereotype.Component;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DatabaseConnection {
-    private static Connection instance = null;
+@Component
+public class DatabaseConnection implements IDatabaseConnection {
 
-    private DatabaseConnection() throws SQLException {
+    private final Connection connection;
+
+    public DatabaseConnection() throws SQLException {
         String url = "jdbc:sqlite:database.db";
-        try {
-            instance = DriverManager.getConnection(url);
-        } catch (SQLException sqlEx) {
-            System.err.println(sqlEx);
-        }
+        this.connection = DriverManager.getConnection(url);
     }
 
-    public static Connection getInstance() {
-        if (instance == null) {
-            try {
-                new DatabaseConnection();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return instance;
+    @Override
+    public Connection getConnection() {
+        return connection;
     }
 }

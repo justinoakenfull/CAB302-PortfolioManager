@@ -101,7 +101,7 @@ public class MainApplication extends Application {
             System.out.println("------------------------------------------------");
         }
 
-        // #TODO Add Holdings to User Account Feild, so we can go user.Holdings.
+        // #TODO Add Holdings to User Account Field, so we can go user.Holdings.
         //Current holdings
         List<PortfolioEntry> holdings = new ArrayList<>();
         // New portfolio

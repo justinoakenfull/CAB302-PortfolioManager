@@ -1,21 +1,25 @@
 package com.javarepowizards.portfoliomanager.dao;
 
 import com.javarepowizards.portfoliomanager.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
 import java.sql.*;
 import java.util.Optional;
 
-
+@Repository
 public class UserDAO {
+
     private final Connection connection;
 
-    public UserDAO() throws SQLException {
-        this.connection = DatabaseConnection.getInstance();
+    @Autowired
+    public UserDAO(IDatabaseConnection dbConnection) throws SQLException {
+        this.connection = dbConnection.getConnection();
         createTables();
     }
 
-    public void createTables() throws SQLException {
+    private void createTables() throws SQLException {
         String[] sqlStatements = {
-                // User authentication table
                 """
             CREATE TABLE IF NOT EXISTS user_auth (
                 user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,20 +28,16 @@ public class UserDAO {
                 password_hash VARCHAR(255) NOT NULL
             )
             """,
-
-                // User profile table
                 """
             CREATE TABLE IF NOT EXISTS users (
                 user_id INTEGER PRIMARY KEY,
                 phone VARCHAR(20),
                 first_name VARCHAR(255),
                 last_name VARCHAR(255),
-                simulation_difficulty TEXT CHECK (Simulation_Difficulty IN ('Easy', 'Medium', 'Hard')) DEFAULT 'Easy',
+                simulation_difficulty TEXT CHECK (simulation_difficulty IN ('Easy', 'Medium', 'Hard')) DEFAULT 'Easy',
                 FOREIGN KEY (user_id) REFERENCES user_auth(user_id) ON DELETE CASCADE
             )
             """,
-
-                // User balances table
                 """
             CREATE TABLE IF NOT EXISTS user_balances (
                 user_id INTEGER PRIMARY KEY,
@@ -58,7 +58,6 @@ public class UserDAO {
     public boolean createUser(User user) throws SQLException {
         connection.setAutoCommit(false);
         try {
-            // Insert into user_auth
             String authSql = """
                 INSERT INTO user_auth (username, email, password_hash)
                 VALUES (?, ?, ?)
@@ -70,31 +69,21 @@ public class UserDAO {
                 authStmt.setString(3, user.getPasswordHash());
 
                 int affectedRows = authStmt.executeUpdate();
-                if (affectedRows == 0) {
-                    throw new SQLException("Creating user failed, no rows affected.");
-                }
+                if (affectedRows == 0) throw new SQLException("Creating user failed, no rows affected.");
 
                 try (ResultSet rs = authStmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         int userId = rs.getInt(1);
                         user.setId(userId);
 
-                        // Insert into users profile table
-                        String profileSql = """
-                            INSERT INTO users (user_id)
-                            VALUES (?)
-                            """;
-                        try (PreparedStatement profileStmt = connection.prepareStatement(profileSql)) {
+                        try (PreparedStatement profileStmt = connection.prepareStatement("""
+                            INSERT INTO users (user_id) VALUES (?)""")) {
                             profileStmt.setInt(1, userId);
                             profileStmt.executeUpdate();
                         }
 
-                        // Insert into user_balances table
-                        String balanceSql = """
-                            INSERT INTO user_balances (user_id)
-                            VALUES (?)
-                            """;
-                        try (PreparedStatement balanceStmt = connection.prepareStatement(balanceSql)) {
+                        try (PreparedStatement balanceStmt = connection.prepareStatement("""
+                            INSERT INTO user_balances (user_id) VALUES (?)""")) {
                             balanceStmt.setInt(1, userId);
                             balanceStmt.executeUpdate();
                         }
@@ -133,7 +122,6 @@ public class UserDAO {
                         rs.getString("password_hash")
                 );
                 user.setId(rs.getInt("user_id"));
-                // Set additional profile and balance info if needed
                 return Optional.of(user);
             }
         }
@@ -162,7 +150,6 @@ public class UserDAO {
                         rs.getString("password_hash")
                 );
                 user.setId(rs.getInt("user_id"));
-                // Set additional profile and balance info if needed
                 return Optional.of(user);
             }
         }
@@ -170,7 +157,7 @@ public class UserDAO {
     }
 
     public void updateSimulationDifficulty(int userId, String difficulty) throws SQLException {
-        String sql = "UPDATE users SET Simulation_Difficulty = ? WHERE user_id = ?";
+        String sql = "UPDATE users SET simulation_difficulty = ? WHERE user_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, difficulty);
             pstmt.setInt(2, userId);

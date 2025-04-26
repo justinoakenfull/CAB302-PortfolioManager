@@ -1,9 +1,9 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
 import com.javarepowizards.portfoliomanager.MainController;
-import com.javarepowizards.portfoliomanager.dao.UserDAO;
+import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
-import com.javarepowizards.portfoliomanager.services.AuthService;
+import com.javarepowizards.portfoliomanager.services.IAuthService;
 import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,24 +24,20 @@ import java.util.regex.Pattern;
 
 @Component
 public class LoginController {
-    @FXML
-    public Button registerButton;
-    @FXML
-    private TextField emailField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private Button loginButton;
 
-    @FXML
-    private Button dummyLogin;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private Button loginButton;
+    @FXML private Button registerButton;
 
     @Autowired
-    private AuthService authService = new AuthService();
+    private IAuthService authService;
+
+    @Autowired
+    private IUserDAO userDAO;
 
     @FXML
     private void handleLogin() {
-        // Get values from the fields
         String email = emailField.getText();
         String password = passwordField.getText();
 
@@ -51,26 +47,25 @@ public class LoginController {
         }
 
         try {
-            UserDAO userDAO = new UserDAO();
-            Optional<User> userOpt = (IsEmail(emailField.getText())) ?
-                    userDAO.getUserByEmail(email) : userDAO.getUserByUsername(email);
+            Optional<User> userOpt = isEmail(email) ?
+                    userDAO.getUserByEmail(email) :
+                    userDAO.getUserByUsername(email);
+
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
                 if (authService.verifyPassword(password, user.getPasswordHash())) {
                     Session.setCurrentUser(user);
                     loadDashboard();
                 } else {
-                    showAlert("Login Failed", "Invalid username/email or password");
+                    showAlert("Login Failed", "Invalid username/email or password.");
                 }
             } else {
-                showAlert("Login Failed", "User not found");
+                showAlert("Login Failed", "User not found.");
             }
         } catch (SQLException e) {
             showAlert("Database Error", "Could not verify credentials: " + e.getMessage());
             e.printStackTrace();
         }
-
-
     }
 
     private void showAlert(String title, String message) {
@@ -87,16 +82,14 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/registration.fxml"));
             Parent newRoot = loader.load();
 
-            // Get current scene from a known node (emailField)
             Scene currentScene = emailField.getScene();
             currentScene.setRoot(newRoot);
 
-            // Optional: update title, but window (Stage) remains the same
             Stage stage = (Stage) currentScene.getWindow();
             stage.setTitle("Register");
             stage.centerOnScreen();
         } catch (IOException e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -106,30 +99,24 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/hello-view.fxml"));
             Parent newRoot = loader.load();
 
-            // Get and use current scene
             Scene currentScene = loginButton.getScene();
             currentScene.setRoot(newRoot);
 
-            // Access controller and invoke showDashboard
             MainController mainController = loader.getController();
             mainController.showDashboard();
 
-            // Update stage properties if needed
             Stage stage = (Stage) currentScene.getWindow();
             stage.setTitle("Dashboard");
             stage.setWidth(1920);
             stage.setHeight(1080);
-            stage.centerOnScreen(); // Optional
-
+            stage.centerOnScreen();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
-    private boolean IsEmail(String email) {
+    private boolean isEmail(String input) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
-        return Pattern.compile(emailRegex).matcher(emailField.getText()).matches();
+        return Pattern.compile(emailRegex).matcher(input).matches();
     }
 }
-
