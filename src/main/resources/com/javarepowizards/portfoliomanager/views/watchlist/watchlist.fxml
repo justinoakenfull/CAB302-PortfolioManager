@@ -46,7 +46,6 @@
                         prefHeight="800"
                         VBox.vgrow="ALWAYS">
                       <children>
-                          <!-- Header bar omitted for brevity… -->
                           <Button fx:id="addStockButton"
                                   text="Add Stock"
                                   onAction="#onAddStock"
@@ -54,7 +53,6 @@
                                   alignment="BOTTOM_RIGHT"
                                   HBox.hgrow="ALWAYS"
                                   prefHeight="100"/>
-                          <!-- Just a placeholder TableView – no <columns> block! -->
                           <TableView fx:id="tableView"
                                      styleClass="watchlist-table"
                                      HBox.hgrow="ALWAYS"
