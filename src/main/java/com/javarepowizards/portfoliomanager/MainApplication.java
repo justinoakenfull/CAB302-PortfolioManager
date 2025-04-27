@@ -10,6 +10,7 @@ import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimul
 import com.javarepowizards.portfoliomanager.services.StockDataFilter;
 import com.javarepowizards.portfoliomanager.services.StockStatistics;
 
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
