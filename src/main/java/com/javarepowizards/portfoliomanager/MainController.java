@@ -2,6 +2,7 @@ package com.javarepowizards.portfoliomanager;
 
 import com.javarepowizards.portfoliomanager.dao.UserDAO;
 import com.javarepowizards.portfoliomanager.models.SimulationDifficulty;
+import com.javarepowizards.portfoliomanager.services.NavigationService;
 
 import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.fxml.FXML;
@@ -25,6 +26,8 @@ public class MainController {
     @FXML
     private StackPane contentArea;
 
+    private NavigationService nav;
+
     @FXML
     private BorderPane rootLayout;
 
@@ -34,28 +37,49 @@ public class MainController {
     private PortfolioDAO portfolioDAO;
     private StockDAO stockDAO;
 
+    @FXML
+    public void initialize() {
+        // Initialize the NavigationService with the content area
+        nav = new NavigationService(contentArea);
+        // Load the initial page (e.g., dashboard)
+        showDashboard();
+    }
 
     @FXML
     public void showDashboard() {
         System.out.println("Showing dashboard");
-        loadPage("dashboard/dashboard.fxml");
+        nav.loadView("dashboard/dashboard.fxml", controller ->{});
     }
 
     @FXML
     private void showWatchlist() {
-        loadPage("watchlist/watchlist.fxml");
+        nav.loadView("watchlist/watchlist.fxml", controller -> {});
     }
 
     @FXML
     private void showPortfolio() {
-        loadPage("portfolio/portfolio.fxml");
+        nav.loadView("portfolio/portfolio.fxml", controller -> {});
     }
 
     @FXML
     private void showStocks() {
-        loadPage("stockspage/stocks.fxml");
+        nav.loadView("stockspage/stocks.fxml", controller -> {});
     }
 
+    @FXML
+    private void showSimulationRefactor(){
+        nav.loadView("simulation/simulation.fxml", controller -> {});
+    }
+
+
+    @FXML
+    private void showSettingsRefactor(){
+        nav.loadView("useraccounts/settings.fxml", controller -> {});
+
+    }
+
+
+    // old method
     @FXML
     private void showSimulation() {
 

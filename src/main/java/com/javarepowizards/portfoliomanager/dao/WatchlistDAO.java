@@ -1,12 +1,14 @@
 package com.javarepowizards.portfoliomanager.dao;
 
 import com.javarepowizards.portfoliomanager.models.StockName;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WatchlistDAO {
+public class WatchlistDAO  {
     // SQL for table creation + CRUD
     private static final String CREATE_SQL = """
         CREATE TABLE IF NOT EXISTS user_watchlist (
@@ -25,8 +27,9 @@ public class WatchlistDAO {
 
     private final Connection conn;
 
+    @Autowired
     public WatchlistDAO() throws SQLException {
-        this.conn = DatabaseConnection.getInstance();
+        this.conn = DatabaseConnection.getConnection();
         // ensure table exists
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(CREATE_SQL);
