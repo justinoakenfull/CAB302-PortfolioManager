@@ -7,6 +7,7 @@ import com.javarepowizards.portfoliomanager.models.*;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -29,12 +30,17 @@ public class MainApplication extends Application {
 
         // Load the login screen
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
+        Parent root = fxmlLoader.load();
+        stage.setScene(new Scene(root, 1200, 800));
+        stage.show();
+
+        /*
         Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.setMinWidth(1200);
         stage.setMinHeight(800);
-        stage.show();
+        stage.show(); */
     }
 
     private void initializeDatabaseServices() throws SQLException {
