@@ -71,13 +71,13 @@ public class MainController {
         nav.loadView("simulation/simulation.fxml", controller -> {});
     }
 
-
+    /*
     @FXML
     private void showSettings(){
         nav.loadView("useraccounts/settings.fxml", controller -> {});
 
     }
-
+    */
 
     // old method
     @FXML
@@ -123,7 +123,7 @@ public class MainController {
 
     /* MUST BE LOGGED IN TO UPDATE SIMULATION DIFFICULTY*/
     @FXML
-    private void showSettingsOld() {
+    private void showSettings() {
         // Set the default selected difficulty (first enum value, "Easy" by default)
         SimulationDifficulty defaultDifficulty = SimulationDifficulty.values()[0];
 

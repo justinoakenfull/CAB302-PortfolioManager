@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.Optional;
 
 @Repository
-public class UserDAO {
+public class UserDAO implements IUserDAO {
 
     private final Connection connection;
 

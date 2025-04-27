@@ -1,5 +1,6 @@
 package com.javarepowizards.portfoliomanager;
 
+import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 
@@ -53,5 +54,9 @@ public final class AppContext {
     // New helper for watchlist (optional)
     public static IWatchlistDAO getWatchlistDAO() {
         return getService(IWatchlistDAO.class);
+    }
+
+    public static IUserDAO getUserDAO() {
+        return getService(IUserDAO.class);
     }
 }

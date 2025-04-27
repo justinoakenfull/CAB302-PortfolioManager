@@ -4,12 +4,16 @@ import com.javarepowizards.portfoliomanager.dao.*;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
 import com.javarepowizards.portfoliomanager.models.*;
+import com.javarepowizards.portfoliomanager.services.AuthService;
+import com.javarepowizards.portfoliomanager.services.IAuthService;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -27,20 +31,14 @@ public class MainApplication extends Application {
         initializeDatabaseServices();
         initializeStockRepository();
         initializeWatchlist();
+        initializeAuthService();
 
         // Load the login screen
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
-        Parent root = fxmlLoader.load();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
+        Parent root = loader.load();
         stage.setScene(new Scene(root, 1200, 800));
-        stage.show();
-
-        /*
-        Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         stage.setTitle("Login");
-        stage.setScene(scene);
-        stage.setMinWidth(1200);
-        stage.setMinHeight(800);
-        stage.show(); */
+        stage.show();
     }
 
     private void initializeDatabaseServices() throws SQLException {
@@ -48,8 +46,14 @@ public class MainApplication extends Application {
         AppContext.registerService(IDatabaseConnection.class, dbConnection);
 
         // Initialize UserDAO since other services might depend on it
-        UserDAO userDAO = new UserDAO(dbConnection);
-        AppContext.registerService(UserDAO.class, userDAO);
+        IUserDAO userDAO = new UserDAO(dbConnection);
+        AppContext.registerService(IUserDAO.class, userDAO);
+    }
+
+    private void initializeAuthService() throws SQLException {
+        PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
+        IAuthService authService = new AuthService(pwEncoder);
+        AppContext.registerService(IAuthService.class, authService);
     }
 
     private void initializeStockRepository() throws URISyntaxException, CsvValidationException, IOException {

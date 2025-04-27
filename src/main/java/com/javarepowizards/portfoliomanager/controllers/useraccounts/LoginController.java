@@ -1,5 +1,6 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
+import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.MainController;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
@@ -10,6 +11,7 @@ import com.javarepowizards.portfoliomanager.services.NavigationService;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -21,12 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 @Component
-public class LoginController {
+public class LoginController implements Initializable {
 
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
@@ -39,8 +43,17 @@ public class LoginController {
     @Autowired
     private IUserDAO userDAO;
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        userDAO = AppContext.getUserDAO();
+        authService = AppContext.getService(IAuthService.class);
+    }
+
+
+
     @FXML
     private void handleLogin() {
+
         String email = emailField.getText(), password = passwordField.getText();
         if (email.isEmpty() || password.isEmpty()) {
             showAlert("Error", "Please enter username/email and password.");
@@ -79,38 +92,6 @@ public class LoginController {
         }
     }
 
-    @FXML
-    private void handleLoginn() {
-        String email = emailField.getText();
-        String password = passwordField.getText();
-
-        if (email.isEmpty() || password.isEmpty()) {
-            showAlert("Error", "Please enter username/email and password.");
-            return;
-        }
-
-        try {
-            Optional<User> userOpt = isEmail(email) ?
-                    userDAO.getUserByEmail(email) :
-                    userDAO.getUserByUsername(email);
-
-            if (userOpt.isPresent()) {
-                User user = userOpt.get();
-                if (authService.verifyPassword(password, user.getPasswordHash())) {
-                    Session.setCurrentUser(user);
-                    loadDashboard();
-                } else {
-                    showAlert("Login Failed", "Invalid username/email or password.");
-                }
-            } else {
-                showAlert("Login Failed", "User not found.");
-            }
-        } catch (SQLException e) {
-            showAlert("Database Error", "Could not verify credentials: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -139,7 +120,7 @@ public class LoginController {
     @FXML
     private void loadDashboard() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/hello-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/hello-view.fxml"));
             Parent newRoot = loader.load();
 
             Scene currentScene = loginButton.getScene();
