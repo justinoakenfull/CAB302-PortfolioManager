@@ -28,12 +28,19 @@ public class MainApplication extends Application {
         initializeStockRepository();
         initializeWatchlist();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
         // Load the login screen
-        Parent root = loader.load();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
+        Parent root = fxmlLoader.load();
         stage.setScene(new Scene(root, 1200, 800));
-        stage.setTitle("Login");
         stage.show();
+
+        /*
+        Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
+        stage.setTitle("Login");
+        stage.setScene(scene);
+        stage.setMinWidth(1200);
+        stage.setMinHeight(800);
+        stage.show(); */
     }
 
     private void initializeDatabaseServices() throws SQLException {

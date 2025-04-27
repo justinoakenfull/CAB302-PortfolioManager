@@ -5,6 +5,9 @@ import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
 import com.javarepowizards.portfoliomanager.services.IAuthService;
 import com.javarepowizards.portfoliomanager.services.Session;
+import com.javarepowizards.portfoliomanager.services.NavigationService;
+
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -38,6 +41,46 @@ public class LoginController {
 
     @FXML
     private void handleLogin() {
+        String email = emailField.getText(), password = passwordField.getText();
+        if (email.isEmpty() || password.isEmpty()) {
+            showAlert("Error", "Please enter username/email and password.");
+            return;
+        }
+
+        try {
+            Optional<User> userOpt = isEmail(email)
+                    ? userDAO.getUserByEmail(email)
+                    : userDAO.getUserByUsername(email);
+
+            if (userOpt.isEmpty() ||
+                    !authService.verifyPassword(password, userOpt.get().getPasswordHash())) {
+                showAlert("Login Failed", "Invalid username/email or password.");
+                return;
+            }
+
+            Session.setCurrentUser(userOpt.get());
+
+            // —— swap in the “shell” with nav bar ——
+            NavigationService.loadScene(
+                    /* source node */   loginButton,
+                    /* fxml path */     "hello-view.fxml",
+                    /* controller init */ ctrl -> {
+                        // no extra setup: MainController.initialize()
+                        // will automatically fire and load the dashboard
+                    },
+                    /* title */         "Dashboard",
+                    /* width */         1200,
+                    /* height */        800
+            );
+
+        } catch (SQLException e) {
+            showAlert("Database Error", "Could not verify credentials: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleLoginn() {
         String email = emailField.getText();
         String password = passwordField.getText();
 
