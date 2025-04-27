@@ -1,6 +1,6 @@
 package com.javarepowizards.portfoliomanager;
 
-import com.javarepowizards.portfoliomanager.dao.UserDAO;
+import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.SimulationDifficulty;
 import com.javarepowizards.portfoliomanager.services.NavigationService;
 
@@ -28,11 +28,10 @@ public class MainController {
 
     private NavigationService nav;
 
-    @FXML
-    private BorderPane rootLayout;
+
 
     @Autowired
-    private UserDAO userDAO;
+    private IUserDAO userDAO;
 
     private PortfolioDAO portfolioDAO;
     private StockDAO stockDAO;
@@ -149,7 +148,7 @@ public class MainController {
             try {
                 // Retrieve the current logged-in user's ID from the session
                 int userId = Session.getCurrentUser().getUserId();
-
+                userDAO = AppContext.getUserDAO();
                 // Use the injected userDAO to update the user's selected simulation difficulty
                 userDAO.updateSimulationDifficulty(userId, diff.name());
 
