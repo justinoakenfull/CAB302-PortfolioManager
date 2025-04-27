@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.models;
 
 import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.dao.WatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
@@ -19,12 +20,12 @@ import java.util.Set;
  */
 public class Watchlist {
     private final StockRepository   repo;
-    private final WatchlistDAO      dao;
+    private final IWatchlistDAO dao;
     private final int               userId;
     private final ObservableList<WatchlistRow> rows = FXCollections.observableArrayList();
 
     public Watchlist(StockRepository repo,
-                          WatchlistDAO dao,
+                          IWatchlistDAO dao,
                           int userId) {
         this.repo   = repo;
         this.dao    = dao;

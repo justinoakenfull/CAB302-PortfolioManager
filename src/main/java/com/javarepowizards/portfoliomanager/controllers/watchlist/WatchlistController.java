@@ -1,8 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.watchlist;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.WatchlistDAO;
-import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
+import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.StockName;
@@ -22,7 +21,6 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.text.NumberFormat;
 import java.util.*;
 
 public class WatchlistController implements Initializable {
@@ -32,15 +30,13 @@ public class WatchlistController implements Initializable {
     @FXML private TableView<WatchlistRow> tableView;
     @FXML private Button    addStockButton;
 
-    private WatchlistDAO watchlistDAO;
+    private IWatchlistDAO watchlistDAO;
     private StockRepository repo;
     private int currentUserId = 1; // TODO: set this on login
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        watchlistDAO = AppContext.getService(WatchlistDAO.class);
-
+        watchlistDAO = AppContext.getService(IWatchlistDAO.class);
         repo = AppContext.getService(StockRepository.class);
 
         try {

@@ -1,27 +1,25 @@
 package com.javarepowizards.portfoliomanager;
 
+import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A simple application context (service locator) for sharing common services.
- * <p>
- * Initialize once at startup, then retrieve from anywhere in the app.
+ * A simple service locator for dependency injection.
+ * Now supports interface-based registration.
  */
 public final class AppContext {
-    private AppContext() {
-        // prevent instantiation
-    }
+    private AppContext() {} // Prevent instantiation
 
-    // Generic registry for any service by its class type
     private static final Map<Class<?>, Object> services = new ConcurrentHashMap<>();
 
     /**
-     * Registers a service instance under its class type.
-     * @param type the interface or class to register
-     * @param instance the implementation instance
-     * @param <T> the service type
-     * @throws IllegalStateException if a service is already registered for this type
+     * Registers a service under its interface/superclass.
+     * @param type The interface/abstract type (e.g., IWatchlistDAO.class)
+     * @param instance The concrete implementation (e.g., WatchlistDAO)
+     * @throws IllegalStateException If the type is already registered.
      */
     public static <T> void registerService(Class<T> type, T instance) {
         if (services.containsKey(type)) {
@@ -31,11 +29,8 @@ public final class AppContext {
     }
 
     /**
-     * Retrieves a registered service by its class type.
-     * @param type the interface or class of the service
-     * @param <T> the service type
-     * @return the registered service instance
-     * @throws IllegalStateException if no service is registered for this type
+     * Retrieves a service by its interface/superclass.
+     * @throws IllegalStateException If the service isn't registered.
      */
     @SuppressWarnings("unchecked")
     public static <T> T getService(Class<T> type) {
@@ -46,19 +41,17 @@ public final class AppContext {
         return (T) service;
     }
 
-    // Convenience methods for common types, if desired
-
-    /**
-     * Register the StockRepository for easy lookup.
-     */
-    public static void initStockRepository(com.javarepowizards.portfoliomanager.domain.stock.StockRepository repo) {
-        registerService(com.javarepowizards.portfoliomanager.domain.stock.StockRepository.class, repo);
+    // --- Convenience Methods (Optional) ---
+    public static void initStockRepository(StockRepository repo) {
+        registerService(StockRepository.class, repo);
     }
 
-    /**
-     * Retrieve the shared StockRepository.
-     */
-    public static com.javarepowizards.portfoliomanager.domain.stock.StockRepository getStockRepository() {
-        return getService(com.javarepowizards.portfoliomanager.domain.stock.StockRepository.class);
+    public static StockRepository getStockRepository() {
+        return getService(StockRepository.class);
+    }
+
+    // New helper for watchlist (optional)
+    public static IWatchlistDAO getWatchlistDAO() {
+        return getService(IWatchlistDAO.class);
     }
 }
