@@ -9,12 +9,13 @@ import javafx.stage.Stage;
 import javafx.scene.Node;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.function.Consumer;
 
 
 public class NavigationService {
     private final StackPane contentArea;
-    private static final String basePath = "src/main/resources/com/javarepowizards/portfoliomanager/views/";
+    private static final String basePath = "/com/javarepowizards/portfoliomanager/views/";
 
 
     public NavigationService(StackPane contentArea) {
@@ -22,9 +23,13 @@ public class NavigationService {
     }
 
     public <T> void loadView(String relativeFxmlPath, Consumer<T> controllerInit) {
-       String fullPath = basePath + relativeFxmlPath;
+        String fullPath = basePath + relativeFxmlPath;
+        URL fxmlUrl = getClass().getResource(fullPath);
+        if (fxmlUrl == null) {
+            throw new IllegalStateException("FXML file not found: " + fullPath);
+        }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fullPath));
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent view = loader.load();
             @SuppressWarnings("unchecked")
             T controller = (T) loader.getController();
@@ -33,15 +38,11 @@ public class NavigationService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load view: " + fullPath, e);
         }
+
     }
 
-    public static <T> void loadScene(Node sourceNode,
-                                     String relativeFxmlPath,
-                                     Consumer<T> controllerInit,
-                                     String windowTitle,
-                                     double width,
-                                     double height)
-    {
+
+    public static <T> void loadScene (Node sourceNode, String relativeFxmlPath, Consumer<T> controllerInit, String windowTitle, double width, double height) {
         String fullPath = basePath + relativeFxmlPath;
         try {
             FXMLLoader loader = new FXMLLoader(

@@ -67,13 +67,13 @@ public class MainController {
     }
 
     @FXML
-    private void showSimulationRefactor(){
+    private void showSimulation(){
         nav.loadView("simulation/simulation.fxml", controller -> {});
     }
 
 
     @FXML
-    private void showSettingsRefactor(){
+    private void showSettings(){
         nav.loadView("useraccounts/settings.fxml", controller -> {});
 
     }
@@ -81,7 +81,7 @@ public class MainController {
 
     // old method
     @FXML
-    private void showSimulation() {
+    private void showSimulationOld() {
 
         StockDAO stockDAO = StockDAO.getInstance();
 
@@ -123,7 +123,7 @@ public class MainController {
 
     /* MUST BE LOGGED IN TO UPDATE SIMULATION DIFFICULTY*/
     @FXML
-    private void showSettings() {
+    private void showSettingsOld() {
         // Set the default selected difficulty (first enum value, "Easy" by default)
         SimulationDifficulty defaultDifficulty = SimulationDifficulty.values()[0];
 
