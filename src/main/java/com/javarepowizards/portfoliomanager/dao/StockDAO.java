@@ -9,12 +9,14 @@ import com.javarepowizards.portfoliomanager.models.StockData;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.sql.*;
 
 /**
  * The StockDAO class is responsible for reading stock data from a CSV file
@@ -31,10 +33,10 @@ public class StockDAO {
     /**
      * Loads the CSV file given its file path.
      * The CSV file is expected to contain three header lines:
-     *    1. The first header row lists the stock symbols (repeated in column groups).
-     *    2. The second header row lists the field names (e.g., Price, Open, High, etc.).
-     *    3. The third header row is used for other meta-information (e.g., a "Date" label) and is ignored.
-     *
+     * 1. The first header row lists the stock symbols (repeated in column groups).
+     * 2. The second header row lists the field names (e.g., Price, Open, High, etc.).
+     * 3. The third header row is used for other meta-information (e.g., a "Date" label) and is ignored.
+     * <p>
      * The method then processes each subsequent line as data.
      *
      * @param filePath the String path to the CSV file.
@@ -160,7 +162,7 @@ public class StockDAO {
      *
      * @param stockName the stock symbol enum (e.g., StockName.WES_AX)
      * @return a list of StockData objects corresponding to that stock,
-     *         or an empty list if no data is available.
+     * or an empty list if no data is available.
      */
     public List<StockData> getStockData(StockName stockName) {
         // Use getOrDefault to return an empty list if no data is found.
@@ -173,7 +175,7 @@ public class StockDAO {
      * that matches the provided date.
      *
      * @param stockName the stock symbol enum.
-     * @param date the specific LocalDate for which data is requested.
+     * @param date      the specific LocalDate for which data is requested.
      * @return the StockData entry if found, or null if no matching entry exists.
      */
     public StockData getStockData(StockName stockName, LocalDate date) {
@@ -187,4 +189,5 @@ public class StockDAO {
         // If no record matches the date, return null.
         return null;
     }
+
 }

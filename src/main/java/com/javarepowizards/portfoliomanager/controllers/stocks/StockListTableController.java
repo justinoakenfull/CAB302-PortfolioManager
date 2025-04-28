@@ -61,5 +61,7 @@ public class StockListTableController implements Initializable {
         );
         tableView.setItems(data);
 
+
+
     }
 }
