@@ -11,6 +11,8 @@ public class StockData {
     // This field is declared final since the date associated with this record is immutable once created.
     private final LocalDate date;
 
+    private final String symbol;
+
     // The current price of the stock. #TODO Decide which open/close to use for price.
     private Double price;
 
@@ -38,8 +40,9 @@ public class StockData {
      * Constructs a new StockData instance associated with the given date.
      * @param date the LocalDate representing the day this data corresponds to.
      */
-    public StockData(LocalDate date) {
+    public StockData(LocalDate date, String symbol) {
         this.date = date;  // Assign the provided date to the immutable 'date' field.
+        this.symbol = symbol;
     }
 
     /**
@@ -161,6 +164,10 @@ public class StockData {
      */
     public void setAdjClose(Double adjClose) {
         this.adjClose = adjClose;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 
     /**

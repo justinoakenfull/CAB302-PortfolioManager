@@ -39,6 +39,7 @@ public class MainApplication extends Application {
         stage.setScene(new Scene(root, 1200, 800));
         stage.setTitle("Login");
         stage.show();
+
     }
 
     private void initializeDatabaseServices() throws SQLException {

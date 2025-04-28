@@ -19,6 +19,8 @@ public class WatchlistRow {
     private final LongProperty   volume        = new SimpleLongProperty();
     private final ObjectProperty<Button> remove = new SimpleObjectProperty<>();
 
+
+
     /**
      * Constructs a WatchlistRow from a stock and a remove callback.
      * @param stock the IStock to display

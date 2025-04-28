@@ -4,6 +4,7 @@ import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
+import com.javarepowizards.portfoliomanager.models.StockData;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
@@ -29,6 +30,8 @@ public class WatchlistController implements Initializable {
     @FXML private VBox      tableContainer;
     @FXML private TableView<WatchlistRow> tableView;
     @FXML private Button    addStockButton;
+    @FXML private ListView<IStock> watchlistListView;
+    private final ObservableList<IStock> watchlistObservableList = FXCollections.observableArrayList();
 
     private IWatchlistDAO watchlistDAO;
     private StockRepository repo;
@@ -38,6 +41,7 @@ public class WatchlistController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         watchlistDAO = AppContext.getService(IWatchlistDAO.class);
         repo = AppContext.getService(StockRepository.class);
+
 
         try {
             refreshTable();
@@ -147,4 +151,5 @@ public class WatchlistController implements Initializable {
             }
         });
     }
+
 }
