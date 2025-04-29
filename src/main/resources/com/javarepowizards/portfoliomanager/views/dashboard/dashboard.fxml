@@ -21,7 +21,9 @@
                 <RowConstraints percentHeight = "40"/>
             </rowConstraints>
 
-    <VBox GridPane.columnIndex="0" GridPane.rowIndex = "0" GridPane.rowSpan = "2"
+    <VBox fx:id= "watchlistPreviewContainer" spacing="10" VBox.vgrow = "ALWAYS" />
+
+  <!--  <VBox GridPane.columnIndex="0" GridPane.rowIndex = "0" GridPane.rowSpan = "2"
           style ="-fx-background-color: white;
                   -fx-border-color: #333;
                   -fx-border-width: 2;
@@ -32,6 +34,7 @@
 
         <Label text = "Watchlist"
                style ="fx-font-size: 24px; -fx-text-fill: black;"/>
+
 </VBox>
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex = "0"
@@ -61,6 +64,7 @@
                style ="fx-font-size: 24px; -fx-text-fill: black;"/>
 
     </VBox>
+    -->
 
 </GridPane>
 

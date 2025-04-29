@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 
 <VBox xmlns="http://javafx.com/javafx"
+      fx:controller="com.javarepowizards.portfoliomanager.controllers.portfolio.PortfolioController"
       xmlns:fx="http://javafx.com/fxml"
       style="-fx-background-color: #B1B3BE;"
       alignment="CENTER"

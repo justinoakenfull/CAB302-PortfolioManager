@@ -5,7 +5,9 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.javarepowizards.portfoliomanager.controllers.stocks.StocksController"
       style="-fx-background-color: #B1B3BE;"
+
       alignment="CENTER"
       spacing="20"
       prefWidth="1200"

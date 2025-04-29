@@ -1,227 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<HBox alignment="TOP_CENTER" styleClass="flow-pane" stylesheets="@watchlist.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistController">
+<HBox xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistController"
+      alignment="TOP_CENTER"
+      styleClass="flow-pane"
+      stylesheets="@watchlist.css">
+
     <children>
-          <VBox prefHeight="800.0" HBox.hgrow="ALWAYS">
-              <children>
-                  <HBox alignment="CENTER_LEFT" prefHeight="100.0">
-                      <children>
-                          <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="240.0">
-                              <children>
-                                  <Label styleClass="heading-title" text="Watchlist">
-                                      <font>
-                                          <Font size="40.0" />
-                                      </font>
-                                  </Label>
-                              </children>
-                          </HBox>
-                  <Region HBox.hgrow="ALWAYS" />
-                          <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="557.0">
-                              <children>
-                                  <Button alignment="BOTTOM_RIGHT" mnemonicParsing="false" onAction="#onAddStock" styleClass="btn" text="Add Stock" />
-                              </children>
-                          </HBox>
-                      </children>
-                      <VBox.margin>
-                          <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
-                      </VBox.margin>
-                  </HBox>
-                  <VBox fx:id="tableContainer"
-                        HBox.hgrow="ALWAYS"
-                        prefHeight="800"
-                        VBox.vgrow="ALWAYS">
-                      <children>
-                          <Button fx:id="addStockButton"
-                                  text="Add Stock"
-                                  onAction="#onAddStock"
-                                  styleClass="btn"
-                                  alignment="BOTTOM_RIGHT"
-                                  HBox.hgrow="ALWAYS"
-                                  prefHeight="100"/>
-                          <TableView fx:id="tableView"
-                                     styleClass="watchlist-table"
-                                     HBox.hgrow="ALWAYS"
-                                     VBox.vgrow="ALWAYS">
-                              <opaqueInsets>
-                                  <Insets/>
-                              </opaqueInsets>
-                          </TableView>
-                      </children>
-                      <VBox.margin>
-                          <Insets top="10" left="30" right="30" bottom="10"/>
-                      </VBox.margin>
-                  </VBox>
-              </children>
-          </VBox>
-          <Region HBox.hgrow="ALWAYS" />
-          <VBox prefHeight="800.0" prefWidth="300.0">
-              <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0" styleClass="card">
-                      <children>
-<!--                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Balance" textAlignment="CENTER">-->
-                          <Text fill="WHITE" text="Balance">
-                     <styleClass>
-                        <String fx:value="heading-title" />
-                        <String fx:value="company-snapshot-title" />
-                     </styleClass>
-                  </Text>
-                  <Separator prefWidth="200.0" styleClass="balance-text" />
-                          <HBox prefHeight="100.0" prefWidth="200.0">
-                              <children>
-                                  <VBox prefHeight="200.0" prefWidth="100.0">
-                                      <children>
-                                          <PieChart prefHeight="167.0" prefWidth="146.0" />
-                                      </children>
-                                  </VBox>
-                                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                                      <children>
-                                          <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                              <children>
-                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="CBA">
-                                                      <HBox.margin>
-                                                          <Insets left="20.0" />
-                                                      </HBox.margin>
-                                                  </Text>
-                                                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-positive" text="+2.4%">
-                                                      <HBox.margin>
-                                                          <Insets left="20.0" />
-                                                      </HBox.margin>
-                                                  </Text>
-                                              </children>
-                                          </HBox>
-                                          <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                              <children>
-                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="CSL">
-                                                      <HBox.margin>
-                                                          <Insets left="20.0" />
-                                                      </HBox.margin>
-                                                  </Text>
-                                                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-neutral" text="0.0%">
-                                                      <HBox.margin>
-                                                          <Insets left="20.0" />
-                                                      </HBox.margin>
-                                                  </Text>
-                                              </children>
-                                          </HBox>
-                                          <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                              <children>
-                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="BHP">
-                                                      <HBox.margin>
-                                                          <Insets left="20.0" />
-                                                      </HBox.margin>
-                                                  </Text>
-                                                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-negative" text="-2.4%">
-                                                      <HBox.margin>
-                                                          <Insets left="20.0" />
-                                                      </HBox.margin>
-                                                  </Text>
-                                              </children>
-                                              <VBox.margin>
-                                                  <Insets />
-                                              </VBox.margin>
-                                          </HBox>
-                                          <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                              <children>
-                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="APT">
-                                                      <HBox.margin>
-                                                          <Insets left="20.0" />
-                                                      </HBox.margin>
-                                                  </Text>
-                                                  <Text fill="#65a24b" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-positive" text="+2.4%">
-                                                      <HBox.margin>
-                                                          <Insets left="20.0" />
-                                                      </HBox.margin>
-                                                  </Text>
-                                              </children>
-                                              <VBox.margin>
-                                                  <Insets />
-                                              </VBox.margin>
-                                          </HBox>
-                                      </children>
-                                  </VBox>
-                              </children>
-                          </HBox>
-                      </children>
-               <VBox.margin>
-                  <Insets bottom="30.0" />
-               </VBox.margin>
-                  </VBox>
-            <Region VBox.vgrow="ALWAYS" />
-                  <VBox prefHeight="200.0" prefWidth="100.0">
-                      <children>
-                          <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="card">
-                              <children>
-                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Company Snapshot" textAlignment="CENTER">
-                                      <font>
-                                          <Font size="40.0" />
-                                      </font>
-                                      <VBox.margin>
-                                          <Insets bottom="15.0" />
-                                      </VBox.margin>
-                           <styleClass>
-                              <String fx:value="heading-title" />
-                              <String fx:value="company-snapshot-title" />
-                           </styleClass>
-                                  </Text>
-                                  <Separator prefWidth="200.0" styleClass="balance-text" />
-                                  <VBox prefHeight="200.0" prefWidth="100.0">
-                                      <children>
-                                          <Text styleClass="company-snapshot-text" text="CBA is Australia's largest bank, offering a comprehensive range of financial services, including retail, business, and institutional banking, as well as wealth management and insurance. As of April 2, 2025, the stock closed at A$154.82, marking a 28% increase over the past year." wrappingWidth="300.0">
-                                              <VBox.margin>
-                                                  <Insets bottom="10.0" top="10.0" />
-                                              </VBox.margin>
-                              </Text>
-                                          <Text styleClass="company-snapshot-text" text="In the first half of the 2025 financial year, CBA reported a cash net profit after tax of A$5.13 billion, a 2% increase from the previous year. This growth was driven by a stable net interest margin of 2.08%, 3% growth in home loans, and 8% growth in business loans. The bank declared an interim dividend of A$2.25 per share, up 5% from the prior year. ​" wrappingWidth="300.0">
-                                              <VBox.margin>
-                                                  <Insets bottom="10.0" />
-                                              </VBox.margin>
-                                          </Text>
-                                          <Text styleClass="company-snapshot-text" text="Investors should note that CBA's high valuation may be sensitive to macroeconomic factors, including potential interest rate adjustments by the Reserve Bank of Australia. ​" wrappingWidth="300.0">
-                                              <VBox.margin>
-                                                  <Insets bottom="10.0" />
-                                              </VBox.margin>
-                                          </Text>
-                                      </children>
-                                      <opaqueInsets>
-                                          <Insets />
-                                      </opaqueInsets>
-                                  </VBox>
-                                  <Separator prefWidth="200.0" />
-                                  <HBox nodeOrientation="RIGHT_TO_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                      <children>
-                                          <Button fx:id="viewStockButton" mnemonicParsing="false" styleClass="btn" text="View Stock">
-                                              <HBox.margin>
-                                                  <Insets right="30.0" top="30.0" />
-                                              </HBox.margin>
-                                          </Button>
-                                      </children>
-                                  </HBox>
-                              </children>
-                          </VBox>
-                      </children>
-                      <VBox.margin>
-                          <Insets />
-                      </VBox.margin>
-                  </VBox>
-              </children>
-              <HBox.margin>
-                  <Insets right="30.0" top="30.0" />
-              </HBox.margin>
-          </VBox>
+
+        <!-- Header + Add Stock button -->
+        <VBox prefHeight="800.0" HBox.hgrow="ALWAYS">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0">
+                    <children>
+                        <Label styleClass="heading-title" text="Watchlist">
+                            <font><Font size="40.0"/></font>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button onAction="#onAddStock"
+                                styleClass="btn"
+                                text="Add Stock"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0" bottom="10.0" left="30.0" right="30.0"/>
+                    </VBox.margin>
+                </HBox>
+
+                <!-- This container holds your TableView and then the stockListContainer below -->
+                <VBox fx:id="tableContainer"
+                      HBox.hgrow="ALWAYS"
+                      VBox.vgrow="ALWAYS">
+                    <children>
+                        <!-- (your existing TableView could stay here or be removed if you no longer use it) -->
+                        <TableView fx:id="tableView"
+                                   styleClass="watchlist-table"
+                                   HBox.hgrow="ALWAYS"
+                                   VBox.vgrow="ALWAYS"/>
+
+                        <!-- THIS is the corrected stockListContainer -->
+                        <VBox fx:id="stockListContainer"
+                              HBox.hgrow="ALWAYS"
+                              VBox.vgrow="ALWAYS"
+                              spacing="8">
+                            <!-- WatchlistRow nodes will be injected here at runtime -->
+                        </VBox>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10" left="30" right="30" bottom="10"/>
+                    </VBox.margin>
+                </VBox>
+            </children>
+        </VBox>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- Sidebar / Cards etc. -->
+        <VBox prefHeight="800.0" prefWidth="300.0">
+            <!-- ... rest of your sidebar content ... -->
+        </VBox>
+
     </children>
 </HBox>

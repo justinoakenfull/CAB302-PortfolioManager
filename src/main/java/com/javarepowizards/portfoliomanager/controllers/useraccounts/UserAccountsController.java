@@ -19,13 +19,6 @@ public class UserAccountsController {
 
     }
 
-
-
-
-
-
-
-
     private boolean IsEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return Pattern.compile(emailRegex).matcher(emailField.getText()).matches();

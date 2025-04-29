@@ -122,6 +122,4 @@ public class RegisterController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-
 }
