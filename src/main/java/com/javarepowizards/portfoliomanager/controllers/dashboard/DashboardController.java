@@ -1,5 +1,6 @@
 package com.javarepowizards.portfoliomanager.controllers.dashboard;
 
+import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 public class DashboardController {
@@ -8,8 +9,12 @@ public class DashboardController {
     private Label watchListLabel;
 
     @FXML
+    private  Label quickTipsLabel;
+
+    @FXML
     public void initialize() {
-        System.out.println("▶ DashboardController.initialize() called");
+        QuickTips quickTips= new QuickTips(quickTipsLabel);
+        quickTips.start();
     }
 }
 
