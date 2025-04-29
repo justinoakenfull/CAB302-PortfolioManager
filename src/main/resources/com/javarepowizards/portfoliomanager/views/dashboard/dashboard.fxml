@@ -10,7 +10,7 @@
           fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
 
           hgap="20" vgap="20"
-          style = "-fx-padding: 20;">
+          style = "-fx-padding: 20: -fx-background-color: #2A2A2A;">
 
             <columnConstraints>
                 <ColumnConstraints percentWidth="60"/>
@@ -22,7 +22,7 @@
             </rowConstraints>
 
     <VBox GridPane.columnIndex="0" GridPane.rowIndex = "0" GridPane.rowSpan = "2"
-          style ="-fx-background-color: white;
+          style ="-fx-background-color: #39393939;
                   -fx-border-color: #333;
                   -fx-border-width: 2;
                   -fx-border-radius: 10;
@@ -32,10 +32,21 @@
 
         <Label text = "Watchlist"
                style ="fx-font-size: 24px; -fx-text-fill: black;"/>
-</VBox>
+        <TableView fx:id ="watchlistTable" VBox.vgrow = "ALWAYS">
+            <columns>
+                <TableColumn fx:id="stockColumn"  text="Stock"  prefWidth="100"/>
+                <TableColumn fx:id="openColumn"   text="Open"   prefWidth="75"/>
+                <TableColumn fx:id="closeColumn"  text="Close"  prefWidth="75"/>
+                <TableColumn fx:id="highColumn"   text="High"   prefWidth="75"/>
+                <TableColumn fx:id="lowColumn"    text="Low"    prefWidth="75"/>
+                <TableColumn fx:id="changeColumn" text="Change" prefWidth="100"/>
+            </columns>
+        </TableView>
+
+    </VBox>
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex = "0"
-          style ="-fx-background-color: white;
+          style ="-fx-background-color: #39393939;
                   -fx-border-color: #333;
                   -fx-border-width: 2;
                   -fx-border-radius: 10;
@@ -49,7 +60,7 @@
     </VBox>
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex = "1"
-          style ="-fx-background-color: white;
+          style ="-fx-background-color: #39393939;
                   -fx-border-color: #333;
                   -fx-border-width: 2;
                   -fx-border-radius: 10;
