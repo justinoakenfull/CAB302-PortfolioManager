@@ -33,6 +33,6 @@ module com.javarepowizards.portfoliomanager {
 
     opens com.javarepowizards.portfoliomanager.controllers.watchlist to javafx.fxml;
 
-
+    opens com.javarepowizards.portfoliomanager.controllers.portfolio to javafx.fxml;
 
 }

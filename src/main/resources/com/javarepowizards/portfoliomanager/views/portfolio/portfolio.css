@@ -1,0 +1,171 @@
+/* Root background */
+.flow-pane {
+    -fx-background-color: #2A2A2A;
+    -fx-padding: 20;
+}
+
+/* Title bar */
+.heading-title {
+    -fx-text-fill: white;
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+}
+
+/* “Add Stock” button */
+.btn {
+    -fx-background-color: #0d89d1;
+    -fx-text-fill: white;
+    -fx-background-radius: 4px;
+    -fx-font-size: 14px;
+    -fx-padding: 8 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
+}
+.btn:hover {
+    -fx-background-color: #0b78b0;
+}
+
+/* Table styling */
+.portfolio-table {
+    -fx-background-color: #39393939;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #3a3f44;
+    -fx-border-width: 1px;
+    -fx-background-insets: 0 0 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0.1, 0, 2);
+    -fx-padding: 0px;
+    -fx-font-size: 16px;
+}
+
+/* Header row: darker background, light text */
+.portfolio-table .column-header-background {
+    -fx-background-color: #2c2f33;
+}
+.portfolio-table .column-header,
+.portfolio-table .column-header .label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e0e0e0;
+}
+
+/* Zebra striping: two shades of dark grey */
+.portfolio-table .table-row-cell:odd {
+    -fx-background-color: #0093ff;
+}
+.portfolio-table .table-row-cell:even {
+    -fx-background-color: #2b2f33;
+}
+
+/* Selection highlight: a subtle lighter grey */
+.portfolio-table .table-row-cell:selected {
+    -fx-background-color: #4e565a;
+}
+
+/* Center‑align and ensure cell text is light */
+.portfolio-table .table-cell {
+    -fx-alignment: CENTER;
+    -fx-text-fill: #e0e0e0;
+}
+
+.portfolio-table .button {
+    -fx-font-size: 16px;
+}
+
+.card-title-text {
+    -fx-underline: false;
+    -fx-font-weight: normal;
+}
+.card-text {
+    -fx-font-size: 16px;
+    -fx-fill: white;
+}
+
+.balance-text {
+    -fx-fill: white;
+}
+
+.balance-value-positive {
+    -fx-fill: #65a24b;
+}
+
+.balance-value-neutral {
+    -fx-fill: #fefb64;
+}
+
+.balance-value-negative {
+    -fx-fill: #d6534c;
+}
+
+.card {
+    -fx-background-color: #39393938;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #3a3f44;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0, 0, 2);
+    -fx-padding: 16px;
+}
+
+/* Dialog background & border */
+.dialog-pane {
+    -fx-background-color: #2B2F33;
+    -fx-border-color:   #3A3F44;
+    -fx-border-width: 1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0, 0, 4);
+}
+
+/* Header (title bar) */
+.dialog-pane .header-panel {
+    -fx-background-color: #2C2F33;
+}
+.dialog-pane .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* Content area (labels, list) */
+.dialog-pane .content {
+    -fx-text-fill: #E0E0E0;
+}
+.dialog-pane .content .label {
+    -fx-text-fill: #E0E0E0;
+}
+
+/* The ChoiceDialog’s ListView */
+.dialog-pane .list-view {
+    -fx-background-color: #23272A;
+    -fx-border-color:   #3A3F44;
+}
+.dialog-pane .list-cell {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: transparent;
+}
+.dialog-pane .list-cell:selected {
+    -fx-background-color: #3A3F44;
+}
+
+/* OK/Cancel buttons */
+.dialog-pane .button-bar .button {
+    -fx-background-color: #0D89D1;
+    -fx-text-fill: white;
+    -fx-background-radius: 4px;
+    -fx-padding: 6 20;
+}
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: #0B78B0;
+}
+.dialog-pane .button-bar .button:cancel {
+    -fx-background-color: #dc3545;
+}
+
+.btn-danger {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: white;
+    -fx-background-radius: 4px;
+    -fx-font-size: 14px;
+    -fx-padding: 8 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
+}
