@@ -1,9 +1,9 @@
 package com.javarepowizards.portfoliomanager.controllers.simulation;
 
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
-import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
@@ -50,7 +50,7 @@ public class SimulationController implements Initializable {
     private ListView<String> listHoldings;
 
     // References that must be provided externally (from MainController, for example)
-    private PortfolioDAO portfolioDAO;
+    private IPortfolioDAO portfolioDAO;
     private StockDAO stockDAO;
     private LocalDate mostRecentDate;
 
@@ -70,7 +70,8 @@ public class SimulationController implements Initializable {
     }
 
     // Setter methods for dependencies.
-    public void setPortfolioDAO(PortfolioDAO portfolioDAO) {
+    public void setPortfolioDAO(IPortfolioDAO portfolioDAO) {
+        System.out.println("portfolio doa = " + portfolioDAO);
         this.portfolioDAO = portfolioDAO;
     }
 

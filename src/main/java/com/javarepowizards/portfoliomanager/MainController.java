@@ -3,17 +3,23 @@ package com.javarepowizards.portfoliomanager;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.SimulationDifficulty;
 import com.javarepowizards.portfoliomanager.services.NavigationService;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.InMemoryPortfolioDAO;
+
 
 import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.layout.StackPane;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
@@ -22,22 +28,28 @@ import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class MainController {
+public class MainController implements Initializable {
     @FXML
     private StackPane contentArea;
 
     private NavigationService nav;
 
-
+    private final LocalDate mostRecentDate = LocalDate.of(2023, 12, 29);
 
     @Autowired
     private IUserDAO userDAO;
 
-    private PortfolioDAO portfolioDAO;
+    @Autowired
+    private IPortfolioDAO portfolioDAO;
+    @Autowired
     private StockDAO stockDAO;
 
     @FXML
-    public void initialize() {
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        stockDAO = stockDAO.getInstance();
+        portfolioDAO = new InMemoryPortfolioDAO();
+
         // Initialize the NavigationService with the content area
         nav = new NavigationService(contentArea);
         // Load the initial page (e.g., dashboard)
@@ -67,58 +79,14 @@ public class MainController {
 
     @FXML
     private void showSimulation(){
-        nav.loadView("simulation/simulation.fxml", controller -> {});
+        nav.loadView("simulation/simulation.fxml", controller -> {
+            var sim = (com.javarepowizards.portfoliomanager.controllers.simulation.SimulationController) controller;
+            sim.setPortfolioDAO(portfolioDAO);
+            sim.setStockDAO(stockDAO);
+            sim.setMostRecentDate(LocalDate.of(2023, 12, 29));
+        });
     }
 
-    /*
-    @FXML
-    private void showSettings(){
-        nav.loadView("useraccounts/settings.fxml", controller -> {});
-
-    }
-    */
-
-    // old method
-    @FXML
-    private void showSimulationOld() {
-
-        StockDAO stockDAO = StockDAO.getInstance();
-
-        // Define the date for which you want to simulate.
-        LocalDate date = LocalDate.of(2023, 12, 29);
-
-        // Use the PortfolioInitializer to create your dummy portfolio.
-        PortfolioDAO portfolioDAO;
-        try {
-            portfolioDAO = com.javarepowizards.portfoliomanager.services.PortfolioInitializer.createDummyPortfolio(stockDAO, date);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            return;
-        }
-
-
-        try {
-            // Create a custom FXMLLoader instance
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/simulation/simulation.fxml"));
-            Parent simulationRoot = loader.load();
-
-            // Retrieve the SimulationController instance
-            com.javarepowizards.portfoliomanager.controllers.simulation.SimulationController simController = loader.getController();
-
-            // Inject dependencies into the SimulationController.
-            // For example, if you have these available:
-            simController.setPortfolioDAO(portfolioDAO);  // yourPortfolioDAO should already be available
-            simController.setStockDAO(stockDAO);          // yourStockDAO should already be available
-            simController.setMostRecentDate(LocalDate.of(2023, 12, 29)); // Or any dynamic date
-
-            // Now clear the content area and add the simulation page.
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(simulationRoot);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     /* MUST BE LOGGED IN TO UPDATE SIMULATION DIFFICULTY*/
     @FXML
