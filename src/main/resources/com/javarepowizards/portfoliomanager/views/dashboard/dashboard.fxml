@@ -60,6 +60,14 @@
         <Label text = "Quick Tips"
                style ="fx-font-size: 24px; -fx-text-fill: black;"/>
 
+    <VBox alignment="CENTER" prefHeight="200">
+        <Label fx:id ="quickTipsLabel"
+               style="-fx-font-size: 24px; -fx-text-fill: #333;"
+               wrapText="true"
+               textAlignment="RIGHT"
+               maxWidth="300"/>
+    </VBox>
+
     </VBox>
 
 </GridPane>
