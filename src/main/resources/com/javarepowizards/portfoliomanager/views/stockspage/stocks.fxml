@@ -1,15 +1,188 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      style="-fx-background-color: #B1B3BE;"
-      alignment="CENTER"
-      spacing="20"
-      prefWidth="1200"
-      prefHeight="800">
-
-    <Label text="Stocks Page" style="-fx-font-size: 24px;"/>
-</VBox>
+<HBox alignment="TOP_CENTER" styleClass="flow-pane" stylesheets="@stocks.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox prefHeight="800.0" HBox.hgrow="ALWAYS">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="240.0">
+                            <children>
+                                <Label styleClass="heading-title" text="Stocks" underline="true">
+                                    <font>
+                                        <Font name="Arial Bold" size="40.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="557.0" />
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
+                    </VBox.margin>
+                </HBox>
+                <VBox fx:id="tableContainer" prefHeight="800" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <children>
+                        <TableView fx:id="tableView" styleClass="watchlist-table" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </TableView>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="10" left="30" right="30" top="10" />
+                    </VBox.margin>
+                </VBox>
+            </children>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <VBox prefHeight="800.0" prefWidth="300.0">
+            <children>
+                <VBox prefHeight="200.0" prefWidth="100.0" styleClass="card">
+                    <children>
+                        <!--                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Balance" textAlignment="CENTER">-->
+                        <Text fill="WHITE" text="Balance">
+                            <styleClass>
+                                <String fx:value="heading-title" />
+                                <String fx:value="company-snapshot-title" />
+                            </styleClass>
+                        </Text>
+                        <Separator prefWidth="200.0" styleClass="balance-text" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <VBox prefHeight="200.0" prefWidth="100.0">
+                                    <children>
+                                        <PieChart prefHeight="167.0" prefWidth="146.0" />
+                                    </children>
+                                </VBox>
+                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="CBA">
+                                                    <HBox.margin>
+                                                        <Insets left="20.0" />
+                                                    </HBox.margin>
+                                                </Text>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-positive" text="+2.4%">
+                                                    <HBox.margin>
+                                                        <Insets left="20.0" />
+                                                    </HBox.margin>
+                                                </Text>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="CSL">
+                                                    <HBox.margin>
+                                                        <Insets left="20.0" />
+                                                    </HBox.margin>
+                                                </Text>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-neutral" text="0.0%">
+                                                    <HBox.margin>
+                                                        <Insets left="20.0" />
+                                                    </HBox.margin>
+                                                </Text>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="BHP">
+                                                    <HBox.margin>
+                                                        <Insets left="20.0" />
+                                                    </HBox.margin>
+                                                </Text>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-negative" text="-2.4%">
+                                                    <HBox.margin>
+                                                        <Insets left="20.0" />
+                                                    </HBox.margin>
+                                                </Text>
+                                            </children>
+                                            <VBox.margin>
+                                                <Insets />
+                                            </VBox.margin>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="APT">
+                                                    <HBox.margin>
+                                                        <Insets left="20.0" />
+                                                    </HBox.margin>
+                                                </Text>
+                                                <Text fill="#65a24b" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-positive" text="+2.4%">
+                                                    <HBox.margin>
+                                                        <Insets left="20.0" />
+                                                    </HBox.margin>
+                                                </Text>
+                                            </children>
+                                            <VBox.margin>
+                                                <Insets />
+                                            </VBox.margin>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="30.0" />
+                    </VBox.margin>
+                </VBox>
+                <Region VBox.vgrow="ALWAYS" />
+                <VBox prefHeight="200.0" prefWidth="100.0">
+                    <children>
+                        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="card">
+                            <children>
+                        <Label text="Buy Stocks" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="40.0" />
+                           </font>
+                        </Label>
+                                <Separator prefWidth="200.0" styleClass="balance-text" />
+                                <VBox prefHeight="200.0" prefWidth="100.0">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                           <children>
+                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <Button alignment="CENTER" mnemonicParsing="false" prefHeight="128.0" prefWidth="128.0" text="Remove" textAlignment="CENTER" />
+                                    <Region prefHeight="200.0" prefWidth="100.0" />
+                                    <TextField alignment="CENTER" maxHeight="32.0" prefHeight="32.0" text="1" />
+                                    <Region prefHeight="200.0" prefWidth="100.0" />
+                                    <Button alignment="CENTER" mnemonicParsing="false" prefHeight="128.0" prefWidth="128.0" text="Add" textAlignment="CENTER" />
+                                 </children>
+                              </HBox>
+                              <Label alignment="CENTER" contentDisplay="CENTER" text="No Stock Selected!" textAlignment="CENTER" textFill="RED">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets left="64.0" />
+                                 </VBox.margin>
+                              </Label>
+                           </children>
+                                </VBox>
+                                <HBox nodeOrientation="RIGHT_TO_LEFT" prefHeight="100.0" prefWidth="200.0" />
+                            </children>
+                        </VBox>
+                    </children>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </VBox>
+            </children>
+            <HBox.margin>
+                <Insets right="30.0" top="30.0" />
+            </HBox.margin>
+        </VBox>
+    </children>
+</HBox>
