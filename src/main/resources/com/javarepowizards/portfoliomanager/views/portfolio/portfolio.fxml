@@ -62,7 +62,10 @@
                                  </children>
                               </VBox>
                               <Region prefHeight="200.0" HBox.hgrow="ALWAYS" />
-                              <PieChart title="Total Value" titleSide="BOTTOM" />
+                               <PieChart fx:id="pieChart" title="Total Value" titleSide="BOTTOM" stylesheets="@portfolio.css">
+
+                               </PieChart>
+
                               <Region prefHeight="200.0" HBox.hgrow="ALWAYS" />
                               <VBox alignment="TOP_RIGHT" prefHeight="200.0">
                                  <children>
@@ -89,9 +92,9 @@
                               </VBox>
                            </children>
                         </HBox>
-                        <TextField promptText="Search for Stock">
+                        <TextField promptText="Search for Stock" styleClass="card-text">
                            <VBox.margin>
-                              <Insets bottom="15.0" left="30.0" right="30.0" top="15.0" />
+                              <Insets bottom="15.0" left="120.0" right="120.0" top="15.0" />
                            </VBox.margin>
                            <font>
                               <Font size="14.0" />
