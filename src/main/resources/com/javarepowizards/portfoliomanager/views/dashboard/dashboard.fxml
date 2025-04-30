@@ -60,12 +60,14 @@
         <Label text = "Quick Tips"
                style ="fx-font-size: 24px; -fx-text-fill: black;"/>
 
-    <VBox alignment="CENTER" prefHeight="200">
+    <VBox alignment="CENTER" prefHeight="200" VBox.vgrow="ALWAYS">
         <Label fx:id ="quickTipsLabel"
-               style="-fx-font-size: 24px; -fx-text-fill: #333;"
                wrapText="true"
-               textAlignment="RIGHT"
-               maxWidth="300"/>
+               textAlignment="CENTER"
+               maxWidth="1000"
+                maxHeight="1000"
+                alignment="CENTER"
+                VBox.vgrow="ALWAYS"/>
     </VBox>
 
     </VBox>
