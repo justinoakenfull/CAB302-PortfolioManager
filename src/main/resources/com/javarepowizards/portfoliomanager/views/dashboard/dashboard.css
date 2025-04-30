@@ -1,66 +1,40 @@
-/*.root {
+/*Root background for dashboard scene */
+.dashboard-root {
     -fx-background-color: #2A2A2A;
 }
 
-.label {
-    -fx-text-fill: white;
+
+/* Dashboard GridPane that arranges 3 main widgets */
+.dashboard-grid {
+    -fx-padding: 20;
 }
 
-/* Style for the main dashboard containers */
-.vbox {
-    -fx-background-color: #2A2A2A;
-    -fx-border-color: #333;
-    -fx-border-width: 2;
+/* Common styling for all dashboard widgets */
+.panel {
+    -fx-background-color: #444444;
+    -fx-border-color: #555555;
+    -fx-border-width: 1.5;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
     -fx-padding: 15;
+
+/* Shadow effect for widgets over dark background */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0, 4), 6, 0.2, 0, 1);
 }
 
-/* Title labels in each section */
-.vbox > .label {
+/* Title styling */
+.panel-label {
     -fx-font-size: 24px;
     -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0.5, 0, 1);
+    -fx-font-weight: bold;
+    -fx-font-style: normal;
+    -fx-font-family: "Segoe UI", sans-serif;
 }
 
-/* Style for any buttons that might be added later */
-.button {
-    -fx-background-color: #2A2A2A;
+/* Quick Tips fade transition styling */
+.quick-tip-label {
+    -fx-font-size: 25px;
     -fx-text-fill: white;
-    -fx-background-radius: 3px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0), 0, 0, 0, 0);
+    -fx-font-weight: bold;
 }
 
-.button:hover {
-    -fx-background-color: #3A3A3A;
-    -fx-effect: dropshadow(gaussian, #0d89d1, 10, 0.5, 0, 0);
-}
-
-.button:pressed {
-    -fx-background-color: #1A1A1A;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0), 0, 0, 0, 0);
-}
-
-/* Style for tables or lists that might be added */
-.table-view, .list-view {
-    -fx-background-color: #2A2A2A;
-    -fx-text-fill: white;
-}
-
-.table-view .column-header, .list-view .list-cell {
-    -fx-background-color: #2A2A2A;
-    -fx-text-fill: white;
-}
-
-.table-view .table-row-cell:odd {
-    -fx-background-color: #333333;
-}
-
-.table-view .table-row-cell:selected {
-    -fx-background-color: #0d89d1;
-}
-
-/* Special accent elements */
-.accent {
-    -fx-effect: dropshadow(gaussian, #0d89d1, 10, 0.5, 0, 0);
-}
