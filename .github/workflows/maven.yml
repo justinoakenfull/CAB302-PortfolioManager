@@ -5,8 +5,11 @@
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
-
 name: Java CI with Maven
+
+permissions:
+  contents: read
+  security-events: write
 
 on:
   push:
@@ -17,23 +20,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Java 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '21'
+          distribution: 'temurin'
           cache: maven
 
-      - name: Ensure mvnw is executable
-        run: chmod +x mvnw
-
-      - name: Build with Maven Wrapper
-        run: ./mvnw -B package
-
-      # Optional: dependency snapshot for GitHub Advanced Security
-      - name: Update dependency graph
-        uses: advanced-security/maven-dependency-submission-action@v4.1.2
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
