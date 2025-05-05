@@ -3,14 +3,72 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      style="-fx-background-color: #B1B3BE;"
-      alignment="CENTER"
-      spacing="20"
-      prefWidth="600"
-      prefHeight="400">
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
+           stylesheets="@dashboard.css"
+           styleClass="dashboard-root">
 
-    <Label text="Dashboard Page" style="-fx-font-size: 24px;"/>
-</VBox>
+    <!-- Grid layout - splitting screen into two columns and two rows -->
+    <GridPane hgap="20" vgap="20"
+              styleClass="dashboard-grid">
+
+        <!-- Column width percentage - watchlist: 60%, 40% - quick tips and portfolio overview-->
+        <columnConstraints>
+            <ColumnConstraints percentWidth="60"/>
+            <ColumnConstraints percentWidth="40"/>
+        </columnConstraints>
+
+        <!-- Row height percentage - 60% fpr upper row, 40% for lower row -->
+        <rowConstraints>
+            <RowConstraints percentHeight="60"/>
+            <RowConstraints percentHeight="40"/>
+        </rowConstraints>
+
+        <!-- Watchlist Widget -->
+        <VBox GridPane.columnIndex="0"
+              GridPane.rowIndex="0"
+              GridPane.rowSpan="2"
+              spacing="10"
+              styleClass="panel">
+            <Label text="Watchlist"
+                   styleClass="panel-label"/>
+        </VBox>
+
+        <!-- Portfolio Overview Widget -->
+        <VBox GridPane.columnIndex="1"
+              GridPane.rowIndex="0"
+              spacing="10"
+              styleClass="panel">
+            <Label text="Portfolio Overview"
+                   styleClass="panel-label"/>
+        </VBox>
+
+        <!-- Quick Tips Widget -->
+        <VBox GridPane.columnIndex="1"
+              GridPane.rowIndex="1"
+              spacing="10"
+              styleClass="panel">
+            <Label text="Quick Tips"
+                   styleClass="panel-label"/>
+
+            <VBox alignment="CENTER"
+                  prefHeight="200"
+                  VBox.vgrow="ALWAYS">
+                <Label fx:id="quickTipsLabel"
+                       wrapText="true"
+                       textAlignment="CENTER"
+                       alignment="CENTER"
+                       styleClass="quick-tip-label"
+                       maxWidth="600"
+                       VBox.vgrow="ALWAYS"/>
+            </VBox>
+        </VBox>
+    </GridPane>
+</StackPane>
+
+
+
+
+
 
