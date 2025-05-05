@@ -35,7 +35,6 @@ public class LoginController implements Initializable {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
-    @FXML private Button registerButton;
 
     @Autowired
     private IAuthService authService;
@@ -88,7 +87,7 @@ public class LoginController implements Initializable {
 
         } catch (SQLException e) {
             showAlert("Database Error", "Could not verify credentials: " + e.getMessage());
-            e.printStackTrace();
+
         }
     }
 
@@ -113,7 +112,7 @@ public class LoginController implements Initializable {
             stage.setTitle("Register");
             stage.centerOnScreen();
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Error: ", e.getMessage());
         }
     }
 
@@ -135,7 +134,7 @@ public class LoginController implements Initializable {
             stage.setHeight(1080);
             stage.centerOnScreen();
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Error: ", e.getMessage());
         }
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 public class PortfolioDAO {
     private List<PortfolioEntry> holdings;
 
-    private double availableBalance;
+    private final double availableBalance;
 
     public PortfolioDAO(List<PortfolioEntry> holdings, double availableBalance) {
         this.holdings = holdings;

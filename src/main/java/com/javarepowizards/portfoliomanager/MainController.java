@@ -22,9 +22,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.scene.Parent;
-import javafx.scene.layout.BorderPane;
 
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,7 +56,6 @@ public class MainController implements Initializable {
 
     @FXML
     public void showDashboard() {
-        System.out.println("Showing dashboard");
         nav.loadView("dashboard/dashboard.fxml", controller ->{});
     }
 
