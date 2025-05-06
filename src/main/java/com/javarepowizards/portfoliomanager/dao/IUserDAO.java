@@ -10,4 +10,8 @@ public interface IUserDAO {
     Optional<User> getUserByEmail(String email) throws SQLException;
     Optional<User> getUserByUsername(String username) throws SQLException;
     void updateSimulationDifficulty(int userId, String difficulty) throws SQLException;
+
+    void updateEmail(int userId, String email);
+    void updateUsername(int userId, String username);
+    void updatePassword(int userId, String newPassword);
 }

@@ -64,6 +64,8 @@ public class LoginController implements Initializable {
                     ? userDAO.getUserByEmail(email)
                     : userDAO.getUserByUsername(email);
 
+
+
             if (userOpt.isEmpty() ||
                     !authService.verifyPassword(password, userOpt.get().getPasswordHash())) {
                 showAlert("Login Failed", "Invalid username/email or password.");
@@ -71,6 +73,9 @@ public class LoginController implements Initializable {
             }
 
             Session.setCurrentUser(userOpt.get());
+
+
+
 
             // —— swap in the “shell” with nav bar ——
             NavigationService.loadScene(
