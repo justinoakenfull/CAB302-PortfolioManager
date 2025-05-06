@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox alignment="TOP_CENTER" styleClass="flow-pane" stylesheets="@stocks.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<HBox alignment="TOP_CENTER" styleClass="flow-pane" stylesheets="@stocks.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.stocks.StocksController">
     <VBox prefHeight="800.0" HBox.hgrow="ALWAYS">
         <HBox alignment="CENTER_LEFT" prefHeight="100.0">
             <VBox.margin>
@@ -22,7 +22,17 @@
                 </Label>
             </HBox>
             <Region HBox.hgrow="ALWAYS" />
-            <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="557.0" />
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="557.0">
+                <TextField maxHeight="32.0" maxWidth="256.0" prefHeight="24.0" prefWidth="196.0"
+                           promptText="Search Stock..">
+                    <font>
+                        <Font name="Arial" size="12.0"/>
+                    </font>
+                    <HBox.margin>
+                        <Insets bottom="20.0" right="16.0"/>
+                    </HBox.margin>
+                </TextField>
+            </HBox>
         </HBox>
         <VBox fx:id="tableContainer" prefHeight="800" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
             <VBox.margin>
@@ -144,7 +154,7 @@
                         <Insets />
                     </opaqueInsets>
                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                        <Button mnemonicParsing="false" prefHeight="64.0" prefWidth="64.0" style="-fx-background-color: transparent;">
+                        <Button mnemonicParsing="false" onAction="#decreasePurchaseAmount" prefHeight="64.0" prefWidth="64.0" style="-fx-background-color: transparent;">
                             <graphic>
                                 <ImageView fitHeight="64.0" fitWidth="64.0" preserveRatio="true">
                                     <Image url="@../../../../../com/javarepowizards/portfoliomanager/images/StockButtonRemove64x64.png" />
@@ -155,7 +165,7 @@
                             </HBox.margin>
                         </Button>
                         <Region prefHeight="200.0" prefWidth="100.0" />
-                        <TextField alignment="CENTER" maxHeight="48.0" maxWidth="320.0" prefHeight="32.0" prefWidth="288.0" text="1">
+                        <TextField alignment="CENTER" fx:id="stockPurchaseAmount" maxHeight="48.0" maxWidth="320.0" prefHeight="32.0" prefWidth="288.0" text="1">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -163,7 +173,7 @@
                         <Font name="Arial" size="14.0" />
                      </font></TextField>
                         <Region prefHeight="200.0" prefWidth="100.0" />
-                        <Button mnemonicParsing="false" prefHeight="64.0" prefWidth="64.0" style="-fx-background-color: transparent;">
+                        <Button mnemonicParsing="false" onAction="#increasePurchaseAmount" prefHeight="64.0" prefWidth="64.0" style="-fx-background-color: transparent;">
                             <graphic>
                                 <ImageView fitHeight="64.0" fitWidth="64.0" preserveRatio="true">
                                     <Image url="@../../../../../com/javarepowizards/portfoliomanager/images/StockButtonAdd64x64.png" />
@@ -176,17 +186,15 @@
                     </HBox>
                     <Region maxHeight="16.0" maxWidth="5000.0" prefHeight="20.0" prefWidth="20.0" VBox.vgrow="ALWAYS" />
                     <HBox prefHeight="100.0" prefWidth="200.0">
-                        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0"
-                                styleClass="purchase-swapper" text="Contracts" textOverrun="CLIP">
+                        <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" styleClass="purchase-swapper" text="Contracts" textOverrun="CLIP">
                             <HBox.margin>
-                                <Insets left="24.0"/>
+                                <Insets left="24.0" />
                             </HBox.margin>
                         </Button>
-                        <Region maxHeight="64.0" maxWidth="32.0" prefHeight="60.0" prefWidth="32.0"/>
-                        <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="92.0" styleClass="purchase-swapper"
-                                text="Balance" textOverrun="CLIP">
+                        <Region maxHeight="64.0" maxWidth="32.0" prefHeight="60.0" prefWidth="32.0" />
+                        <Button mnemonicParsing="false" prefHeight="23.0" prefWidth="92.0" styleClass="purchase-swapper" text="Balance" textOverrun="CLIP">
                             <font>
-                                <Font name="Arial" size="12.0"/>
+                                <Font name="Arial" size="12.0" />
                             </font>
                         </Button>
                     </HBox>

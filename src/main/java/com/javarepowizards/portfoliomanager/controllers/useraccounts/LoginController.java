@@ -91,14 +91,6 @@ public class LoginController implements Initializable {
         }
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
     @FXML
     private void switchToRegister() {
         try {
@@ -136,6 +128,14 @@ public class LoginController implements Initializable {
         } catch (IOException e) {
             showAlert("Error: ", e.getMessage());
         }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private boolean isEmail(String input) {
