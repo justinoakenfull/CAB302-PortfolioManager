@@ -54,6 +54,7 @@ public class StocksController implements Initializable {
         }
     }
 
+
     @FXML
     private void BuyStock() {
         // TODO: Allow user to buy stocks (will be stored in SQLite, needs UserDAO).

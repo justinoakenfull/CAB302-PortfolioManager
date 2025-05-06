@@ -45,6 +45,15 @@ public class UserDAO implements IUserDAO {
                 currency VARCHAR(3) DEFAULT 'AUD',
                 FOREIGN KEY (user_id) REFERENCES user_auth(user_id) ON DELETE CASCADE
             )
+            """,
+                """
+            CREATE TABLE IF NOT EXISTS user_holdings (
+                user_id INTEGER PRIMARY KEY,
+                ticker VARCHAR(10) NOT NULL,
+                holding_amount INTEGER NOT NULL,
+                holding_value DECIMAL(15,2) NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES user_auth(user_id) ON DELETE CASCADE
+            )
             """
         };
 
@@ -164,4 +173,10 @@ public class UserDAO implements IUserDAO {
             pstmt.executeUpdate();
         }
     }
+
+    // TODO: Get user holdings.
+
+
+
+    // TODO: Add user holdings.
 }
