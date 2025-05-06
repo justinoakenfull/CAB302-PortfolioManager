@@ -165,6 +165,35 @@ public class UserDAO implements IUserDAO {
         return Optional.empty();
     }
 
+
+    public Optional<User> getUserById(int userId) throws SQLException {
+        String sql = """
+            SELECT ua.user_id, ua.username, ua.email, ua.password_hash,
+                   up.first_name, up.last_name, up.phone,
+                   ub.balance, ub.currency
+            FROM user_auth ua
+            LEFT JOIN users up ON ua.user_id = up.user_id
+            LEFT JOIN user_balances ub ON ua.user_id = ub.user_id
+            WHERE ua.user_id = ?
+            """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                User user = new User(
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password_hash")
+                );
+                user.setId(rs.getInt("user_id"));
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+
     public void updateSimulationDifficulty(int userId, String difficulty) throws SQLException {
         String sql = "UPDATE users SET simulation_difficulty = ? WHERE user_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

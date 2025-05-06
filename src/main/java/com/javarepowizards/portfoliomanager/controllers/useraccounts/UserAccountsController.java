@@ -62,13 +62,13 @@ public class UserAccountsController implements Initializable {
 
     @FXML
     private void updateUserPassword() throws SQLException {
-        String username  = Session.getCurrentUser().getUsername();
+
         String oldPassword = oldPasswordField.getText();
         String newPassword = newPasswordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
         try {
-            Optional<User> userOpt = userDAO.getUserByUsername(username);
+            Optional<User> userOpt = userDAO.getUserById(Session.getCurrentUser().getUserId());
             if (userOpt.isEmpty() || !authService.verifyPassword(oldPassword, userOpt.get().getPasswordHash())) {
                 System.out.println("Incorrect Password!");
             }
