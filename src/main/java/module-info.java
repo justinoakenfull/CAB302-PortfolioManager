@@ -22,8 +22,6 @@ module com.javarepowizards.portfoliomanager {
 
     opens com.javarepowizards.portfoliomanager.controllers.useraccounts to javafx.fxml;
 
-    opens com.javarepowizards.portfoliomanager.controllers.Portfolio to javafx.fxml;
-
     opens com.javarepowizards.portfoliomanager.controllers.portfolio to javafx.fxml;
 
     opens com.javarepowizards.portfoliomanager.controllers.dashboard to javafx.fxml;
@@ -37,6 +35,6 @@ module com.javarepowizards.portfoliomanager {
 
     opens com.javarepowizards.portfoliomanager.controllers.watchlist to javafx.fxml;
 
-    opens com.javarepowizards.portfoliomanager.controllers.portfolio to javafx.fxml;
+
 
 }
