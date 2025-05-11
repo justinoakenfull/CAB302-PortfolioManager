@@ -2,6 +2,7 @@
 package com.javarepowizards.portfoliomanager.dao;
 
 // Import the StockName enum which defines the allowed stock symbols.
+import com.javarepowizards.portfoliomanager.MainApplication;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.StockData;
 
@@ -9,6 +10,7 @@ import com.javarepowizards.portfoliomanager.models.StockData;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +25,30 @@ import java.util.Map;
  * The CSV is assumed to have a specific header format and data layout.
  */
 public class StockDAO {
+
+    private static final String DEFAULT_CSV_PATH = "/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv";
+
+    private static class Holder {
+        private static final StockDAO INSTANCE = new StockDAO();
+    }
+    public static StockDAO getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    private StockDAO() {
+        try {
+            // Attempt to locate the CSV on the classpath
+            URL url = MainApplication.class.getResource(DEFAULT_CSV_PATH);
+            // Null‐check to avoid NullPointerException if the resource is missing (probably not needed)
+            if (url == null) {
+                throw new RuntimeException("Could not find resource on classpath: " + DEFAULT_CSV_PATH);
+            }
+            // Load the CSV
+            loadCSV(url.getFile());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load stock data from " + DEFAULT_CSV_PATH, e);
+        }
+    }
 
     // stockDataMap uses an EnumMap to hold a list of StockData entries for each StockName.
     // The use of an EnumMap guarantees type-safety and efficient key lookups.

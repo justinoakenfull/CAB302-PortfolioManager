@@ -25,7 +25,7 @@
 }
 
 /* Table styling */
-.watchlist-table {
+.portfolio-table {
     -fx-background-color: #39393939;
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
@@ -38,44 +38,44 @@
 }
 
 /* Header row: darker background, light text */
-.watchlist-table .column-header-background {
+.portfolio-table .column-header-background {
     -fx-background-color: #2c2f33;
 }
-.watchlist-table .column-header,
-.watchlist-table .column-header .label {
+.portfolio-table .column-header,
+.portfolio-table .column-header .label {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: #e0e0e0;
 }
 
 /* Zebra striping: two shades of dark grey */
-.watchlist-table .table-row-cell:odd {
+.portfolio-table .table-row-cell:odd {
     -fx-background-color: #0093ff;
 }
-.watchlist-table .table-row-cell:even {
+.portfolio-table .table-row-cell:even {
     -fx-background-color: #2b2f33;
 }
 
 /* Selection highlight: a subtle lighter grey */
-.watchlist-table .table-row-cell:selected {
+.portfolio-table .table-row-cell:selected {
     -fx-background-color: #4e565a;
 }
 
 /* Center‑align and ensure cell text is light */
-.watchlist-table .table-cell {
+.portfolio-table .table-cell {
     -fx-alignment: CENTER;
     -fx-text-fill: #e0e0e0;
 }
 
-.watchlist-table .button {
+.portfolio-table .button {
     -fx-font-size: 16px;
 }
 
-.company-snapshot-title {
+.card-title-text {
     -fx-underline: false;
     -fx-font-weight: normal;
 }
-.company-snapshot-text {
+.card-text {
     -fx-font-size: 16px;
     -fx-fill: white;
 }
@@ -168,4 +168,52 @@
     -fx-font-size: 14px;
     -fx-padding: 8 20;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
+}
+
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+
+}
+
+.chart-legend-item {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.chart-legend-item .label {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.chart-legend-item text {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.chart-legend {
+    -fx-font-size: 16px;
+    -fx-background-color: rgba(0, 0, 0, 0.6);  /* semi-transparent black */
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+    -fx-background-radius: 4px;
+    -fx-padding: 15px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+/* (optional) tweak the little symbol boxes */
+.chart-legend-item-symbol {
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+    -fx-background-radius: 2px;
+}
+
+.chart-pie-label {
+    -fx-fill: white;
+    -fx-font-size: 16px;
 }

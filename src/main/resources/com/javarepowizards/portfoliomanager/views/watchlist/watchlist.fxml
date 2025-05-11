@@ -41,28 +41,31 @@
                           <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
                       </VBox.margin>
                   </HBox>
-                  <TableView fx:id="tableView" prefHeight="700.0" styleClass="watchlist-table" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
-                      <columns>
-                          <TableColumn fx:id="shortStockColumn" minWidth="75.0" prefWidth="-1.0" styleClass="column-header-background" />
-                          <TableColumn fx:id="stockColumn" minWidth="75.0" prefWidth="135.0" styleClass="column-header-background" text="Stock" />
-                          <TableColumn fx:id="openColumn" minWidth="75.0" prefWidth="-1.0" style="-fx-alignment: CENTER;" styleClass="column-header-background" text="Open" />
-                          <TableColumn fx:id="closeColumn" minWidth="75.0" prefWidth="-1.0" style="-fx-alignment: CENTER;" styleClass="column-header-background" text="Close" />
-                          <TableColumn fx:id="changeColumn" minWidth="75.0" prefWidth="-1.0" style="-fx-alignment: CENTER;" styleClass="column-header-background" text="Change" />
-                          <TableColumn fx:id="changePercentColumn" minWidth="75.0" prefWidth="-1.0" style="-fx-alignment: CENTER;" styleClass="column-header-background" text="Change %" />
-                          <TableColumn fx:id="priceColumn" minWidth="75.0" prefWidth="-1.0" style="-fx-alignment: CENTER;" styleClass="column-header-background" text="Price" />
-                          <TableColumn fx:id="volumeColumn" minWidth="75.0" prefWidth="-1.0" style="-fx-alignment: CENTER;" styleClass="column-header-background" text="Volume" />
-                          <TableColumn fx:id="removeColumn" minWidth="75.0" style="-fx-alignment: CENTER;" styleClass="column-header-background" text="Remove" />
-                      </columns>
-                      <opaqueInsets>
-                          <Insets />
-                      </opaqueInsets>
+                  <VBox fx:id="tableContainer"
+                        HBox.hgrow="ALWAYS"
+                        prefHeight="800"
+                        VBox.vgrow="ALWAYS">
+                      <children>
+                          <Button fx:id="addStockButton"
+                                  text="Add Stock"
+                                  onAction="#onAddStock"
+                                  styleClass="btn"
+                                  alignment="BOTTOM_RIGHT"
+                                  HBox.hgrow="ALWAYS"
+                                  prefHeight="100"/>
+                          <TableView fx:id="tableView"
+                                     styleClass="watchlist-table"
+                                     HBox.hgrow="ALWAYS"
+                                     VBox.vgrow="ALWAYS">
+                              <opaqueInsets>
+                                  <Insets/>
+                              </opaqueInsets>
+                          </TableView>
+                      </children>
                       <VBox.margin>
-                          <Insets left="30.0" right="30.0" top="10.0" />
+                          <Insets top="10" left="30" right="30" bottom="10"/>
                       </VBox.margin>
-                      <effect>
-                          <DropShadow blurType="GAUSSIAN" color="gray" spread="0.005" />
-                      </effect>
-                  </TableView>
+                  </VBox>
               </children>
           </VBox>
           <Region HBox.hgrow="ALWAYS" />

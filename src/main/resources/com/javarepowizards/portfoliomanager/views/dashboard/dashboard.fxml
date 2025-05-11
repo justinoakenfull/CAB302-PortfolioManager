@@ -3,65 +3,70 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
+           stylesheets="@dashboard.css"
+           styleClass="dashboard-root">
 
-<GridPane xmlns="http://javafx.com/javafx"
-          xmlns:fx="http://javafx.com/fxml"
-          fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
+    <!-- Grid layout - splitting screen into two columns and two rows -->
+    <GridPane hgap="20" vgap="20"
+              styleClass="dashboard-grid">
 
-          hgap="20" vgap="20"
-          style = "-fx-padding: 20;">
+        <!-- Column width percentage - watchlist: 60%, 40% - quick tips and portfolio overview-->
+        <columnConstraints>
+            <ColumnConstraints percentWidth="60"/>
+            <ColumnConstraints percentWidth="40"/>
+        </columnConstraints>
 
-            <columnConstraints>
-                <ColumnConstraints percentWidth="60"/>
-                <ColumnConstraints percentWidth = "40"/>
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints percentHeight="60"/>
-                <RowConstraints percentHeight = "40"/>
-            </rowConstraints>
+        <!-- Row height percentage - 60% fpr upper row, 40% for lower row -->
+        <rowConstraints>
+            <RowConstraints percentHeight="60"/>
+            <RowConstraints percentHeight="40"/>
+        </rowConstraints>
 
-    <VBox GridPane.columnIndex="0" GridPane.rowIndex = "0" GridPane.rowSpan = "2"
-          style ="-fx-background-color: white;
-                  -fx-border-color: #333;
-                  -fx-border-width: 2;
-                  -fx-border-radius: 10;
-                  -fx-background-radius: 1-;
-                  -fx-padding: 15;"
-          spacing = "10">
+        <!-- Watchlist Widget -->
+        <VBox GridPane.columnIndex="0"
+              GridPane.rowIndex="0"
+              GridPane.rowSpan="2"
+              spacing="10"
+              styleClass="panel">
+            <Label text="Watchlist"
+                   styleClass="panel-label"/>
+        </VBox>
 
-        <Label text = "Watchlist"
-               style ="fx-font-size: 24px; -fx-text-fill: black;"/>
-</VBox>
+        <!-- Portfolio Overview Widget -->
+        <VBox GridPane.columnIndex="1"
+              GridPane.rowIndex="0"
+              spacing="10"
+              styleClass="panel">
+            <Label text="Portfolio Overview"
+                   styleClass="panel-label"/>
+        </VBox>
 
-    <VBox GridPane.columnIndex="1" GridPane.rowIndex = "0"
-          style ="-fx-background-color: white;
-                  -fx-border-color: #333;
-                  -fx-border-width: 2;
-                  -fx-border-radius: 10;
-                  -fx-background-radius: 1-;
-                  -fx-padding: 15;"
-          spacing = "10">
+        <!-- Quick Tips Widget -->
+        <VBox GridPane.columnIndex="1"
+              GridPane.rowIndex="1"
+              spacing="10"
+              styleClass="panel">
+            <Label text="Quick Tips"
+                   styleClass="panel-label"/>
 
-        <Label text = "Portfolio Overview"
-               style ="fx-font-size: 24px; -fx-text-fill: black;"/>
+            <VBox alignment="CENTER"
+                  prefHeight="200"
+                  VBox.vgrow="ALWAYS">
+                <Label fx:id="quickTipsLabel"
+                       wrapText="true"
+                       textAlignment="CENTER"
+                       alignment="CENTER"
+                       styleClass="quick-tip-label"
+                       maxWidth="600"
+                       VBox.vgrow="ALWAYS"/>
+            </VBox>
+        </VBox>
+    </GridPane>
+</StackPane>
 
-    </VBox>
-
-    <VBox GridPane.columnIndex="1" GridPane.rowIndex = "1"
-          style ="-fx-background-color: white;
-                  -fx-border-color: #333;
-                  -fx-border-width: 2;
-                  -fx-border-radius: 10;
-                  -fx-background-radius: 1-;
-                  -fx-padding: 15;"
-          spacing = "10">
-
-        <Label text = "Quick Tips"
-               style ="fx-font-size: 24px; -fx-text-fill: black;"/>
-
-    </VBox>
-
-</GridPane>
 
 
 

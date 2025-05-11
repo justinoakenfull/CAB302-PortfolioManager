@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.config;
 
 import com.javarepowizards.portfoliomanager.services.AuthService;
+import com.javarepowizards.portfoliomanager.services.IAuthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,7 +16,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthService authService() {
-        return new AuthService();
+    public IAuthService authService(PasswordEncoder passwordEncoder) {
+        return new AuthService(passwordEncoder);
     }
 }
