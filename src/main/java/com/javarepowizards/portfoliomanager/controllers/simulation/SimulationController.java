@@ -107,9 +107,6 @@ public class SimulationController implements Initializable {
     }
     private void runSimulation() {
 
-
-
-
         // Retrieve simulation days from the slider.
         int simulationDays = (int) sliderSimulationDays.getValue();
 

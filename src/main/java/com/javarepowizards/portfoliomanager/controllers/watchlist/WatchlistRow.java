@@ -44,6 +44,7 @@ public class WatchlistRow {
         Button btn = new Button("Remove");
         btn.getStyleClass().add("btn-danger");
         btn.setOnAction(e -> onRemove.run());
+        btn.setStyle("-fx-background-color:#c0392b; -fx-text-fill: white");
         remove.set(btn);
     }
 

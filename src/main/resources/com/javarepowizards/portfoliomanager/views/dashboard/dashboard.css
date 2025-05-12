@@ -38,3 +38,8 @@
     -fx-font-weight: bold;
 }
 
+.table-view .table-cell {
+-fx-alignment: CENTER;
+}
+
+
