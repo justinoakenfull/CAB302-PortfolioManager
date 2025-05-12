@@ -9,8 +9,6 @@ public class User {
     // Remove salt field since BCrypt handles it internally
     // Add other profile fields as needed
 
-    public User() { }
-
     public User(String username, String email, String passwordHash) {
         this.username = username;
         this.email = email;

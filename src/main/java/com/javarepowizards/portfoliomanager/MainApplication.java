@@ -21,8 +21,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.List;
 
 public class MainApplication extends Application {
     @Override
@@ -50,7 +48,7 @@ public class MainApplication extends Application {
         AppContext.registerService(IUserDAO.class, userDAO);
     }
 
-    private void initializeAuthService() throws SQLException {
+    private void initializeAuthService() {
         PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
         IAuthService authService = new AuthService(pwEncoder);
         AppContext.registerService(IAuthService.class, authService);

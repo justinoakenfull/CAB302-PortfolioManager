@@ -75,7 +75,6 @@ public class SimulationController implements Initializable {
 
     // Setter methods for dependencies.
     public void setPortfolioDAO(IPortfolioDAO portfolioDAO) {
-        System.out.println("portfolio doa = " + portfolioDAO);
         this.portfolioDAO = portfolioDAO;
         refreshPortfolioData();
     }
@@ -107,9 +106,6 @@ public class SimulationController implements Initializable {
         }
     }
     private void runSimulation() {
-
-
-
 
         // Retrieve simulation days from the slider.
         int simulationDays = (int) sliderSimulationDays.getValue();

@@ -8,6 +8,7 @@ import com.javarepowizards.portfoliomanager.dao.InMemoryPortfolioDAO;
 
 
 import com.javarepowizards.portfoliomanager.services.Session;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,9 +23,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.scene.Parent;
-import javafx.scene.layout.BorderPane;
 
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,7 +57,6 @@ public class MainController implements Initializable {
 
     @FXML
     public void showDashboard() {
-        System.out.println("Showing dashboard");
         nav.loadView("dashboard/dashboard.fxml", controller ->{});
     }
 
@@ -86,6 +84,9 @@ public class MainController implements Initializable {
             sim.setMostRecentDate(LocalDate.of(2023, 12, 29));
         });
     }
+
+    @FXML
+    private void showMyAccount() { nav.loadView("useraccounts/userAccountsProfile.fxml", controller -> {});}
 
 
     /* MUST BE LOGGED IN TO UPDATE SIMULATION DIFFICULTY*/
