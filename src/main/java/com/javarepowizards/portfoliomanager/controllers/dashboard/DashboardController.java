@@ -6,12 +6,15 @@ import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
+import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 
+import javafx.collections.ObservableList;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.fxml.FXML;
@@ -22,6 +25,8 @@ import java.util.*;
 import java.util.Locale;
 import javafx.util.Callback;
 import javafx.scene.control.TableCell;
+import javafx.scene.layout.Pane;
+import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 
 
 /**
@@ -32,6 +37,7 @@ public class DashboardController {
 
     // Label that displays rotating investment tips
     @FXML private  Label quickTipsLabel;
+    @FXML private Pane portfolioPieContainer;
 
     // Tableview and columns for the watchlist section
     @FXML private TableView<WatchlistRow> watchlistTable;
@@ -63,6 +69,7 @@ public class DashboardController {
         bindColumnWidths();
         refreshWatchlist();
         watchlistDAO.addListener(this :: refreshWatchlist);
+        buildPortfolioPieChart();
 
     }
 
@@ -123,6 +130,34 @@ public class DashboardController {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void buildPortfolioPieChart(){
+        PortfolioDAO portfolioDAO = AppContext.getService(PortfolioDAO.class);
+        List<PortfolioEntry> entries = portfolioDAO.getHoldings();
+
+        double totalValue = entries.stream()
+                .mapToDouble(e -> e.getBuyPrice() * e.getQuantity())
+                .sum();
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+
+        for (PortfolioEntry entry : entries) {
+            double value = entry.getBuyPrice() * entry.getQuantity();
+            double percent = (value / totalValue) * 100;
+            pieData.add(new PieChart.Data(entry.getStock().getCompanyName(),value));
+        }
+
+        PieChart chart = new PieChart(pieData);
+        chart.setLegendVisible(true);
+        chart.setLabelsVisible(true);
+
+        chart.minWidthProperty().bind(portfolioPieContainer.widthProperty());
+        chart.minHeightProperty().bind(portfolioPieContainer.heightProperty());
+        chart.maxWidthProperty().bind(portfolioPieContainer.widthProperty());
+        chart.maxHeightProperty().bind(portfolioPieContainer.heightProperty());
+
+        portfolioPieContainer.getChildren().setAll(chart);
     }
 }
 

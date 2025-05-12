@@ -41,6 +41,10 @@ public enum StockName {
         return displayName;
     }
 
+    public String getCompanyName(){
+        return displayName;
+    }
+
     @Override
     public String toString() {
         return symbol;
