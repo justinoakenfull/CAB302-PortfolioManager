@@ -172,3 +172,11 @@
     -fx-padding: 8 20;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
 }
+
+/* Override white text for Change (%) cells */
+.stock-table .table-cell.balance-value-positive {
+    -fx-text-fill: #65a24b;   /* green */
+}
+.stock-table .table-cell.balance-value-negative {
+    -fx-text-fill: #d6534c;   /* red */
+}

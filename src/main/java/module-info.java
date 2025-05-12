@@ -26,6 +26,9 @@ module com.javarepowizards.portfoliomanager {
 
     opens com.javarepowizards.portfoliomanager.controllers.dashboard to javafx.fxml;
 
+    opens com.javarepowizards.portfoliomanager.controllers.stocks to javafx.fxml;
+
+
     exports com.javarepowizards.portfoliomanager.controllers.dashboard;
     exports com.javarepowizards.portfoliomanager.domain.stock;
 
