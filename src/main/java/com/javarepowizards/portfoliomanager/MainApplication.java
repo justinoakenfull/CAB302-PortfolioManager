@@ -23,6 +23,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.List;
+import java.util.ArrayList;
+import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
+import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 
 public class MainApplication extends Application {
     @Override
@@ -43,6 +49,7 @@ public class MainApplication extends Application {
     }
 
     private void initializeDatabaseServices() throws SQLException {
+        // 1) DB connection, user DAO
         IDatabaseConnection dbConnection = new DatabaseConnection();
         AppContext.registerService(IDatabaseConnection.class, dbConnection);
 
