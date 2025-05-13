@@ -160,6 +160,9 @@
                 <configuration>
                     <skipModuleInfo>true</skipModuleInfo>
                     <aggregate>false</aggregate>
+                    <sourceFileExcludes>
+                        <sourceFileExclude>**/module-info.java</sourceFileExclude>
+                    </sourceFileExcludes>
                     <destDir>javadoc</destDir>
                     <reportOutputDirectory>${project.build.directory}/docs</reportOutputDirectory>
                 </configuration>
