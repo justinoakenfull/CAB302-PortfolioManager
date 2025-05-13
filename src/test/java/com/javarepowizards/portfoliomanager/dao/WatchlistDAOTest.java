@@ -1,9 +1,5 @@
-package dao;
+package com.javarepowizards.portfoliomanager.dao;
 
-import com.javarepowizards.portfoliomanager.dao.DatabaseConnection;
-import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
-import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
-import com.javarepowizards.portfoliomanager.dao.WatchlistDAO;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import org.junit.jupiter.api.*;
 
