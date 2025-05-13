@@ -33,7 +33,6 @@ module com.javarepowizards.portfoliomanager {
     exports com.javarepowizards.portfoliomanager.domain.stock;
 
     exports com.javarepowizards.portfoliomanager.controllers.stocks to javafx.fxml;
-    opens com.javarepowizards.portfoliomanager.controllers.stocks to javafx.fxml;
 
 
 

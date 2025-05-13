@@ -56,13 +56,6 @@ public class MainApplication extends Application {
         // Initialize UserDAO since other services might depend on it
         IUserDAO userDAO = new UserDAO(dbConnection);
         AppContext.registerService(IUserDAO.class, userDAO);
-
-        // 2) PortfolioDAO
-        // PortfolioDAO expects (List<PortfolioEntry>, double) – supply an empty list + your starting cash
-        List<PortfolioEntry> initialEntries = new ArrayList<>();
-        double startingCash = 10_000.00;  // or whatever you choose
-        PortfolioDAO portfolioDAO = new PortfolioDAO(initialEntries, startingCash);
-        AppContext.registerService(PortfolioDAO.class, portfolioDAO);
     }
 
     private void initializeAuthService() {
