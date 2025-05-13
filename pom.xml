@@ -158,6 +158,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
+                    <skipModuleInfo>true</skipModuleInfo>
                     <aggregate>false</aggregate>
                     <destDir>javadoc</destDir>
                     <reportOutputDirectory>${project.build.directory}/docs</reportOutputDirectory>
