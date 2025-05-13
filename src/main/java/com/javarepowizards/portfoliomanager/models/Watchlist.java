@@ -38,7 +38,7 @@ public class Watchlist {
         return rows;
     }
 
-    /** Reloads the list from the DAO & shared repo. */
+    /** Reloads the list from the DAO &amp; shared repo. */
     public void refresh() {
         rows.clear();
         try {
