@@ -6,6 +6,7 @@ import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockReposito
 import com.javarepowizards.portfoliomanager.models.*;
 import com.javarepowizards.portfoliomanager.services.AuthService;
 import com.javarepowizards.portfoliomanager.services.IAuthService;
+import com.javarepowizards.portfoliomanager.services.PortfolioInitializer;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +22,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class MainApplication extends Application {
     @Override
@@ -30,6 +32,7 @@ public class MainApplication extends Application {
         initializeStockRepository();
         initializeWatchlist();
         initializeAuthService();
+        initializePortfolio();
 
         // Load the login screen
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
@@ -64,6 +67,9 @@ public class MainApplication extends Application {
         Path csvDescPath = Paths.get(descUrl.toURI());
         StockRepository repo = new InMemoryStockRepository(csvPath, csvDescPath);
         AppContext.initStockRepository(repo);
+
+        StockDAO stockDAO = StockDAO.getInstance();
+        AppContext.registerService(StockDAO.class, stockDAO);
     }
 
     private void initializeWatchlist() throws SQLException {
@@ -76,6 +82,16 @@ public class MainApplication extends Application {
 
         AppContext.registerService(IWatchlistDAO.class, watchlistDAO); // Register interface
         AppContext.registerService(Watchlist.class, watchlist);
+
+    }
+
+    private void initializePortfolio() {
+        StockDAO stockDAO = AppContext.getService(StockDAO.class);
+
+        LocalDate mostRecentDate = LocalDate.of(2023,12,29);
+        PortfolioDAO portfolioDAO = PortfolioInitializer.createDummyPortfolio(stockDAO, mostRecentDate);
+        AppContext.registerService(PortfolioDAO.class,portfolioDAO);
+
     }
 
     public static void main(String[] args) {
