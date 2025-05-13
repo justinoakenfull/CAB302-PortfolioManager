@@ -179,3 +179,68 @@
     -fx-control-inner-background: #2b2b2b;
     -fx-text-fill: white;
 }
+
+/* ──────────────────────────────────────────────────────────────
+   DARK WATCHLIST TABLE  (matches the second screenshot)
+   ──────────────────────────────────────────────────────────────*/
+
+/* Outer frame & body */
+.table-view.watchlist-table {
+    -fx-background-color: #1e232b;          /* frame */
+    -fx-control-inner-background: #262d37;  /* rows area */
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Column headers */
+.table-view.watchlist-table .column-header-background {
+    -fx-background-color: #1b2027;
+}
+.table-view.watchlist-table .column-header,
+.table-view.watchlist-table .column-header .label {
+    -fx-text-fill: #e1e5ee;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* Zebra striping */
+.table-view.watchlist-table .table-row-cell:odd  { -fx-background-color: #242b35; }
+.table-view.watchlist-table .table-row-cell:even { -fx-background-color: #262d37; }
+
+/* Hover & selection */
+.table-view.watchlist-table .table-row-cell:hover      { -fx-background-color: #313844; }
+.table-view.watchlist-table .table-row-cell:selected   { -fx-background-color: #3a4555; }
+
+/* Cell text */
+.table-view.watchlist-table .table-cell {
+    -fx-alignment: CENTER_RIGHT;
+    -fx-text-fill: #e1e5ee;
+    -fx-font-size: 14px;
+}
+
+/* Add slight padding inside cells for breathing room */
+.table-view.watchlist-table .table-cell {
+    -fx-padding: 4 8 4 8;
+}
+
+/* Green / red positive‑negative change
+   (TableCellFactories already add the style classes below) */
+.table-view.watchlist-table .change-positive { -fx-text-fill: #1db954; }
+.table-view.watchlist-table .change-negative { -fx-text-fill: #ff6961; }
+
+/* “Remove” button (btn‑danger already added in WatchlistRow) */
+.button.btn-danger {
+    -fx-background-color: #d9534f;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+}
+.button.btn-danger:hover { -fx-background-color: #c9302c; }
+
+/* Blue “Add Stock” button (btn class already there) */
+.button.btn {
+    -fx-background-color: #0d6efd;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+}
+.button.btn:hover { -fx-background-color: #0b5ed7; }
+
