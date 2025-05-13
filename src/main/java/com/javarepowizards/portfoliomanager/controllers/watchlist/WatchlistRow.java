@@ -1,10 +1,13 @@
 package com.javarepowizards.portfoliomanager.controllers.watchlist;
 
-import com.javarepowizards.portfoliomanager.models.StockData;
-import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
+import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import javafx.beans.property.*;
 import javafx.scene.control.Button;
 
+/**
+ * A row in the watchlist table, backed by an IStock instance.
+ */
 public class WatchlistRow {
     private final StringProperty shortName     = new SimpleStringProperty();
     private final StringProperty displayName   = new SimpleStringProperty();
@@ -16,18 +19,33 @@ public class WatchlistRow {
     private final LongProperty   volume        = new SimpleLongProperty();
     private final ObjectProperty<Button> remove = new SimpleObjectProperty<>();
 
-    public WatchlistRow(StockName symbol, StockData data, Button removeBtn) {
-        shortName.set(symbol.name());
-        displayName.set(symbol.getSymbol());
-        open.set(data.getOpen());
-        close.set(data.getClose());
-        change.set(data.getClose() - data.getOpen());
+    /**
+     * Constructs a WatchlistRow from a stock and a remove callback.
+     * @param stock the IStock to display
+     * @param onRemove callback invoked when remove button is clicked
+     */
+    public WatchlistRow(IStock stock, Runnable onRemove) {
+        PriceRecord rec = stock.getCurrentRecord();
+
+        shortName.set(stock.getTicker());
+        displayName.set(stock.getCompanyName());
+
+        open.set(rec.getOpen());
+        close.set(rec.getClose());
+        change.set(rec.getClose() - rec.getOpen());
         changePercent.set(open.get() == 0
                 ? 0
                 : ((change.get() / open.get()) * 100));
-        price.set(data.getPrice() != null ? data.getPrice() : data.getClose());
-        volume.set(data.getVolume());
-        remove.set(removeBtn);
+
+        // price can represent last traded price or close
+        price.set(rec.getClose());
+        volume.set(rec.getVolume());
+
+        Button btn = new Button("Remove");
+        btn.getStyleClass().add("btn-danger");
+        btn.setOnAction(e -> onRemove.run());
+        btn.setStyle("-fx-background-color:#c0392b; -fx-text-fill: white");
+        remove.set(btn);
     }
 
     public StringProperty shortNameProperty()     { return shortName; }
@@ -37,6 +55,6 @@ public class WatchlistRow {
     public DoubleProperty changeProperty()        { return change; }
     public DoubleProperty changePercentProperty() { return changePercent; }
     public DoubleProperty priceProperty()         { return price; }
-    public LongProperty   volumeProperty()        { return volume; }
+    public LongProperty volumeProperty()          { return volume; }
     public ObjectProperty<Button> removeProperty(){ return remove; }
 }

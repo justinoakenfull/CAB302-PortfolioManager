@@ -48,6 +48,6 @@
 }
 
 #dummyLogin:pressed {
-    -fx-background-color: ⁠1A1A1A;
+    -fx-background-color: #1A1A1A;
     -fx-effect: dropshadow(gaussian, #0d89d1, 10, 0.5, 0, 0);
 }

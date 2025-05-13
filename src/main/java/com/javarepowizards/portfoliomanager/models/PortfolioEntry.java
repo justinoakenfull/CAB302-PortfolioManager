@@ -15,6 +15,9 @@ public class PortfolioEntry {
     public double getPurchasePrice() { return purchasePrice; }
     public double getAmountHeld() { return amountHeld; }
 
+    public double getBuyPrice() {return purchasePrice;}
+    public double getQuantity() {return amountHeld;}
+
     public void setPurchasePrice(double purchasePrice) { this.purchasePrice = purchasePrice; }
     public void setAmountHeld(double amountHeld) { this.amountHeld = amountHeld; }
 

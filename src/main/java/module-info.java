@@ -13,6 +13,7 @@ module com.javarepowizards.portfoliomanager {
     requires spring.context;
     requires java.sql;
     requires spring.security.crypto;
+    requires com.opencsv;
 
     opens com.javarepowizards.portfoliomanager to javafx.fxml;
     exports com.javarepowizards.portfoliomanager;
@@ -21,9 +22,19 @@ module com.javarepowizards.portfoliomanager {
 
     opens com.javarepowizards.portfoliomanager.controllers.useraccounts to javafx.fxml;
 
+    opens com.javarepowizards.portfoliomanager.controllers.portfolio to javafx.fxml;
+
     opens com.javarepowizards.portfoliomanager.controllers.dashboard to javafx.fxml;
 
+    opens com.javarepowizards.portfoliomanager.controllers.stocks to javafx.fxml;
+
+
     exports com.javarepowizards.portfoliomanager.controllers.dashboard;
+    exports com.javarepowizards.portfoliomanager.domain.stock;
+
+    exports com.javarepowizards.portfoliomanager.controllers.stocks to javafx.fxml;
+
+
 
     // Open the controllers.simulation package for reflection by javafx.fxml
     opens com.javarepowizards.portfoliomanager.controllers.simulation to javafx.fxml;
@@ -31,5 +42,7 @@ module com.javarepowizards.portfoliomanager {
     opens com.javarepowizards.portfoliomanager.controllers.watchlist to javafx.fxml;
 
 
+
+    exports com.javarepowizards.portfoliomanager.domain.price;
 
 }

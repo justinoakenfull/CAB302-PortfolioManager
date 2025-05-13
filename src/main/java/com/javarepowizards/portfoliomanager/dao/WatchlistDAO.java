@@ -1,12 +1,15 @@
 package com.javarepowizards.portfoliomanager.dao;
 
 import com.javarepowizards.portfoliomanager.models.StockName;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WatchlistDAO {
+@Repository
+public class WatchlistDAO implements IWatchlistDAO {
     // SQL for table creation + CRUD
     private static final String CREATE_SQL = """
         CREATE TABLE IF NOT EXISTS user_watchlist (
@@ -25,8 +28,19 @@ public class WatchlistDAO {
 
     private final Connection conn;
 
-    public WatchlistDAO() throws SQLException {
-        this.conn = DatabaseConnection.getInstance();
+    private final List<Runnable> listeners = new ArrayList<>();
+
+    @Override
+    public void addListener(Runnable r) { listeners.add(r); }
+
+    @Override
+    public void removeListener (Runnable r) { listeners.remove(r);}
+
+    private void notifyListeners() {listeners.forEach(Runnable ::run);}
+
+    @Autowired
+    public WatchlistDAO(IDatabaseConnection databaseConnection) throws SQLException {
+        this.conn = databaseConnection.getConnection();
         // ensure table exists
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(CREATE_SQL);
@@ -52,7 +66,9 @@ public class WatchlistDAO {
         try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
             ps.setInt(1, userId);
             ps.setString(2, symbol.name());
-            ps.executeUpdate();
+            if (ps.executeUpdate() > 0){
+             notifyListeners();
+            }
         }
     }
 
@@ -61,7 +77,9 @@ public class WatchlistDAO {
         try (PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
             ps.setInt(1, userId);
             ps.setString(2, symbol.name());
-            ps.executeUpdate();
+            if (ps.executeUpdate() > 0) {
+                notifyListeners();
+            }
         }
     }
 }

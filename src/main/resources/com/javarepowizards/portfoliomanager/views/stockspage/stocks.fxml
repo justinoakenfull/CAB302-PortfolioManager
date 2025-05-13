@@ -1,15 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
-
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      style="-fx-background-color: #B1B3BE;"
-      alignment="CENTER"
+<!--
+  Root container for the Stocks view.
+  Uses an HBox to place the stocks table on the left
+  and the portfolio pie chart on the right.
+  Applies global styles via stocks.css and the flow-pane styleClass.
+-->
+<HBox xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.javarepowizards.portfoliomanager.controllers.stocks.StocksController"
+      alignment="TOP_CENTER"
       spacing="20"
-      prefWidth="1200"
-      prefHeight="800">
+      stylesheets="@stocks.css"
+      styleClass="flow-pane">
 
-    <Label text="Stocks Page" style="-fx-font-size: 24px;"/>
-</VBox>
+    <children>
+
+        <!--
+          LEFT PANEL: Card containing the stocks TableView
+          and buy controls.
+        -->
+        <VBox HBox.hgrow="ALWAYS"
+              spacing="10"
+              styleClass="card">
+            <!--
+              Uniform padding inside the card (20px each side).
+            -->
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- HEADER: Title label for the stocks table -->
+            <HBox alignment="CENTER_LEFT">
+                <Label text="Stocks"
+                       styleClass="heading-title"/>
+            </HBox>
+
+            <!--
+              TABLEVIEW: Displays all available stocks.
+              Populated and configured in the controller.
+            -->
+            <TableView fx:id="tableView"
+                       styleClass="stock-table"
+                       VBox.vgrow="ALWAYS"/>
+
+            <!--
+              BUY CONTROLS: Quantity input + Buy button.
+              Both wired to controller handlers.
+            -->
+            <HBox spacing="10"
+                  alignment="CENTER_LEFT">
+                <Label text="Quantity:"
+                       styleClass="label"/>
+                <TextField fx:id="quantityField"
+                           promptText="e.g. 5"
+                           styleClass="text-field"/>
+                <Button fx:id="buyStockButton"
+                        text="Buy"
+                        styleClass="btn"/>
+            </HBox>
+
+            <!--
+              FEEDBACK: Displays success or error messages
+              after buy attempts.
+            -->
+            <Label fx:id="buyFeedbackLabel"
+                   styleClass="feedback-label"
+                   text=""/>
+        </VBox>
+
+
+        <!--
+          RIGHT PANEL: Card containing the portfolio allocation pie chart.
+          Fixed prefWidth to keep layout consistent.
+        -->
+        <VBox fx:id="portfolioBox"
+              prefWidth="300"
+              spacing="10"
+              styleClass="card">
+            <!--
+              Matching padding to left card for visual consistency.
+            -->
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!--
+              PORTFOLIO HEADING: Wrapping, ellipsizing label.
+              Bound in the controller to fit within this VBox.
+            -->
+            <Label fx:id="portfolioHeading"
+                   text="Portfolio Allocation"
+                   styleClass="heading-title"
+                   wrapText="true"
+                   textOverrun="ELLIPSIS"
+                   textAlignment="CENTER"
+                   maxWidth="Infinity"/>
+
+            <!--
+              PIE CHART: Visualizes portfolio allocation by value.
+              Data populated in the controller.
+            -->
+            <PieChart fx:id="balancePieChart"
+                      title="By Value"/>
+        </VBox>
+
+    </children>
+</HBox>

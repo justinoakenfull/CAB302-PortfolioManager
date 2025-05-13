@@ -1,10 +1,12 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
-import com.javarepowizards.portfoliomanager.dao.UserDAO;
+import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
-import com.javarepowizards.portfoliomanager.services.AuthService;
+import com.javarepowizards.portfoliomanager.services.IAuthService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -15,11 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 @Component
-public class RegisterController {
+public class RegisterController implements Initializable {
 
     @FXML private TextField usernameField;
     @FXML private TextField emailField;
@@ -27,28 +31,32 @@ public class RegisterController {
     @FXML private PasswordField confirmPasswordField;
 
     @Autowired
-    private AuthService authService = new AuthService();
+    private IAuthService authService;
+
+    @Autowired
+    private IUserDAO userDAO;
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        userDAO = AppContext.getService(IUserDAO.class);
+        authService = AppContext.getService(IAuthService.class);
+    }
 
     @FXML
     private void handleRegister() {
-        // Validate inputs
-        if (!validateInputs()) {
-            return;
-        }
+        if (!validateInputs()) return;
 
         try {
-            // Create and save user
             User user = new User(
                     usernameField.getText().trim(),
                     emailField.getText().trim(),
                     authService.hashPassword(passwordField.getText())
             );
 
-            UserDAO userDAO = new UserDAO();
             if (userDAO.createUser(user)) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully!");
                 clearForm();
-                switchToLogin(); // Navigate to login after successful registration
+                switchToLogin();
             }
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Could not create user: " + e.getMessage());
@@ -63,11 +71,9 @@ public class RegisterController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
             Parent newRoot = loader.load();
 
-            // Get current scene from a known node (usernameField)
             Scene currentScene = usernameField.getScene();
             currentScene.setRoot(newRoot);
 
-            // Optional: update window title
             Stage stage = (Stage) currentScene.getWindow();
             stage.setTitle("Login");
             stage.centerOnScreen();
@@ -76,28 +82,23 @@ public class RegisterController {
         }
     }
 
-
     private boolean validateInputs() {
-        // Check empty fields
-        if (usernameField.getText().isBlank() || emailField.getText().isBlank() ||
-                passwordField.getText().isBlank() || confirmPasswordField.getText().isBlank()) {
+        if (usernameField.getText().isBlank() || emailField.getText().isBlank()
+                || passwordField.getText().isBlank() || confirmPasswordField.getText().isBlank()) {
             showAlert(Alert.AlertType.WARNING, "Validation Error", "All fields are required");
             return false;
         }
 
-        // Check password match
         if (!passwordField.getText().equals(confirmPasswordField.getText())) {
             showAlert(Alert.AlertType.WARNING, "Validation Error", "Passwords do not match");
             return false;
         }
 
-        // Check password strength
         if (passwordField.getText().length() < 8) {
             showAlert(Alert.AlertType.WARNING, "Validation Error", "Password must be at least 8 characters");
             return false;
         }
 
-        // Validate email format
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         if (!Pattern.compile(emailRegex).matcher(emailField.getText()).matches()) {
             showAlert(Alert.AlertType.WARNING, "Validation Error", "Invalid email format");
@@ -121,4 +122,6 @@ public class RegisterController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+
 }
