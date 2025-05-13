@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane prefHeight="600.0" prefWidth="1000.0" styleClass="flow-pane" stylesheets="@watchlist.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistModalController">
+
+    <top>
+        <Label fx:id="stockTitle" BorderPane.alignment="CENTER">
+         <styleClass>
+            <String fx:value="company-snapshot-title" />
+            <String fx:value="heading-title" />
+         </styleClass></Label>
+    </top>
+
+
+    <center>
+        <SplitPane dividerPositions="0.25" styleClass="card">
+            <items>
+                <GridPane hgap="10" vgap="10">
+                    <Label text="Open:" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                  <styleClass>
+                     <String fx:value="label" />
+                     <String fx:value="company-snapshot-text" />
+                  </styleClass></Label>
+                    <Label fx:id="openLabel" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Close:" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                  <styleClass>
+                     <String fx:value="label" />
+                     <String fx:value="company-snapshot-text" />
+                  </styleClass></Label>
+                    <Label fx:id="closeLabel" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Change:" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                  <styleClass>
+                     <String fx:value="label" />
+                     <String fx:value="company-snapshot-text" />
+                  </styleClass></Label>
+                    <Label fx:id="changeLabel" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Change %:" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                  <styleClass>
+                     <String fx:value="label" />
+                     <String fx:value="company-snapshot-text" />
+                  </styleClass></Label>
+                    <Label fx:id="changePercentLabel" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                    <Label text="Volume:" textFill="WHITE" GridPane.columnIndex="0" GridPane.rowIndex="4">
+                  <styleClass>
+                     <String fx:value="label" />
+                     <String fx:value="company-snapshot-text" />
+                  </styleClass></Label>
+                    <Label fx:id="volumeLabel" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+               <columnConstraints>
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+                </GridPane>
+
+                <!-- Right: long description -->
+                <TextArea fx:id="longDescArea" editable="false" wrapText="true">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <styleClass>
+                  <String fx:value="company-snapshot-textarea" />
+                  <String fx:value="company-snapshot-text" />
+               </styleClass></TextArea>
+            </items>
+        </SplitPane>
+    </center>
+
+    <bottom>
+        <Separator />
+        <Button onAction="#onClose" styleClass="btn" text="Close" BorderPane.alignment="CENTER_RIGHT">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <BorderPane.margin>
+            <Insets top="10.0" />
+         </BorderPane.margin></Button>
+    </bottom>
+   <padding>
+      <Insets bottom="15.0" top="15.0" />
+   </padding>
+</BorderPane>

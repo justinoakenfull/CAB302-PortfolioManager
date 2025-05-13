@@ -11,12 +11,18 @@ import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,6 +35,8 @@ public class WatchlistController implements Initializable {
     @FXML private VBox      tableContainer;
     @FXML private TableView<WatchlistRow> tableView;
     @FXML private Button    addStockButton;
+    @FXML private Text snapshotText;
+    @FXML private Button    viewStockButton;
 
     private IWatchlistDAO watchlistDAO;
     private StockRepository repo;
@@ -125,6 +133,23 @@ public class WatchlistController implements Initializable {
                 col.getStyleClass().add("column-header-background")
         );
 
+        table.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldRow, newRow) -> {
+                    if (newRow != null) {
+                        String ticker = newRow.shortNameProperty().get();
+                        IStock selectedStock;
+                        try {
+                            selectedStock = repo.getByTicker(ticker);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        snapshotText.setText(selectedStock.getShortDescription());
+
+                    } else {
+                        snapshotText.setText("An error getting the stock or description occurred.");
+                    }
+                });
     }
 
 
@@ -146,5 +171,41 @@ public class WatchlistController implements Initializable {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    @FXML
+    private void onViewStock() {
+        var selected = tableView.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+        String ticker = selected.shortNameProperty().get();
+        IStock stock;
+        try {
+            stock = repo.getByTicker(ticker);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String resource = "/com/javarepowizards/portfoliomanager/views/watchlist/WatchlistModal.fxml";
+        URL fxmlUrl = getClass().getResource(resource);
+        if (fxmlUrl == null) {
+            throw new IllegalStateException("Cannot find FXML: " + resource);
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            WatchlistModalController modal = loader.getController();
+            modal.initData(stock);
+
+            Stage dialog = new Stage();
+            dialog.initOwner(viewStockButton.getScene().getWindow());
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.setTitle(stock.getTicker() + " Details");
+            dialog.setScene(new Scene(root));
+            dialog.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
