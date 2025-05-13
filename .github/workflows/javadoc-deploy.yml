@@ -1,6 +1,8 @@
 name: Deploy Javadocs to GitHub Pages
 
-# Run whenever you push to main (or change to your primary branch name)
+permissions:
+  contents: write
+
 on:
   push:
     branches:
