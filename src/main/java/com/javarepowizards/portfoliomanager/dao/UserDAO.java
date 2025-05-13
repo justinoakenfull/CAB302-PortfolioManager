@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.dao;
 
 import com.javarepowizards.portfoliomanager.models.User;
+import com.javarepowizards.portfoliomanager.services.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,6 +44,15 @@ public class UserDAO implements IUserDAO {
                 user_id INTEGER PRIMARY KEY,
                 balance DECIMAL(15,2) NOT NULL DEFAULT 0.00,
                 currency VARCHAR(3) DEFAULT 'AUD',
+                FOREIGN KEY (user_id) REFERENCES user_auth(user_id) ON DELETE CASCADE
+            )
+            """,
+                """
+            CREATE TABLE IF NOT EXISTS user_holdings (
+                user_id INTEGER PRIMARY KEY,
+                ticker VARCHAR(10) NOT NULL,
+                holding_amount INTEGER NOT NULL,
+                holding_value DECIMAL(15,2) NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES user_auth(user_id) ON DELETE CASCADE
             )
             """
@@ -156,6 +166,35 @@ public class UserDAO implements IUserDAO {
         return Optional.empty();
     }
 
+
+    public Optional<User> getUserById(int userId) throws SQLException {
+        String sql = """
+            SELECT ua.user_id, ua.username, ua.email, ua.password_hash,
+                   up.first_name, up.last_name, up.phone,
+                   ub.balance, ub.currency
+            FROM user_auth ua
+            LEFT JOIN users up ON ua.user_id = up.user_id
+            LEFT JOIN user_balances ub ON ua.user_id = ub.user_id
+            WHERE ua.user_id = ?
+            """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                User user = new User(
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password_hash")
+                );
+                user.setId(rs.getInt("user_id"));
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+
     public void updateSimulationDifficulty(int userId, String difficulty) throws SQLException {
         String sql = "UPDATE users SET simulation_difficulty = ? WHERE user_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -164,4 +203,62 @@ public class UserDAO implements IUserDAO {
             pstmt.executeUpdate();
         }
     }
+
+
+
+
+    public void updateEmail(int userId, String email) {
+        String sql = "UPDATE user_auth SET email = ? WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void updateUsername(int userId, String username) {
+        String sql = "UPDATE user_auth SET username = ? WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updatePassword(int userId, String newPassword) {
+        String sql = "UPDATE user_auth set password_hash = ? WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newPassword);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public Optional<User> getCurrentUser() {
+        Optional<User> user;
+
+        try {
+            user = getUserById(Session.getCurrentUser().getUserId());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return user;
+    }
+
+
+    // TODO: Get user holdings.
+
+
+
+    // TODO: Add user holdings.
 }

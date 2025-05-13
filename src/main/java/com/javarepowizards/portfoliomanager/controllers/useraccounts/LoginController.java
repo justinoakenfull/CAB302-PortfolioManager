@@ -35,7 +35,6 @@ public class LoginController implements Initializable {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
-    @FXML private Button registerButton;
 
     @Autowired
     private IAuthService authService;
@@ -65,6 +64,8 @@ public class LoginController implements Initializable {
                     ? userDAO.getUserByEmail(email)
                     : userDAO.getUserByUsername(email);
 
+
+
             if (userOpt.isEmpty() ||
                     !authService.verifyPassword(password, userOpt.get().getPasswordHash())) {
                 showAlert("Login Failed", "Invalid username/email or password.");
@@ -72,6 +73,9 @@ public class LoginController implements Initializable {
             }
 
             Session.setCurrentUser(userOpt.get());
+
+
+
 
             // —— swap in the “shell” with nav bar ——
             NavigationService.loadScene(
@@ -88,16 +92,8 @@ public class LoginController implements Initializable {
 
         } catch (SQLException e) {
             showAlert("Database Error", "Could not verify credentials: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        }
     }
 
     @FXML
@@ -113,7 +109,7 @@ public class LoginController implements Initializable {
             stage.setTitle("Register");
             stage.centerOnScreen();
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Error: ", e.getMessage());
         }
     }
 
@@ -135,8 +131,16 @@ public class LoginController implements Initializable {
             stage.setHeight(1080);
             stage.centerOnScreen();
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Error: ", e.getMessage());
         }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private boolean isEmail(String input) {

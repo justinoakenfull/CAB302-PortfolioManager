@@ -60,7 +60,6 @@ public class StockDAO {
      *    1. The first header row lists the stock symbols (repeated in column groups).
      *    2. The second header row lists the field names (e.g., Price, Open, High, etc.).
      *    3. The third header row is used for other meta-information (e.g., a "Date" label) and is ignored.
-     *
      * The method then processes each subsequent line as data.
      *
      * @param filePath the String path to the CSV file.
@@ -76,7 +75,7 @@ public class StockDAO {
             // Read the third header row that may simply be used to denote the "Date" column.
             String headerIgnoreLine = br.readLine();
 
-            // Check if any of the header lines are missing; if so, throw an exception to signal the misformatted CSV.
+            // Check if any of the header lines are missing; if so, throw an exception to signal the mis-formatted CSV.
             if (headerSymbolsLine == null || headerFieldsLine == null || headerIgnoreLine == null) {
                 throw new IllegalArgumentException("CSV file does not contain required header rows.");
             }
