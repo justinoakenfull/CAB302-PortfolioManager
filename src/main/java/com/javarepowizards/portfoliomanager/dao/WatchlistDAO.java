@@ -28,6 +28,16 @@ public class WatchlistDAO implements IWatchlistDAO {
 
     private final Connection conn;
 
+    private final List<Runnable> listeners = new ArrayList<>();
+
+    @Override
+    public void addListener(Runnable r) { listeners.add(r); }
+
+    @Override
+    public void removeListener (Runnable r) { listeners.remove(r);}
+
+    private void notifyListeners() {listeners.forEach(Runnable ::run);}
+
     @Autowired
     public WatchlistDAO(IDatabaseConnection databaseConnection) throws SQLException {
         this.conn = databaseConnection.getConnection();
@@ -56,7 +66,9 @@ public class WatchlistDAO implements IWatchlistDAO {
         try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
             ps.setInt(1, userId);
             ps.setString(2, symbol.name());
-            ps.executeUpdate();
+            if (ps.executeUpdate() > 0){
+             notifyListeners();
+            }
         }
     }
 
@@ -65,7 +77,9 @@ public class WatchlistDAO implements IWatchlistDAO {
         try (PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
             ps.setInt(1, userId);
             ps.setString(2, symbol.name());
-            ps.executeUpdate();
+            if (ps.executeUpdate() > 0) {
+                notifyListeners();
+            }
         }
     }
 }

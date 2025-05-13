@@ -8,4 +8,7 @@ public interface IWatchlistDAO {
     List<StockName> listForUser(int userId) throws SQLException;
     void addForUser(int userId, StockName symbol) throws SQLException;
     void removeForUser(int userId, StockName symbol) throws SQLException;
+
+    void addListener (Runnable r);
+    void removeListener (Runnable r);
 }
