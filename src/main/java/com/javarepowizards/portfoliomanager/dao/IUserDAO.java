@@ -17,5 +17,5 @@ public interface IUserDAO {
     void updateUsername(int userId, String username);
     void updatePassword(int userId, String newPassword);
 
-
+    Optional<User> getCurrentUser();
 }

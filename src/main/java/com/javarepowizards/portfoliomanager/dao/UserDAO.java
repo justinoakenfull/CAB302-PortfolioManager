@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.dao;
 
 import com.javarepowizards.portfoliomanager.models.User;
+import com.javarepowizards.portfoliomanager.services.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -241,7 +242,18 @@ public class UserDAO implements IUserDAO {
 
     }
 
+    @Override
+    public Optional<User> getCurrentUser() {
+        Optional<User> user;
 
+        try {
+            user = getUserById(Session.getCurrentUser().getUserId());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return user;
+    }
 
 
     // TODO: Get user holdings.
