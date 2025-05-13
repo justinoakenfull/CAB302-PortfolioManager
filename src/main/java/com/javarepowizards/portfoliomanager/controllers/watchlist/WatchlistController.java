@@ -30,8 +30,17 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * Controller for the Watchlist view.
+ * Manages the retrieval of a user's watchlist from the DAO, displays it in a table,
+ * and handles user interactions such as adding or viewing stock details.
+ */
 public class WatchlistController implements Initializable {
 
+    /**
+     * A drop-shadow effect that can be applied to the watchlist table
+     * for enhanced visual styling.
+     */
     public DropShadow dropShadow;
     @FXML private VBox      tableContainer;
     @FXML private TableView<WatchlistRow> tableView;
@@ -41,8 +50,16 @@ public class WatchlistController implements Initializable {
 
     private IWatchlistDAO watchlistDAO;
     private StockRepository repo;
-    private int currentUserId = 1; // TODO: set this on login
+    private int currentUserId;
 
+    /**
+     * Initializes the controller after its root element has been processed.
+     * Sets up DAO instances, determines the current user ID, logs it,
+     * and populates the watchlist table.
+     *
+     * @param location  the location used to resolve relative paths for the root object, or null if unknown
+     * @param resources the resources used to localize the root object, or null if not localized
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         watchlistDAO = AppContext.getService(IWatchlistDAO.class);
@@ -50,7 +67,7 @@ public class WatchlistController implements Initializable {
         IUserDAO userDAO = AppContext.getService(IUserDAO.class);
         currentUserId = userDAO.getCurrentUser().isPresent() ? userDAO.getCurrentUser().get().getUserId() : 1;
 
-        System.out.println("Current user ID: " + currentUserId);
+        //System.out.println("Current user ID: " + currentUserId);
 
         try {
             refreshTable();

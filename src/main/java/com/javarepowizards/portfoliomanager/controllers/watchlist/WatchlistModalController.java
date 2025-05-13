@@ -7,12 +7,25 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
+
+/**
+ * Controller for the watchlist modal dialog.
+ * Responsible for populating and displaying detailed stock information
+ * in a separate modal window.
+ */
 public class WatchlistModalController {
 
     @FXML private Label    stockTitle;
     @FXML private Label    openLabel, closeLabel, changeLabel, changePercentLabel, volumeLabel;
     @FXML private TextArea longDescArea;
 
+    /**
+     * Populate the modal view with data from the given stock.
+     * Sets the company name, ticker, price details (open, close, change, change percent),
+     * trading volume, and long description on the corresponding UI controls.
+     *
+     * @param stock the stock whose data will be displayed in the modal
+     */
     public void initData(IStock stock) {
         stockTitle.setText(stock.getCompanyName() + " (" + stock.getTicker() + ")");
         PriceRecord rec = stock.getCurrentRecord();

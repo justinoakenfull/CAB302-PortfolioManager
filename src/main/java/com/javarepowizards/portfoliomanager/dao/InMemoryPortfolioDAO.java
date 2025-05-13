@@ -1,7 +1,6 @@
 package com.javarepowizards.portfoliomanager.dao;
 
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
-import com.javarepowizards.portfoliomanager.dao.StockDAO; // BAD ENCAPSULATION, remove imports later
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.StockData;
 import org.springframework.stereotype.Repository;
@@ -10,6 +9,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * In-memory implementation of the portfolio data access object.
+ * Stores portfolio entries and available balance in memory.
+ * Initializes with a default set of holdings as of a fixed date.
+ */
 @Repository
 public class InMemoryPortfolioDAO implements IPortfolioDAO {
 
@@ -17,7 +21,10 @@ public class InMemoryPortfolioDAO implements IPortfolioDAO {
     private double availableBalance = 10_000;
     private StockDAO stockDAO;
 
-
+    /**
+     * Constructs the in-memory portfolio DAO and populates initial holdings.
+     * Uses a fixed date to fetch sample stock data for initial entries.
+     */
     public InMemoryPortfolioDAO(){
 
         LocalDate date = LocalDate.of(2023, 12, 29);
@@ -35,9 +42,33 @@ public class InMemoryPortfolioDAO implements IPortfolioDAO {
 
     }
 
+    /**
+     * Returns the list of current portfolio entries.
+     *
+     * @return a list of portfolio entries held in memory
+     */
     @Override public List<PortfolioEntry> getHoldings()                { return holdings; }
+
+    /**
+     * Returns the available cash balance for the portfolio.
+     *
+     * @return the available balance
+     */
     @Override public double getAvailableBalance()                     { return availableBalance; }
+
+    /**
+     * Adds a new entry to the portfolio holdings.
+     *
+     * @param entry the portfolio entry to add
+     */
     @Override public void addToHoldings(PortfolioEntry entry)         { holdings.add(entry); }
+
+    /**
+     * Computes the total value of the portfolio.
+     * Includes the available cash balance plus the market value of all holdings.
+     *
+     * @return the total portfolio value
+     */
     @Override public double getTotalPortfolioValue()                  {
         double total = availableBalance;
         for (PortfolioEntry e : holdings) total += e.getMarketValue();

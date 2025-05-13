@@ -12,10 +12,24 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 
+
+/**
+ * Loader that reads ASX price history and optional descriptions from CSV files.
+ * Stores price records and descriptions in memory for fast lookup.
+ */
 public class OpenCsvAsxLoader implements PriceHistoryLoader {
     private final Map<String, List<PriceRecord>> data = new HashMap<>();
     private final Map<String, StockDescription> descriptions = new HashMap<>();
 
+    /**
+     * Constructs a loader and reads price history from the given CSV file.
+     * Expects the CSV to have two header lines for tickers and fields, then data rows.
+     * After loading, price records for each ticker are sorted by date.
+     *
+     * @param csvPath path to the ASX price CSV file
+     * @throws IOException if an I/O error occurs while reading the file
+     * @throws CsvValidationException if the CSV format is invalid
+     */
     public OpenCsvAsxLoader(Path csvPath) throws IOException, CsvValidationException {
         try (Reader r = Files.newBufferedReader(csvPath);
              CSVReader reader = new CSVReader(r)) {
@@ -74,6 +88,14 @@ public class OpenCsvAsxLoader implements PriceHistoryLoader {
                 .forEach(list -> list.sort(Comparator.comparing(PriceRecord::getDate)));
     }
 
+    /**
+     * Reads stock descriptions from the specified CSV file.
+     * The CSV must have at least three columns: ticker, short description, long description.
+     *
+     * @param descCsv path to the descriptions CSV file
+     * @throws IOException if an I/O error occurs while reading the file
+     * @throws CsvValidationException if the CSV format is invalid or header is missing
+     */
     public void loadDescriptions(Path descCsv) throws IOException, CsvValidationException {
         try (Reader r = Files.newBufferedReader(descCsv);
              CSVReader reader = new CSVReader(r)) {
@@ -97,17 +119,33 @@ public class OpenCsvAsxLoader implements PriceHistoryLoader {
     }
 
     /**
-     * @return empty if no description was loaded for that ticker
+     * Returns the description for a given ticker, if one was loaded.
+     *
+     * @param ticker the stock ticker symbol
+     * @return an Optional containing the StockDescription or empty if not present
      */
     public Optional<StockDescription> getDescription(String ticker) {
         return Optional.ofNullable(descriptions.get(ticker));
     }
 
+
+    /**
+     * Returns the set of all tickers for which price history has been loaded.
+     *
+     * @return an unmodifiable set of ticker strings
+     */
     @Override
     public Set<String> availableTickers() {
         return Collections.unmodifiableSet(data.keySet());
     }
 
+    /**
+     * Returns the full price history for the specified ticker.
+     * If no data exists for the ticker, returns an empty list.
+     *
+     * @param ticker the stock ticker symbol
+     * @return an unmodifiable list of PriceRecord objects
+     */
     @Override
     public List<PriceRecord> loadHistory(String ticker) {
         return Collections.unmodifiableList(data.getOrDefault(ticker, List.of()));

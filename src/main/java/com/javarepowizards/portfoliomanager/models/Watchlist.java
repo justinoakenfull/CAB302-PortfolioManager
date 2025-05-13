@@ -2,10 +2,8 @@ package com.javarepowizards.portfoliomanager.models;
 
 import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
-import com.javarepowizards.portfoliomanager.dao.WatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
-import com.javarepowizards.portfoliomanager.models.StockName;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -15,8 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Holds the shared, observable list of WatchlistRow for one user.
- * Any view binding to this model will see updates automatically.
+ * Manages the observable watchlist for a single user.
+ * The rows list is live and updates any bound TableView automatically.
  */
 public class Watchlist {
     private final StockRepository   repo;
@@ -24,6 +22,14 @@ public class Watchlist {
     private final int               userId;
     private final ObservableList<WatchlistRow> rows = FXCollections.observableArrayList();
 
+    /**
+     * Creates a Watchlist model for the given user.
+     * Immediately loads the current watchlist entries.
+     *
+     * @param repo   repository for retrieving stock details
+     * @param dao    DAO for persisting and querying the user's watchlist
+     * @param userId unique identifier of the user whose watchlist is managed
+     */
     public Watchlist(StockRepository repo,
                           IWatchlistDAO dao,
                           int userId) {
@@ -33,12 +39,23 @@ public class Watchlist {
         refresh();
     }
 
-    /** @return the live list of rows, for TableView#setItems(...) */
+    /**
+     * Returns the live list of WatchlistRow objects.
+     * Use this in TableView#setItems to bind the view to this model.
+     *
+     * @return an observable list of WatchlistRow entries
+     */
     public ObservableList<WatchlistRow> getRows() {
         return rows;
     }
 
-    /** Reloads the list from the DAO &amp; shared repo. */
+    /**
+     * Reloads the watchlist entries from the DAO and stock repository.
+     * Clears existing rows, then for each symbol in the user's watchlist:
+     * verifies availability, retrieves the IStock, and adds a row
+     * with a removal callback that updates both DAO and view.
+     * Any SQLException or IOException is wrapped in a RuntimeException.
+     */
     public void refresh() {
         rows.clear();
         try {

@@ -2,19 +2,27 @@ package com.javarepowizards.portfoliomanager.ui;
 
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.paint.Color;
 import javafx.util.Callback;
-
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.function.Function;
 
+/**
+ * Utility class providing factory methods for creating TableCell instances
+ * tailored to display numeric, currency, and long values in TableView columns.
+ * Class is non-instantiable.
+ */
 public final class TableCellFactories {
     private TableCellFactories() {}
 
     /**
-     * Numeric cell: formats to `decimals` places, and if colourIfPositive==true
-     * paints text green when {@literal >=0}, red when {@literal <0}.
+     * Returns a cell factory that formats Double values to the specified number
+     * of decimal places. If colourIfPositive is true, text color is set to green
+     * when value is greater than or equal to zero and red when value is negative.
+     *
+     * @param decimals number of decimal places to display
+     * @param colourIfPositive true to apply positive/negative colouring
+     * @param <S> the row item type
+     * @return a Callback suitable for use as a TableColumn cell factory
      */
     public static <S>
     Callback<TableColumn<S,Double>,TableCell<S,Double>>
@@ -40,8 +48,14 @@ public final class TableCellFactories {
     }
 
     /**
-     * Currency cell: uses NumberFormat.getCurrencyInstance(locale), set to `decimals` places.
-     * Always centered.
+     * Returns a cell factory that formats Double values as currency
+     * using the specified Locale and number of decimal places.
+     * Cells are centered by default in the TableView.
+     *
+     * @param locale the Locale for currency formatting
+     * @param decimals number of decimal places to display
+     * @param <S> the row item type
+     * @return a Callback suitable for use as a TableColumn cell factory
      */
     public static <S>
     Callback<TableColumn<S,Double>,TableCell<S,Double>>
@@ -62,7 +76,10 @@ public final class TableCellFactories {
     }
 
     /**
-     * Long cell: formats with thousands separators (%,d).
+     * Returns a cell factory that formats Long values with thousands separators.
+     *
+     * @param <S> the row item type
+     * @return a Callback suitable for use as a TableColumn cell factory
      */
     public static <S>
     Callback<TableColumn<S,Long>,TableCell<S,Long>>

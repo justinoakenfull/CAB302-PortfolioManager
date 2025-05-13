@@ -8,10 +8,26 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Reads historical ASX trading data from a CSV file and converts it into
+ * StockBar objects organized by ticker symbol.
+ * Uses the first two lines of the CSV to determine column metadata,
+ * then parses each subsequent row into date and value maps.
+ */
 public class HistoricalDataCSVLoader {
 
     private final String csvFilePath = "src/main/resources/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv";
 
+    /**
+     * Loads historical stock data from the specified CSV file.
+     * Determines which columns correspond to open, high, low, close and volume
+     * for each ticker, then builds StockBar instances for each date and ticker.
+     *
+     * @param csvFilePath file system path to the CSV containing ASX data
+     * @return a map where each key is a ticker symbol and the value is a list
+     *         of StockBar objects sorted in file order
+     * @throws IOException if reading the CSV file fails
+     */
     public Map<String, List<StockBar>> loadStockData(String csvFilePath) throws IOException {
         Map<String, List<StockBar>> stockData = new HashMap<>();
 
