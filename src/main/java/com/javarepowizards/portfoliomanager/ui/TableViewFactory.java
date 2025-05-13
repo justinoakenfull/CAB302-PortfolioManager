@@ -8,7 +8,7 @@ import javafx.util.Callback;
 import java.util.List;
 
 /**
- * Builds a TableView<S> given a list of ColumnConfig<S,?>.
+ * Builds a TableView{@literal <S>} given a list of ColumnConfig{@literal <S,?>}.
  */
 public class TableViewFactory {
     @SuppressWarnings("unchecked")

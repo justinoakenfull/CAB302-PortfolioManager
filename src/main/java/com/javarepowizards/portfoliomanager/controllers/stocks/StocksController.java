@@ -18,14 +18,10 @@ import java.io.IOException;
 
 /**
  * Controller for the Stocks view.
- * <p>
  * Responsible for:
- * <ul>
- *   <li>Initializing the stocks TableView with data and custom cell formatting.</li>
- *   <li>Handling user interactions such as buying a stock.</li>
- *   <li>Binding UI elements for responsive layout.</li>
- * </ul>
- * </p>
+ *   Initializing the stocks TableView with data and custom cell formatting.
+ *   Handling user interactions such as buying a stock.
+ *   Binding UI elements for responsive layout.
  */
 public class StocksController {
 
@@ -43,17 +39,15 @@ public class StocksController {
 
     /**
      * Called automatically after FXML fields are injected.
-     * <p>
      * Performs the following initialization steps:
-     * <ol>
-     *   <li>Retrieve services (StockRepository, PortfolioDAO) from application context.</li>
-     *   <li>Create and configure TableColumn objects.</li>
-     *   <li>Install custom cell factories for formatting numeric values and coloring Change (%).</li>
-     *   <li>Load stock data into the table.</li>
-     *   <li>Set up event handler for the Buy button.</li>
-     *   <li>Bind the portfolio heading width for responsive wrapping/ellipsis.</li>
-     * </ol>
-     * </p>
+     *   Retrieve services (StockRepository, PortfolioDAO) from application context.
+     *   Create and configure TableColumn objects.
+     *   Install custom cell factories for formatting numeric values and coloring Change (%).
+     *   Load stock data into the table.
+     *   Set up event handler for the Buy button.
+     *   Bind the portfolio heading width for responsive wrapping/ellipsis.
+     * 
+     * 
      */
     @FXML
     public void initialize() {
@@ -197,10 +191,8 @@ public class StocksController {
 
     /**
      * Handles the “Buy” button action.
-     * <p>
      * Validates the selected stock and quantity, then creates a PortfolioEntry
      * and saves it via the PortfolioDAO. Feedback is shown in the buyFeedbackLabel.
-     * </p>
      */
     private void handleBuyStock() {
         StockRow selected = tableView.getSelectionModel().getSelectedItem();

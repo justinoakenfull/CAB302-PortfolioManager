@@ -14,7 +14,7 @@ public final class TableCellFactories {
 
     /**
      * Numeric cell: formats to `decimals` places, and if colourIfPositive==true
-     * paints text green when >=0, red when <0.
+     * paints text green when {@literal >=0}, red when {@literal <0}.
      */
     public static <S>
     Callback<TableColumn<S,Double>,TableCell<S,Double>>

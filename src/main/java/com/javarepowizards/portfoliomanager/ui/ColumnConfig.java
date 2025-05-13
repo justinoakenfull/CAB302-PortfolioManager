@@ -7,10 +7,11 @@ import javafx.util.Callback;
 import java.util.function.Function;
 
 /**
- * Describes one column in a TableView<S>:
- *  - header text
- *  - how to extract an ObservableValue<T> from S
- *  - optional custom cell factory
+ * Describes one column in a {@code TableView<S>}:
+ *  - how to extract an {@code ObservableValue<T>} from S
+ *
+ * @param <S> the row‐type
+ * @param <T> the cell‐value type
  */
 public class ColumnConfig<S,T> {
     private final String header;
