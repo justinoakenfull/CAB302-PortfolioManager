@@ -4,6 +4,7 @@ package com.javarepowizards.portfoliomanager.controllers.dashboard;
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
@@ -27,6 +28,8 @@ import javafx.util.Callback;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.Pane;
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
+import com.javarepowizards.portfoliomanager.services.PortfolioInitializer;
+import java.time.LocalDate;
 
 
 /**
@@ -54,6 +57,7 @@ public class DashboardController {
     private final IWatchlistDAO watchlistDAO = AppContext.getService(IWatchlistDAO.class);
     private final StockRepository repo = AppContext.getService(StockRepository.class);
     private final int currentUserId = 1;
+    private final StockDAO stockDAO = StockDAO.getInstance();
 
     /**
      * Called automatically when the FXML is loaded
@@ -133,19 +137,19 @@ public class DashboardController {
     }
 
     private void buildPortfolioPieChart(){
-        PortfolioDAO portfolioDAO = AppContext.getService(PortfolioDAO.class);
+        StockDAO stockDAO = StockDAO.getInstance();
+        PortfolioDAO portfolioDAO = PortfolioInitializer.createDummyPortfolio(stockDAO, LocalDate.of(2023, 12, 29));
         List<PortfolioEntry> entries = portfolioDAO.getHoldings();
 
         double totalValue = entries.stream()
-                .mapToDouble(e -> e.getBuyPrice() * e.getQuantity())
+                .mapToDouble(PortfolioEntry::getMarketValue)
                 .sum();
 
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
 
         for (PortfolioEntry entry : entries) {
-            double value = entry.getBuyPrice() * entry.getQuantity();
-            double percent = (value / totalValue) * 100;
-            pieData.add(new PieChart.Data(entry.getStock().getCompanyName(),value));
+            double value = entry.getMarketValue();
+            pieData.add(new PieChart.Data(entry.getStock().getSymbol(),value));
         }
 
         PieChart chart = new PieChart(pieData);
