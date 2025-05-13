@@ -1,0 +1,1 @@
+moduleSearchIndex = [{"l":"com.javarepowizards.portfoliomanager"}];updateSearchResults();

@@ -1,0 +1,17 @@
+module:com.javarepowizards.portfoliomanager
+com.javarepowizards.portfoliomanager
+com.javarepowizards.portfoliomanager.config
+com.javarepowizards.portfoliomanager.controllers.dashboard
+com.javarepowizards.portfoliomanager.controllers.portfolio
+com.javarepowizards.portfoliomanager.controllers.simulation
+com.javarepowizards.portfoliomanager.controllers.stocks
+com.javarepowizards.portfoliomanager.controllers.useraccounts
+com.javarepowizards.portfoliomanager.controllers.watchlist
+com.javarepowizards.portfoliomanager.dao
+com.javarepowizards.portfoliomanager.domain.price
+com.javarepowizards.portfoliomanager.domain.stock
+com.javarepowizards.portfoliomanager.infrastructure
+com.javarepowizards.portfoliomanager.models
+com.javarepowizards.portfoliomanager.operations.simulation
+com.javarepowizards.portfoliomanager.services
+com.javarepowizards.portfoliomanager.ui
