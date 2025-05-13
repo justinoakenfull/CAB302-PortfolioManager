@@ -6,6 +6,10 @@
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="JavadocGenerationManager">
+    <option name="OUTPUT_DIRECTORY" value="D:/University/CAB302/Repo/CAB302-PortfolioManager/javadocs" />
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="false" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
