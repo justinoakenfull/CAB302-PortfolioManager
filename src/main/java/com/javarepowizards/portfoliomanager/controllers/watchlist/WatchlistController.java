@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.watchlist;
 
 import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
@@ -46,6 +47,10 @@ public class WatchlistController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         watchlistDAO = AppContext.getService(IWatchlistDAO.class);
         repo = AppContext.getService(StockRepository.class);
+        IUserDAO userDAO = AppContext.getService(IUserDAO.class);
+        currentUserId = userDAO.getCurrentUser().isPresent() ? userDAO.getCurrentUser().get().getUserId() : 1;
+
+        System.out.println("Current user ID: " + currentUserId);
 
         try {
             refreshTable();
