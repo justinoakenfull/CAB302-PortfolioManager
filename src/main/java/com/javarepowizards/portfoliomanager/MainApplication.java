@@ -55,12 +55,14 @@ public class MainApplication extends Application {
     }
 
     private void initializeStockRepository() throws URISyntaxException, CsvValidationException, IOException {
-        URL csvUrl = getClass().getResource("/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv");
-        if (csvUrl == null) {
-            throw new IllegalStateException("CSV file not found");
+        URL priceCsvUrl = getClass().getResource("/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv");
+        URL descUrl   = getClass().getResource("/com/javarepowizards/portfoliomanager/data/descriptions.csv");
+        if (priceCsvUrl == null || descUrl == null) {
+            throw new IllegalStateException("CSV file(s) not found");
         }
-        Path csvPath = Paths.get(csvUrl.toURI());
-        StockRepository repo = new InMemoryStockRepository(csvPath);
+        Path csvPath = Paths.get(priceCsvUrl.toURI());
+        Path csvDescPath = Paths.get(descUrl.toURI());
+        StockRepository repo = new InMemoryStockRepository(csvPath, csvDescPath);
         AppContext.initStockRepository(repo);
     }
 

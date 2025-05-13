@@ -39,4 +39,6 @@ module com.javarepowizards.portfoliomanager {
 
     opens com.javarepowizards.portfoliomanager.controllers.portfolio to javafx.fxml;
 
+    exports com.javarepowizards.portfoliomanager.domain.price;
+
 }

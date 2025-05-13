@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.infrastructure;
 
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
+import com.javarepowizards.portfoliomanager.domain.stock.StockDescription;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -13,6 +14,7 @@ import java.util.*;
 
 public class OpenCsvAsxLoader implements PriceHistoryLoader {
     private final Map<String, List<PriceRecord>> data = new HashMap<>();
+    private final Map<String, StockDescription> descriptions = new HashMap<>();
 
     public OpenCsvAsxLoader(Path csvPath) throws IOException, CsvValidationException {
         try (Reader r = Files.newBufferedReader(csvPath);
@@ -70,6 +72,35 @@ public class OpenCsvAsxLoader implements PriceHistoryLoader {
         // finally sort each ticker’s history
         data.values()
                 .forEach(list -> list.sort(Comparator.comparing(PriceRecord::getDate)));
+    }
+
+    public void loadDescriptions(Path descCsv) throws IOException, CsvValidationException {
+        try (Reader r = Files.newBufferedReader(descCsv);
+             CSVReader reader = new CSVReader(r)) {
+
+            String[] header = reader.readNext();
+            if (header == null || header.length < 3) {
+                throw new CsvValidationException("Expected header with at least 3 columns");
+            }
+
+            String[] row;
+            while ((row = reader.readNext()) != null) {
+                if (row.length < 3 || row[0].isBlank()) continue;
+
+                String ticker   = row[0].trim().replace("\"", "");
+                String shortDesc= row[1].trim().replace("\"", "");
+                String longDesc = row[2].trim().replace("\"", "");
+
+                descriptions.put(ticker, new StockDescription(shortDesc, longDesc));
+            }
+        }
+    }
+
+    /**
+     * @return empty if no description was loaded for that ticker
+     */
+    public Optional<StockDescription> getDescription(String ticker) {
+        return Optional.ofNullable(descriptions.get(ticker));
     }
 
     @Override

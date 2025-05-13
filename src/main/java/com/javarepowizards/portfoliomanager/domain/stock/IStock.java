@@ -24,6 +24,16 @@ public interface IStock {
     PriceHistory getHistory();
 
     /**
+     * A short 100 word description of the stock
+     */
+    String getShortDescription();
+
+    /**
+     * A longer 300 word description of the stock
+     */
+    String getLongDescription();
+
+    /**
      * Convenience: price for a specific day, if available.
      */
     default Optional<PriceRecord> getRecord(LocalDate date) {
