@@ -11,6 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
@@ -33,7 +35,7 @@ public class StocksController {
     @FXML private Button buyStockButton;              // Button to trigger buy operation
     @FXML private VBox portfolioBox;                  // Container for portfolio pie chart
     // @FXML private Label portfolioHeading;             // Heading label for portfolio pane
-
+    @FXML private TableColumn<StockRow, Void> actionCol;
 
     // --- Data access objects ---
     private PortfolioDAO portfolioDAO;                // DAO for managing portfolio entries
@@ -53,6 +55,7 @@ public class StocksController {
      */
     @FXML
     public void initialize() {
+        tableView.getColumns().clear();
         // Retrieve application services
         this.stockRepository = AppContext.getService(StockRepository.class);
         this.portfolioDAO    = AppContext.getService(PortfolioDAO.class);
@@ -87,11 +90,12 @@ public class StocksController {
         TableColumn<StockRow, Long> volumeCol = new TableColumn<>("Volume (M)");
         volumeCol.setCellValueFactory(cell -> cell.getValue().volumeProperty().asObject());
 
+
         // --- Cell formatting ---
 
         // Factory to format numbers to two decimal places, default white text
         Callback<TableColumn<StockRow, Double>, TableCell<StockRow, Double>> twoDecimalFactory =
-                col -> new TableCell<StockRow, Double>() {
+                col -> new TableCell<>() {
                     @Override
                     protected void updateItem(Double value, boolean empty) {
                         super.updateItem(value, empty);
@@ -114,7 +118,7 @@ public class StocksController {
         changeCol.setCellFactory(twoDecimalFactory);
 
         // Factory for Change (%) column: append “%”, color red/green
-        changePctCol.setCellFactory(col -> new TableCell<StockRow, Double>() {
+        changePctCol.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Double value, boolean empty) {
                 super.updateItem(value, empty);
@@ -143,7 +147,7 @@ public class StocksController {
         });
 
         // Attach all columns to the TableView
-        tableView.getColumns().setAll(
+        tableView.getColumns().addAll(
                 tickerCol, nameCol,
                 openCol, closeCol,
                 changeCol, changePctCol,
@@ -159,8 +163,58 @@ public class StocksController {
             buyFeedbackLabel.setTextFill(Color.RED);
         }
 
+
         // --- Event handlers ---
          buyStockButton.setOnAction(e -> handleBuyStock());
+
+        setupActionColumn();
+        tableView.getColumns().add(actionCol);
+
+    }
+
+    private void setupActionColumn() {
+        actionCol.setCellFactory(new Callback<TableColumn<StockRow, Void>, TableCell<StockRow, Void>>() {
+            @Override
+            public TableCell<StockRow, Void> call(final TableColumn<StockRow, Void> param) {
+                return new TableCell<StockRow, Void>() {
+                    private final Button btn = new Button();
+
+                    {
+                        // Create image view
+                        ImageView imageView = new ImageView(
+                                new Image(getClass().getResourceAsStream(
+                                        "/com/javarepowizards/portfoliomanager/images/StockInfo64x64.png")));
+
+                        // Set image size (adjust as needed)
+                        imageView.setFitWidth(64);
+                        imageView.setFitHeight(64);
+
+                        // Configure button
+                        btn.setGraphic(imageView);
+                        btn.getStyleClass().add("image-button"); // Add custom CSS class
+                        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                        btn.setOnAction((ActionEvent event) -> {
+                            StockRow data = getTableView().getItems().get(getIndex());
+                            tableView.getSelectionModel().select(data);
+                            handleBuyStock();
+                        });
+
+                        // Tooltip for better UX
+                        btn.setTooltip(new Tooltip("Buy this stock"));
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btn);
+                        }
+                    }
+                };
+            }
+        });
     }
 
     /**

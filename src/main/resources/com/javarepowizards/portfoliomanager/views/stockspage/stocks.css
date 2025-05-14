@@ -183,3 +183,17 @@
     -fx-background-color: transparent;
     -fx-text-fill: #0d89d1;
 }
+
+/* Action button in table */
+.action-button {
+    -fx-background-color: transparent;
+}
+
+.action-button:hover {
+    -fx-background-color: transparent
+}
+
+/* Make sure buttons in table cells are centered */
+.stock-table .table-cell {
+    -fx-alignment: CENTER;
+}
