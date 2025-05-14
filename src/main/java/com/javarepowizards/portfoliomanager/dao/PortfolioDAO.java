@@ -4,7 +4,7 @@ import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 
 import java.util.List;
 
-public class PortfolioDAO {
+public class PortfolioDAO implements IPortfolioDAO{
     private List<PortfolioEntry> holdings;
 
     private final double availableBalance;
