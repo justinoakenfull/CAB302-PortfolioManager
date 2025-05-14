@@ -204,6 +204,25 @@ public class UserDAO implements IUserDAO {
         }
     }
 
+    public void updateFullName(int userId, String fName, String lName) throws SQLException {
+        String sqlFName = "UPDATE users SET first_name = ? WHERE user_id = ?";
+        String sqlLName = "UPDATE users SET last_name = ? WHERE user_id = ?";
+        if (fName != null) {
+            try (PreparedStatement pstmt = connection.prepareStatement(sqlFName)) {
+                pstmt.setString(1, fName);
+                pstmt.setInt(2, userId);
+                pstmt.executeUpdate();
+            }
+        }
+        if (lName != null) {
+            try (PreparedStatement pstmt = connection.prepareStatement(sqlLName)) {
+                pstmt.setString(1, lName);
+                pstmt.setInt(2, userId);
+                pstmt.executeUpdate();
+            }
+        }
+    }
+
 
 
 
@@ -239,7 +258,6 @@ public class UserDAO implements IUserDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override

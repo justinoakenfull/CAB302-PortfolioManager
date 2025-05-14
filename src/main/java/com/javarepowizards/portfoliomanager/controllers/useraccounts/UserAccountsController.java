@@ -7,6 +7,7 @@ import com.javarepowizards.portfoliomanager.services.IAuthService;
 import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,8 @@ import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 public class UserAccountsController implements Initializable {
-    @FXML private TextField nameField; // TODO: Add handling
+    @FXML private TextField fNameField;
+    @FXML private TextField lNameField;
     @FXML private TextField usernameField; // Field - User's Last Name.
     @FXML private TextField emailField; // Field - User's email.
 
@@ -35,59 +37,70 @@ public class UserAccountsController implements Initializable {
     @Autowired
     private IAuthService authService;
 
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         userDAO = AppContext.getService(IUserDAO.class);
         authService = AppContext.getService(IAuthService.class);
     }
 
-
-
     @FXML
     private void updateUserInfo() {
-        String username = usernameField.getText();
-        String email = emailField.getText();
         try {
-            if (username != null) {
+            String fName = fNameField.getText();
+            String lName = lNameField.getText();
+            String username = usernameField.getText();
+            String email = emailField.getText();
+            System.out.println(username);
+            if (username.length() > 1) {
                 userDAO.updateUsername(Session.getCurrentUser().getUserId(), username);
             }
-            if (email != null && IsEmail(email)) {
-
+            if (email.length() > 1 && IsEmail(email)) {
                 userDAO.updateEmail(Session.getCurrentUser().getUserId(), email);
+            } else if (email.length() > 1 && !IsEmail(email)) {
+                throw new Exception("Incorrect email format.");
+            }
+            if (fName.length() > 1 || lName.length() > 1) {
+                userDAO.updateFullName(Session.getCurrentUser().getUserId(), fName, lName);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlertError(e.getMessage());
         }
     }
 
     @FXML
-    private void updateUserPassword() throws SQLException {
-
+    private void updateUserPassword() {
         String oldPassword = oldPasswordField.getText();
         String newPassword = newPasswordField.getText();
         String confirmPassword = confirmPasswordField.getText();
-
         try {
             Optional<User> userOpt = userDAO.getUserById(Session.getCurrentUser().getUserId());
             if (userOpt.isEmpty() || !authService.verifyPassword(oldPassword, userOpt.get().getPasswordHash())) {
-                System.out.println("Incorrect Password!");
+                throw new SQLException("Incorrect Password!");
             }
             if (!Objects.equals(newPassword, confirmPassword)) {
-                System.out.println("New password does not match.");
+                throw new SQLException("New password does not match.");
+            }
+            if (newPassword.length() < 8) {
+                throw new SQLException("Password must be at least 8 characters.");
             }
             userDAO.updatePassword(Session.getCurrentUser().getUserId(), authService.hashPassword(confirmPassword));
         } catch (SQLException e) {
-            e.printStackTrace();
+            showAlertError(e.getMessage());
         }
     }
 
-
+    private void showAlertError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
     private boolean IsEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
-        return Pattern.compile(emailRegex).matcher(emailField.getText()).matches();
+        return Pattern.compile(emailRegex).matcher(email).matches();
     }
-
-
-
 }
