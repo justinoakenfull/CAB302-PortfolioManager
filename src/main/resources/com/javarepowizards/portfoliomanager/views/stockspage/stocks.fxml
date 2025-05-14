@@ -42,7 +42,8 @@
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                 </columnResizePolicy>
                 <columns>
-                    <TableColumn fx:id="actionCol" editable="false" prefWidth="100.0" resizable="false" sortable="false" text="Action" />
+                    <TableColumn fx:id="infoCol" editable="false" prefWidth="100.0" resizable="false" sortable="false" />
+                    <TableColumn fx:id="favouriteCol" editable="false" prefWidth="100.0" resizable="false" sortable="false" />
                 </columns>
             </TableView>
         </VBox>

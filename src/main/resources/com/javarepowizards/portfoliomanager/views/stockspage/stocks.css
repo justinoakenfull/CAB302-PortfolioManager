@@ -185,11 +185,11 @@
 }
 
 /* Action button in table */
-.action-button {
+.image-button {
     -fx-background-color: transparent;
 }
 
-.action-button:hover {
+.image-button:hover {
     -fx-background-color: transparent
 }
 

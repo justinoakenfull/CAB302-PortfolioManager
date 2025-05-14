@@ -35,7 +35,8 @@ public class StocksController {
     @FXML private Button buyStockButton;              // Button to trigger buy operation
     @FXML private VBox portfolioBox;                  // Container for portfolio pie chart
     // @FXML private Label portfolioHeading;             // Heading label for portfolio pane
-    @FXML private TableColumn<StockRow, Void> actionCol;
+    @FXML private TableColumn<StockRow, Void> infoCol;
+    @FXML private TableColumn<StockRow, Void> favouriteCol;
 
     // --- Data access objects ---
     private PortfolioDAO portfolioDAO;                // DAO for managing portfolio entries
@@ -165,33 +166,65 @@ public class StocksController {
 
 
         // --- Event handlers ---
-         buyStockButton.setOnAction(e -> handleBuyStock());
+        buyStockButton.setOnAction(e -> handleBuyStock());
 
-        setupActionColumn();
-        tableView.getColumns().add(actionCol);
+        setupInfoColumn();
+        setupFavouriteColumn();
+        tableView.getColumns().addAll(favouriteCol, infoCol);
+
 
     }
 
-    private void setupActionColumn() {
-        actionCol.setCellFactory(new Callback<TableColumn<StockRow, Void>, TableCell<StockRow, Void>>() {
+    private void setupFavouriteColumn() {
+        favouriteCol.setCellFactory(new Callback<>() {
             @Override
             public TableCell<StockRow, Void> call(final TableColumn<StockRow, Void> param) {
-                return new TableCell<StockRow, Void>() {
+                return new TableCell<>() {
                     private final Button btn = new Button();
-
                     {
-                        // Create image view
                         ImageView imageView = new ImageView(
-                                new Image(getClass().getResourceAsStream(
-                                        "/com/javarepowizards/portfoliomanager/images/StockInfo64x64.png")));
-
-                        // Set image size (adjust as needed)
-                        imageView.setFitWidth(64);
-                        imageView.setFitHeight(64);
-
-                        // Configure button
+                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/Unfavourited32x32.png")));
+                        imageView.setFitWidth(32);
+                        imageView.setFitHeight(32);
                         btn.setGraphic(imageView);
-                        btn.getStyleClass().add("image-button"); // Add custom CSS class
+                        btn.getStyleClass().add("image-button");
+                        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                        btn.setOnAction((ActionEvent event) -> {
+                            StockRow data = getTableView().getItems().get(getIndex());
+                            tableView.getSelectionModel().select(data);
+                            handleFavourite();
+                        });
+
+                        // Tooltip for better UX
+                        btn.setTooltip(new Tooltip("Check this stock out"));
+                    }
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btn);
+                        }
+                    }
+                };
+            }
+        });
+    }
+
+    private void setupInfoColumn() {
+        infoCol.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<StockRow, Void> call(final TableColumn<StockRow, Void> param) {
+                return new TableCell<>() {
+                    private final Button btn = new Button();
+                    {
+                        ImageView imageView = new ImageView(
+                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockInfo64x64.png")));
+                        imageView.setFitWidth(32);
+                        imageView.setFitHeight(32);
+                        btn.setGraphic(imageView);
+                        btn.getStyleClass().add("image-button");
                         btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                         btn.setOnAction((ActionEvent event) -> {
                             StockRow data = getTableView().getItems().get(getIndex());
@@ -200,9 +233,8 @@ public class StocksController {
                         });
 
                         // Tooltip for better UX
-                        btn.setTooltip(new Tooltip("Buy this stock"));
+                        btn.setTooltip(new Tooltip("Check this stock out"));
                     }
-
                     @Override
                     public void updateItem(Void item, boolean empty) {
                         super.updateItem(item, empty);
@@ -286,6 +318,13 @@ public class StocksController {
     }
 
     @FXML
-    public void decreasePurchaseAmount(ActionEvent actionEvent) {
+    private void decreasePurchaseAmount() {
+
     }
+
+    @FXML
+    private void handleFavourite() {
+
+    }
+
 }
