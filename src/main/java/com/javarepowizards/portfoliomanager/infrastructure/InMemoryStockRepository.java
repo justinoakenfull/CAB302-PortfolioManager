@@ -15,19 +15,35 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * In-memory implementation of the StockRepository interface.
+ * Uses CSV-based loader to read price history and descriptions,
+ * and caches created IStock instances for reuse.
+ */
 public class InMemoryStockRepository implements StockRepository {
     private final PriceHistoryLoader loader;
     private final Map<String,IStock> cache = new ConcurrentHashMap<>();
+
     /**
-     * @param csvPath Path to your ASX price CSV.
+     * Constructs the repository with a path to the ASX price CSV.
+     * Descriptions are not loaded in this constructor.
+     *
+     * @param csvPath path to the ASX price data CSV file
+     * @throws IOException if reading the CSV fails
+     * @throws CsvValidationException if the CSV content is invalid
      */
     public InMemoryStockRepository(Path csvPath) throws IOException, CsvValidationException {
         this.loader = new OpenCsvAsxLoader(csvPath);
     }
 
     /**
-     * @param priceCsvPath Path to your ASX price CSV.
-     * @param descCsvPath  Path to your descriptions.csv.
+     * Constructs the repository with paths to the ASX price CSV and a descriptions CSV.
+     * The descriptions CSV must contain rows of ticker, short description, and long description.
+     *
+     * @param priceCsvPath path to the ASX price data CSV file
+     * @param descCsvPath path to the CSV containing stock descriptions
+     * @throws IOException if reading either CSV fails
+     * @throws CsvValidationException if the CSV content is invalid
      */
     public InMemoryStockRepository(Path priceCsvPath,
                                    Path descCsvPath)
@@ -38,11 +54,25 @@ public class InMemoryStockRepository implements StockRepository {
         loader.loadDescriptions(descCsvPath);
     }
 
+    /**
+     * Returns the set of all ticker symbols available in the price CSV.
+     *
+     * @return a set of ticker strings
+     */
     @Override
     public Set<String> availableTickers() {
         return loader.availableTickers();
     }
 
+    /**
+     * Retrieves or creates an IStock instance for the given ticker.
+     * Price history is loaded on first request and stored in cache.
+     * If no history exists for the ticker, a stub record with zero values
+     * for the current date is used. Descriptions default to blank if absent.
+     *
+     * @param ticker the stock ticker symbol
+     * @return an IStock instance containing price history and descriptions
+     */
     @Override
     public IStock getByTicker(String ticker) {
         return cache.computeIfAbsent(ticker, t -> {
@@ -72,6 +102,12 @@ public class InMemoryStockRepository implements StockRepository {
         });
     }
 
+    /**
+     * Returns a list of IStock instances for all available tickers.
+     * Stocks are retrieved in the order of the available tickers set iteration.
+     *
+     * @return unmodifiable list of all loaded IStock instances
+     */
     @Override
     public List<IStock> getAll() {
         return availableTickers().stream()

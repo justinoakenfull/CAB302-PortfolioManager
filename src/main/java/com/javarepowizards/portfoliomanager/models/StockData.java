@@ -11,7 +11,7 @@ public class StockData {
     // This field is declared final since the date associated with this record is immutable once created.
     private final LocalDate date;
 
-    // The current price of the stock. #TODO Decide which open/close to use for price.
+    // The current price of the stock.
     private Double price;
 
     // The opening price of the stock on the recorded day.

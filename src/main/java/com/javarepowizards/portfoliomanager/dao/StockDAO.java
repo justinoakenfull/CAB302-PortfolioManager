@@ -19,10 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The StockDAO class is responsible for reading stock data from a CSV file
- * and making it available via in-memory lookup methods.
- * It uses an EnumMap keyed by StockName to store a list of StockData objects for each stock.
- * The CSV is assumed to have a specific header format and data layout.
+ * Provides access to historical stock data loaded from a CSV resource.
+ * Uses an EnumMap to store a list of StockData entries for each StockName.
+ * The CSV file must follow a specific three-header format before data rows.
  */
 public class StockDAO {
 
@@ -31,6 +30,12 @@ public class StockDAO {
     private static class Holder {
         private static final StockDAO INSTANCE = new StockDAO();
     }
+
+    /**
+     * Returns the singleton instance of StockDAO.
+     *
+     * @return the single StockDAO instance
+     */
     public static StockDAO getInstance() {
         return Holder.INSTANCE;
     }
@@ -55,15 +60,12 @@ public class StockDAO {
     private final Map<StockName, List<StockData>> stockDataMap = new EnumMap<>(StockName.class);
 
     /**
-     * Loads the CSV file given its file path.
-     * The CSV file is expected to contain three header lines:
-     *    1. The first header row lists the stock symbols (repeated in column groups).
-     *    2. The second header row lists the field names (e.g., Price, Open, High, etc.).
-     *    3. The third header row is used for other meta-information (e.g., a "Date" label) and is ignored.
-     * The method then processes each subsequent line as data.
+     * Loads stock data from the CSV file at the given path.
+     * Expects three header rows: symbols, field names, and an ignored row.
+     * Each subsequent line is parsed into StockData objects grouped by stock.
      *
-     * @param filePath the String path to the CSV file.
-     * @throws IOException if the file cannot be read.
+     * @param filePath path to the CSV file
+     * @throws IOException if reading the file fails
      */
     public void loadCSV(String filePath) throws IOException {
         // Open the file using a BufferedReader wrapped around a FileReader.
@@ -180,12 +182,12 @@ public class StockDAO {
         }
     }
 
+
     /**
-     * Retrieves the list of stock data entries for the specified stock symbol.
+     * Returns all loaded StockData entries for the given stock symbol.
      *
-     * @param stockName the stock symbol enum (e.g., StockName.WES_AX)
-     * @return a list of StockData objects corresponding to that stock,
-     *         or an empty list if no data is available.
+     * @param stockName the stock symbol enum
+     * @return list of StockData for that symbol, or an empty list if none
      */
     public List<StockData> getStockData(StockName stockName) {
         // Use getOrDefault to return an empty list if no data is found.
