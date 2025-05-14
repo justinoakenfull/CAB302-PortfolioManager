@@ -8,6 +8,7 @@ import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -27,11 +28,12 @@ public class StocksController {
 
     // --- FXML-injected UI components ---
     @FXML private TableView<StockRow> tableView;      // Main table of available stocks
-    @FXML private TextField quantityField;            // User input for quantity to buy
+    @FXML private TextField stockQuantityField;            // User input for quantity to buy
     @FXML private Label buyFeedbackLabel;             // Feedback label for buy actions
     @FXML private Button buyStockButton;              // Button to trigger buy operation
     @FXML private VBox portfolioBox;                  // Container for portfolio pie chart
-    @FXML private Label portfolioHeading;             // Heading label for portfolio pane
+    // @FXML private Label portfolioHeading;             // Heading label for portfolio pane
+
 
     // --- Data access objects ---
     private PortfolioDAO portfolioDAO;                // DAO for managing portfolio entries
@@ -158,13 +160,7 @@ public class StocksController {
         }
 
         // --- Event handlers ---
-        buyStockButton.setOnAction(e -> handleBuyStock());
-
-        // --- Responsive heading binding ---
-        // Bind the heading’s max width to the VBox width minus left+right padding (20px each)
-        portfolioHeading
-                .maxWidthProperty()
-                .bind(portfolioBox.widthProperty().subtract(40));
+         buyStockButton.setOnAction(e -> handleBuyStock());
     }
 
     /**
@@ -206,7 +202,7 @@ public class StocksController {
 
         try {
             // Parse user-entered quantity
-            int quantity = Integer.parseInt(quantityField.getText());
+            int quantity = Integer.parseInt(stockQuantityField.getText());
 
             // Build a PortfolioEntry and persist it
             StockName stockName = StockName.fromString(selected.tickerProperty().get());
@@ -228,5 +224,14 @@ public class StocksController {
             buyFeedbackLabel.setText("Error: " + ex.getMessage());
             buyFeedbackLabel.setTextFill(Color.RED);
         }
+    }
+
+    @FXML
+    private void increasePurchaseAmount() {
+
+    }
+
+    @FXML
+    public void decreasePurchaseAmount(ActionEvent actionEvent) {
     }
 }

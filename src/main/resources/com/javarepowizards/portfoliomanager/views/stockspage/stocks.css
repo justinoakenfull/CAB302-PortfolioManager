@@ -12,7 +12,7 @@
 }
 
 /* "Add Stock" button */
-.btn {
+.button {
     -fx-background-color: #0d89d1;
     -fx-text-fill: white;
     -fx-background-radius: 4px;
@@ -20,7 +20,7 @@
     -fx-padding: 8 20;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
 }
-.btn:hover {
+.button:hover {
     -fx-background-color: #0b78b0;
 }
 
@@ -164,7 +164,7 @@
     -fx-background-color: #dc3545;
 }
 
-.btn-danger {
+.button-danger {
     -fx-background-color: #dc3545;
     -fx-text-fill: white;
     -fx-background-radius: 4px;
@@ -173,10 +173,13 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
 }
 
-/* Override white text for Change (%) cells */
-.stock-table .table-cell.balance-value-positive {
-    -fx-text-fill: #65a24b;   /* green */
+.text-field {
+    -fx-background-color: #2c2f33;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0.1, 0, 2);
 }
-.stock-table .table-cell.balance-value-negative {
-    -fx-text-fill: #d6534c;   /* red */
+
+.purchase-swapper {
+    -fx-background-color: transparent;
+    -fx-text-fill: #0d89d1;
 }
