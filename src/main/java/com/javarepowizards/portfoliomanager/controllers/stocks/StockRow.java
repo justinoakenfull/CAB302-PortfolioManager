@@ -3,6 +3,8 @@ package com.javarepowizards.portfoliomanager.controllers.stocks;
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import javafx.beans.property.*;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 
 public class StockRow {
     private final StringProperty ticker = new SimpleStringProperty();
@@ -12,6 +14,8 @@ public class StockRow {
     private final DoubleProperty change = new SimpleDoubleProperty();
     private final DoubleProperty changePercent = new SimpleDoubleProperty();
     private final LongProperty volume = new SimpleLongProperty();
+
+
 
     public StockRow(IStock stock) {
         PriceRecord rec = stock.getCurrentRecord();
