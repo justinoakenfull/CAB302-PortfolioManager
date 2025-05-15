@@ -1,6 +1,8 @@
 package com.javarepowizards.portfoliomanager.controllers.stocks;
 
 import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.dao.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
@@ -10,12 +12,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * Controller for the Stocks view.
@@ -24,7 +35,7 @@ import java.io.IOException;
  *   Handling user interactions such as buying a stock.
  *   Binding UI elements for responsive layout.
  */
-public class StocksController {
+public class StocksController implements Initializable {
 
     // --- FXML-injected UI components ---
     @FXML private TableView<StockRow> tableView;      // Main table of available stocks
@@ -33,29 +44,29 @@ public class StocksController {
     @FXML private Button buyStockButton;              // Button to trigger buy operation
     @FXML private VBox portfolioBox;                  // Container for portfolio pie chart
     // @FXML private Label portfolioHeading;             // Heading label for portfolio pane
-
+    @FXML private TableColumn<StockRow, Void> infoCol;
+    @FXML private TableColumn<StockRow, Void> favouriteCol;
 
     // --- Data access objects ---
     private PortfolioDAO portfolioDAO;                // DAO for managing portfolio entries
     private StockRepository stockRepository;          // Repository for fetching stock data
 
-    /**
-     * Called automatically after FXML fields are injected.
-     * Performs the following initialization steps:
-     *   Retrieve services (StockRepository, PortfolioDAO) from application context.
-     *   Create and configure TableColumn objects.
-     *   Install custom cell factories for formatting numeric values and coloring Change (%).
-     *   Load stock data into the table.
-     *   Set up event handler for the Buy button.
-     *   Bind the portfolio heading width for responsive wrapping/ellipsis.
-     * 
-     * 
-     */
-    @FXML
-    public void initialize() {
+    @Autowired
+    IWatchlistDAO watchlistDAO;
+
+    private int currentUserId;
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        watchlistDAO = AppContext.getService(IWatchlistDAO.class);
+        IUserDAO userDAO = AppContext.getService(IUserDAO.class);
+        currentUserId = userDAO.getCurrentUser().isPresent() ? userDAO.getCurrentUser().get().getUserId() : 1;
+
+        tableView.getColumns().clear();
         // Retrieve application services
-        this.stockRepository = AppContext.getService(StockRepository.class);
-        this.portfolioDAO    = AppContext.getService(PortfolioDAO.class);
+        stockRepository = AppContext.getService(StockRepository.class);
+        portfolioDAO    = AppContext.getService(PortfolioDAO.class);
 
         // --- TableColumn setup ---
 
@@ -87,11 +98,12 @@ public class StocksController {
         TableColumn<StockRow, Long> volumeCol = new TableColumn<>("Volume (M)");
         volumeCol.setCellValueFactory(cell -> cell.getValue().volumeProperty().asObject());
 
+
         // --- Cell formatting ---
 
         // Factory to format numbers to two decimal places, default white text
         Callback<TableColumn<StockRow, Double>, TableCell<StockRow, Double>> twoDecimalFactory =
-                col -> new TableCell<StockRow, Double>() {
+                col -> new TableCell<>() {
                     @Override
                     protected void updateItem(Double value, boolean empty) {
                         super.updateItem(value, empty);
@@ -114,7 +126,7 @@ public class StocksController {
         changeCol.setCellFactory(twoDecimalFactory);
 
         // Factory for Change (%) column: append “%”, color red/green
-        changePctCol.setCellFactory(col -> new TableCell<StockRow, Double>() {
+        changePctCol.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Double value, boolean empty) {
                 super.updateItem(value, empty);
@@ -143,7 +155,7 @@ public class StocksController {
         });
 
         // Attach all columns to the TableView
-        tableView.getColumns().setAll(
+        tableView.getColumns().addAll(
                 tickerCol, nameCol,
                 openCol, closeCol,
                 changeCol, changePctCol,
@@ -159,8 +171,120 @@ public class StocksController {
             buyFeedbackLabel.setTextFill(Color.RED);
         }
 
+
         // --- Event handlers ---
-         buyStockButton.setOnAction(e -> handleBuyStock());
+        buyStockButton.setOnAction(e -> handleBuyStock());
+
+        setupInfoColumn();
+        setupFavouriteColumn();
+        tableView.getColumns().addAll(favouriteCol, infoCol);
+
+
+    }
+
+    private void setupFavouriteColumn() {
+        favouriteCol.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<StockRow, Void> call(final TableColumn<StockRow, Void> param) {
+                return new TableCell<>() {
+                    private final Button btn = new Button();
+                    private final ImageView unfavourited = new ImageView(
+                            new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/Unfavourited32x32.png"))));
+                    private final ImageView favourite = new ImageView(
+                            new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/Favourited32x32.png"))));
+                    {
+
+                        unfavourited.setFitWidth(32);
+                        unfavourited.setFitHeight(32);
+                        favourite.setFitWidth(32);
+                        favourite.setFitHeight(32);
+
+                        btn.getStyleClass().add("image-button");
+                        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+                        btn.setOnAction((ActionEvent event) -> {
+                            StockRow data = getTableView().getItems().get(getIndex());
+                            String ticker = data.tickerProperty().get();
+                            StockName stockName = StockName.fromString(ticker);
+
+                            try {
+                                List<StockName> favorites = watchlistDAO.listForUser(currentUserId);
+                                if (favorites.contains(stockName)) {
+                                    watchlistDAO.removeForUser(currentUserId, stockName);
+                                    btn.setGraphic(unfavourited);
+                                    btn.setTooltip(new Tooltip("Add to favourites"));
+                                } else {
+                                    watchlistDAO.addForUser(currentUserId, stockName);
+                                    btn.setGraphic(favourite);
+                                    btn.setTooltip(new Tooltip("Remove from favourites"));
+                                }
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                    }
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            StockRow data = getTableView().getItems().get(getIndex());
+                            String ticker = data.tickerProperty().get();
+                            StockName stockName = StockName.fromString(ticker);
+
+                            try {
+                                List<StockName> favourites = watchlistDAO.listForUser(currentUserId);
+                                boolean isFavourite = favourites.contains(stockName);
+
+                                btn.setGraphic(isFavourite ? favourite : unfavourited);
+                                btn.setTooltip(new Tooltip(isFavourite ? "Remove from favourites" : "Add to favourites"));
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
+                            }
+                            setGraphic(btn);
+                        }
+                    }
+                };
+            }
+        });
+    }
+
+    private void setupInfoColumn() {
+        infoCol.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<StockRow, Void> call(final TableColumn<StockRow, Void> param) {
+                return new TableCell<>() {
+                    private final Button btn = new Button();
+                    {
+                        ImageView imageView = new ImageView(
+                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockInfo64x64.png")));
+                        imageView.setFitWidth(32);
+                        imageView.setFitHeight(32);
+                        btn.setGraphic(imageView);
+                        btn.getStyleClass().add("image-button");
+                        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                        btn.setOnAction((ActionEvent event) -> {
+                            StockRow data = getTableView().getItems().get(getIndex());
+                            tableView.getSelectionModel().select(data);
+                            selectStocks();
+                        });
+
+                        // Tooltip for better UX
+                        btn.setTooltip(new Tooltip("Check this stock out"));
+                    }
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btn);
+                        }
+                    }
+                };
+            }
+        });
     }
 
     /**
@@ -180,7 +304,6 @@ public class StocksController {
                 rows.add(new StockRow(stock));
             }
         }
-
         // Populate the table
         tableView.setItems(rows);
     }
@@ -232,6 +355,27 @@ public class StocksController {
     }
 
     @FXML
-    public void decreasePurchaseAmount(ActionEvent actionEvent) {
+    private void decreasePurchaseAmount() {
+
     }
+
+    @FXML
+    private void selectStocks() {
+        StockRow selected = tableView.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            buyFeedbackLabel.setText("No Stock Selected!");
+            buyFeedbackLabel.getStyleClass().add("buy-feedback-label-none");
+            buyFeedbackLabel.setTextFill(Color.RED);
+        } else {
+            buyFeedbackLabel.setText(selected.companyNameProperty().get());
+            buyFeedbackLabel.getStyleClass().add("buy-feedback-label-selected");
+            buyFeedbackLabel.setTextFill(Color.GREEN);
+        }
+    }
+
+
+
+
+
 }
