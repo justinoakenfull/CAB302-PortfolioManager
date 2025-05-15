@@ -48,13 +48,67 @@ public class WatchlistRow {
         remove.set(btn);
     }
 
+    /**
+     * Returns the property representing the stock’s short name.
+     *
+     * @return the StringProperty for the short name
+     */
     public StringProperty shortNameProperty()     { return shortName; }
+
+    /**
+     * Returns the property representing the stock’s full display name.
+     *
+     * @return the StringProperty for the display name
+     */
     public StringProperty displayNameProperty()   { return displayName; }
+
+    /**
+     * Returns the property representing the opening price.
+     *
+     * @return the DoubleProperty for the opening price
+     */
     public DoubleProperty openProperty()          { return open; }
+
+    /**
+     * Returns the property representing the closing price.
+     *
+     * @return the DoubleProperty for the closing price
+     */
     public DoubleProperty closeProperty()         { return close; }
+
+    /**
+     * Returns the property representing the absolute price change.
+     *
+     * @return the DoubleProperty for the price change
+     */
     public DoubleProperty changeProperty()        { return change; }
+
+    /**
+     * Returns the property representing the percentage price change.
+     *
+     * @return the DoubleProperty for the percentage change
+     */
     public DoubleProperty changePercentProperty() { return changePercent; }
+
+
+    /**
+     * Returns the property representing the current price.
+     *
+     * @return the DoubleProperty for the current price
+     */
     public DoubleProperty priceProperty()         { return price; }
+
+    /**
+     * Returns the property representing the trading volume.
+     *
+     * @return the LongProperty for the volume
+     */
     public LongProperty volumeProperty()          { return volume; }
+
+    /**
+     * Returns the property representing the remove button control.
+     *
+     * @return the ObjectProperty containing the remove Button
+     */
     public ObjectProperty<Button> removeProperty(){ return remove; }
 }

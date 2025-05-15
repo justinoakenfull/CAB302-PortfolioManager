@@ -57,6 +57,7 @@
               styleClass="panel">
             <Label text="Portfolio Overview"
                    styleClass="panel-label"/>
+            <Pane fx:id="portfolioPieContainer" prefWidth="300" prefHeight="300" VBox.vgrow = "ALWAYS"/>
         </VBox>
 
         <!-- Quick Tips Widget -->

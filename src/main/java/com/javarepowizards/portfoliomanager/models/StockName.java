@@ -1,5 +1,9 @@
 package com.javarepowizards.portfoliomanager.models;
 
+/**
+ * Enumeration of supported ASX stock symbols and their corresponding display names.
+ * Each constant holds the exact symbol used in CSV headers and a human-friendly name.
+ */
 public enum StockName {
     WES_AX("WES.AX", "Wesfarmers Ltd"),
     TLS_AX("TLS.AX", "Telstra Corp Ltd"),
@@ -26,26 +30,61 @@ public enum StockName {
     private final String symbol;
     private final String displayName;
 
+    /**
+     * Constructs a StockName constant with its CSV symbol and display name.
+     *
+     * @param symbol the exact string used in CSV headers, for example "WES.AX"
+     * @param displayName the human-friendly name, for example "Wesfarmers Ltd"
+     */
     StockName(String symbol, String displayName) {
         this.symbol      = symbol;
         this.displayName = displayName;
     }
 
-    /** The exact string used in your CSV header, e.g. "WES.AX". */
+    /**
+     * Returns the symbol used in CSV headers.
+     *
+     * @return the CSV symbol string
+     */
     public String getSymbol() {
         return symbol;
     }
 
-    /** Human‐friendly company name, e.g. "Wesfarmers Ltd". */
+    /**
+     * Returns the human-friendly company name.
+     *
+     * @return the display name string
+     */
     public String getDisplayName() {
         return displayName;
     }
 
+    /**
+     * Alias for getDisplayName.
+     *
+     * @return the display name string
+     */
+    public String getCompanyName(){
+        return displayName;
+    }
+
+    /**
+     * Returns the symbol as the string representation.
+     *
+     * @return the CSV symbol
+     */
     @Override
     public String toString() {
         return symbol;
     }
 
+    /**
+     * Parses the provided string to its corresponding StockName constant.
+     *
+     * @param symbol the CSV symbol or string to parse
+     * @return the matching StockName constant
+     * @throws IllegalArgumentException if the symbol does not match any constant
+     */
     public static StockName fromString(String symbol) {
         for (StockName sn : values()) {
             if (sn.symbol.equals(symbol.trim())) {

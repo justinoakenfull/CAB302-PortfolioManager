@@ -10,16 +10,21 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
 
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.StackPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.javarepowizards.portfoliomanager.controllers.simulation.SimulationController"
+            stylesheets="@simulation.css"
             prefWidth="1200.0" prefHeight="800.0"
             style="-fx-background-color: #2A2A2A;">
 
-    <!-- CENTER: VBox containing chart, simulation settings, and output box 3A3632 -->
+    <!-- CENTER: VBox containing chart, simulation settings, and output box  -->
     <center>
         <VBox spacing="10" style="-fx-padding: 10;">
             <!-- LineChart with black border and rounded corners 656565-->
-            <LineChart fx:id="portfolioLineChart" prefWidth="900" prefHeight="700"
+            <LineChart fx:id="portfolioLineChart" prefWidth="900" prefHeight="650"
                        style="-fx-background-color: #39393939;
                               -fx-border-color: #000000;
                               -fx-border-width: 2px;
@@ -56,15 +61,20 @@
                                -fx-border-radius: 8;"/>
             </HBox>
 
-            <!-- Output Box: HBox with black border and rounded corners -->
-            <HBox spacing="10" style="-fx-background-color: #39393939;
-                                      -fx-border-color: #000000;
-                                      -fx-border-width: 2px;
-                                      -fx-background-radius: 10;
-                                      -fx-border-radius: 10;
-                                      -fx-padding: 10;" prefHeight="200">
-                <!-- Left side: Metrics VBox -->
-                <VBox spacing="5" alignment="TOP_LEFT" prefWidth="450">
+            <!-- Output Box: HBox with metrics and  AI  -->
+            <HBox spacing="10"
+                  prefHeight="250"
+                  style="-fx-background-color: #39393939;
+             -fx-border-color: #000000;
+             -fx-border-width: 2px;
+             -fx-background-radius: 10;
+             -fx-border-radius: 10;
+             -fx-padding: 10;">
+
+                <!-- Left side: Metrics VBox  -->
+                <VBox spacing="5"
+                      alignment="TOP_LEFT"
+                      prefWidth="200">
                     <Label text="Sharpe Ratio:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
                     <Label fx:id="labelSharpeRatio" style="-fx-text-fill: #FFFFFF;"/>
                     <Label text="Volatility:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
@@ -73,11 +83,39 @@
                     <Label fx:id="labelCumulativeReturn" style="-fx-text-fill: #FFFFFF;"/>
                 </VBox>
 
-                <!-- Right side: Placeholder -->
-                <VBox alignment="CENTER" prefWidth="450">
-                    <Label text="Complete Simulation to receive results" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px;"/>
-                </VBox>
+                <!-- Right side: AI Review + Spinner  -->
+                <StackPane fx:id="aiContainer"
+                           alignment="CENTER"
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-background-color: #39393939;
+                    -fx-padding: 10;
+                    -fx-background-radius: 10;">
+
+                    <!-- ScrollPane  -->
+                    <ScrollPane fx:id="scrollReview"
+                                fitToWidth="true"
+                                hbarPolicy="NEVER"
+                                vbarPolicy="AS_NEEDED"
+                                HBox.hgrow="ALWAYS"
+                                VBox.vgrow="ALWAYS"
+                                style="-fx-background-color: transparent;
+                       -fx-border-color: transparent;">
+                        <content>
+                            <Label fx:id="labelReview"
+                                   wrapText="true"
+                                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                        </content>
+                    </ScrollPane>
+
+                    <!-- Centered spinner -->
+                    <ProgressIndicator fx:id="progressIndicator"
+                                       visible="false"
+                                       prefWidth="40"
+                                       prefHeight="40"/>
+                </StackPane>
             </HBox>
+
+
         </VBox>
     </center>
 

@@ -6,6 +6,7 @@ import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockReposito
 import com.javarepowizards.portfoliomanager.models.*;
 import com.javarepowizards.portfoliomanager.services.AuthService;
 import com.javarepowizards.portfoliomanager.services.IAuthService;
+import com.javarepowizards.portfoliomanager.services.PortfolioInitializer;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +22,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 
 public class MainApplication extends Application {
     @Override
@@ -30,6 +33,7 @@ public class MainApplication extends Application {
         initializeStockRepository();
         initializeWatchlist();
         initializeAuthService();
+        initializePortfolio();
 
         // Load the login screen
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
@@ -40,6 +44,7 @@ public class MainApplication extends Application {
     }
 
     private void initializeDatabaseServices() throws SQLException {
+        // 1) DB connection, user DAO
         IDatabaseConnection dbConnection = new DatabaseConnection();
         AppContext.registerService(IDatabaseConnection.class, dbConnection);
 
@@ -55,13 +60,18 @@ public class MainApplication extends Application {
     }
 
     private void initializeStockRepository() throws URISyntaxException, CsvValidationException, IOException {
-        URL csvUrl = getClass().getResource("/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv");
-        if (csvUrl == null) {
-            throw new IllegalStateException("CSV file not found");
+        URL priceCsvUrl = getClass().getResource("/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv");
+        URL descUrl   = getClass().getResource("/com/javarepowizards/portfoliomanager/data/descriptions.csv");
+        if (priceCsvUrl == null || descUrl == null) {
+            throw new IllegalStateException("CSV file(s) not found");
         }
-        Path csvPath = Paths.get(csvUrl.toURI());
-        StockRepository repo = new InMemoryStockRepository(csvPath);
+        Path csvPath = Paths.get(priceCsvUrl.toURI());
+        Path csvDescPath = Paths.get(descUrl.toURI());
+        StockRepository repo = new InMemoryStockRepository(csvPath, csvDescPath);
         AppContext.initStockRepository(repo);
+
+        StockDAO stockDAO = StockDAO.getInstance();
+        AppContext.registerService(StockDAO.class, stockDAO);
     }
 
     private void initializeWatchlist() throws SQLException {
@@ -74,6 +84,16 @@ public class MainApplication extends Application {
 
         AppContext.registerService(IWatchlistDAO.class, watchlistDAO); // Register interface
         AppContext.registerService(Watchlist.class, watchlist);
+
+    }
+
+    private void initializePortfolio() {
+        StockDAO stockDAO = AppContext.getService(StockDAO.class);
+
+        LocalDate mostRecentDate = LocalDate.of(2023,12,29);
+        PortfolioDAO portfolioDAO = PortfolioInitializer.createDummyPortfolio(stockDAO, mostRecentDate);
+        AppContext.registerService(PortfolioDAO.class,portfolioDAO);
+
     }
 
     public static void main(String[] args) {

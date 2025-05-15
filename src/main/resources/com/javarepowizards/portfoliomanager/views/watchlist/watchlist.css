@@ -82,18 +82,22 @@
 
 .balance-text {
     -fx-fill: white;
+    -fx-text-fill: white;
 }
 
 .balance-value-positive {
     -fx-fill: #65a24b;
+    -fx-text-fill: #65a24b;
 }
 
 .balance-value-neutral {
     -fx-fill: #fefb64;
+    -fx-text-fill: #fefb64;
 }
 
 .balance-value-negative {
     -fx-fill: #d6534c;
+    -fx-text-fill: #d6534c;
 }
 
 .card {
@@ -170,6 +174,11 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
 }
 
+.company-snapshot-textarea {
+    -fx-background-color: #2b2b2b;
+    -fx-control-inner-background: #2b2b2b;
+    -fx-text-fill: white;
+}
 
 /* ──────────────────────────────────────────────────────────────
    DARK WATCHLIST TABLE  (matches the second screenshot)
@@ -234,3 +243,4 @@
     -fx-background-radius: 4;
 }
 .button.btn:hover { -fx-background-color: #0b5ed7; }
+
