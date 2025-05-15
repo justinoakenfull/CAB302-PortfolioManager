@@ -179,6 +179,9 @@ public class StocksController implements Initializable {
         setupFavouriteColumn();
         tableView.getColumns().addAll(favouriteCol, infoCol);
 
+        // Enable Search
+        setupSearchFunctionality();
+
 
     }
 
@@ -293,19 +296,20 @@ public class StocksController implements Initializable {
      * @throws IOException if there is a problem fetching or reading stock data
      */
     private void loadStocks() throws IOException {
-        ObservableList<StockRow> rows = FXCollections.observableArrayList();
-
+        allStocks.clear(); // Make sure it's reset each time
         // Iterate over all available tickers
         for (String ticker : stockRepository.availableTickers()) {
             IStock stock = stockRepository.getByTicker(ticker);
 
             // Only add rows for stocks with valid data
             if (stock != null && stock.getCurrentRecord() != null) {
-                rows.add(new StockRow(stock));
+                StockRow row = new StockRow(stock);
+                allStocks.add(row); // Store in master list
             }
         }
-        // Populate the table
-        tableView.setItems(rows);
+
+        // Populate the table with all stocks initially
+        tableView.setItems(FXCollections.observableArrayList(allStocks));
     }
 
     /**
@@ -351,12 +355,32 @@ public class StocksController implements Initializable {
 
     @FXML
     private void increasePurchaseAmount() {
+        try {
+            // Parse the current quantity from the input field, trimming whitespace
+            int current = Integer.parseInt(stockQuantityField.getText().trim());
 
+            // Increment the value and update the input field
+            stockQuantityField.setText(String.valueOf(current + 1));
+        } catch (NumberFormatException e) {
+            // If input is not a valid number, reset it to 1
+            stockQuantityField.setText("1");
+        }
     }
 
     @FXML
     private void decreasePurchaseAmount() {
+        try {
+            // Parse the current quantity from the input field, trimming whitespace
+            int current = Integer.parseInt(stockQuantityField.getText().trim());
 
+            // Decrease the value only if it is greater than 1
+            if (current > 1) {
+                stockQuantityField.setText(String.valueOf(current - 1));
+            }
+        } catch (NumberFormatException e) {
+            // If input is not a valid number, reset it to 1
+            stockQuantityField.setText("1");
+        }
     }
 
     @FXML
@@ -372,6 +396,42 @@ public class StocksController implements Initializable {
             buyFeedbackLabel.getStyleClass().add("buy-feedback-label-selected");
             buyFeedbackLabel.setTextFill(Color.GREEN);
         }
+    }
+
+    @FXML private TextField stockSearchField;
+
+    private ObservableList<StockRow> allStocks = FXCollections.observableArrayList();
+
+    private void setupSearchFunctionality() {
+        // Add a listener to the search field to react to user input changes
+        stockSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Trim whitespace and convert input to lowercase for case-insensitive matching
+            String search = newValue.trim().toLowerCase();
+
+            if (search.isEmpty()) {
+                // If the search field is empty, show all available stocks
+                tableView.setItems(FXCollections.observableArrayList(allStocks));
+                return;
+            }
+
+            // Create a new list to hold filtered stock results
+            ObservableList<StockRow> filtered = FXCollections.observableArrayList();
+
+            // Loop through all available stocks
+            for (StockRow row : allStocks) {
+                // Get the stock's ticker and company name in lowercase
+                String ticker = row.tickerProperty().get().toLowerCase();
+                String name = row.companyNameProperty().get().toLowerCase();
+
+                // Check if the search term matches either the ticker or company name
+                if (ticker.contains(search) || name.contains(search)) {
+                    filtered.add(row); // Add matching stock to filtered list
+                }
+            }
+
+            // Display only the filtered list in the table
+            tableView.setItems(filtered);
+        });
     }
 
 
