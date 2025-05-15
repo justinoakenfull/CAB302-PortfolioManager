@@ -3,6 +3,7 @@ package com.javarepowizards.portfoliomanager.controllers.simulation;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
+import com.javarepowizards.portfoliomanager.services.OllamaService;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,14 +16,24 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextArea;
+
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.regex.Matcher;
 
 public class SimulationController implements Initializable {
+
+
 
     @FXML
     private LineChart<Number, Number> portfolioLineChart;
@@ -48,6 +59,12 @@ public class SimulationController implements Initializable {
     private Button btnRunSimulation;
     @FXML
     private TextArea textReview;
+
+    @FXML
+    private Label labelReview;
+
+    @FXML
+    private ProgressIndicator progressIndicator;
     @FXML
     private ListView<String> listHoldings;
 
@@ -55,6 +72,38 @@ public class SimulationController implements Initializable {
     private IPortfolioDAO portfolioDAO;
     private StockDAO stockDAO;
     private LocalDate mostRecentDate;
+    private final OllamaService ollamaService = new OllamaService();
+
+    private static final Pattern TAGGED_RESPONSE = Pattern.compile("(?s)(?<=<Start>)(.*?)(?=<Finish>)");
+
+    private static final String PROMPT_TEMPLATE= """
+            You are an AI tutor/grader built into a student investment-simulator. After I running the simulation, you use these results:
+            
+            • Starting balance: $%.2f \s
+            • Portfolio holdings:
+            %s
+            • Portfolio balance: $%.2f \s
+            • Sharpe ratio: %.2f \s
+            • Volatility: %.2f%% \s
+            • Cumulative return: %.2f%% \s
+            
+            Now respond **exactly** in the structure below, with no extra greetings or commentary, wrapped in <Start> and <Finish> tags:
+            
+            <Start>
+            Performance Summary & Review:
+            {Your detailed, creative overview—beyond just stats}
+            
+            Highlights:
+            - {Bullet-point insights}
+            
+            Tips for Improvement:
+            - {Actionable, portfolio-specific advice}
+            
+            Rating:
+            /10 with a brief comment
+            <Finish>
+            ""\";
+            """;
 
 
 
@@ -71,6 +120,7 @@ public class SimulationController implements Initializable {
 
         // Set run simulation button action.
         btnRunSimulation.setOnAction(e -> runSimulation());
+        progressIndicator.setVisible(false);
     }
 
     // Setter methods for dependencies.
@@ -106,6 +156,9 @@ public class SimulationController implements Initializable {
         }
     }
     private void runSimulation() {
+
+
+
 
         // Retrieve simulation days from the slider.
         int simulationDays = (int) sliderSimulationDays.getValue();
@@ -172,6 +225,68 @@ public class SimulationController implements Initializable {
         labelSharpeRatio      .setText(String.format("%.2f",   annualisedSharpe));
         labelPortfolioValue   .setText(String.format("Portfolio: $%,.2f", end));
 
+        double preBalance = portfolioDAO.getAvailableBalance();
+        double preValue = portfolioDAO.getTotalPortfolioValue();
+
+
+        // Prepare UI
+        btnRunSimulation.setDisable(true);
+        labelReview.setText("Loading AI Summary...");
+        labelReview.setStyle("-fx-text-fill: #FFFFFF;");
+        progressIndicator.setVisible(true);
+
+
+        List<String> rows = portfolioDAO.getHoldings().stream()
+                .map(en -> String.format("%s: %.0f shares @ $%,.2f = $%,.2f",
+                        en.getStock().getSymbol(),
+                        en.getAmountHeld(),
+                        en.getPurchasePrice(),
+                        en.getMarketValue()))
+                .collect(Collectors.toList());
+
+
+        String prompt = String.format(
+                PROMPT_TEMPLATE,
+                preBalance + preValue,       // e.g. 81755.59
+                rows,          // the String from step 1
+                end + preBalance,         // e.g. 76659.42
+                annualisedSharpe,           // e.g. –0.47
+                annualisedVol * 100,      // e.g. 12.17
+                cumulativeReturn // e.g. –6.23
+        );
+
+
+        // Create background task for ai
+        Task<String> aiTask = new Task<>() {
+           @Override
+            protected String call() throws Exception {
+               return ollamaService.generateResponse(prompt);
+           }
+        };
+
+        // On success update text are and reset UI
+        aiTask.setOnSucceeded(evt -> {
+            String raw = aiTask.getValue();
+            String core = extractCore(raw);
+
+
+            labelReview.setText(core);
+
+            btnRunSimulation.setDisable(false);
+            progressIndicator.setVisible(false);
+        });
+
+        // on failure
+        aiTask.setOnFailed(evt -> {
+            Throwable ex = aiTask.getException();
+            ex.printStackTrace();
+            textReview.setText("⚠️ AI call failed: " + aiTask.getException().getMessage());
+            btnRunSimulation.setDisable(false);
+            progressIndicator.setVisible(false);
+        });
+
+
+        new Thread(aiTask, "Ollama-Service-Thread").start();
 
     }
 
@@ -179,4 +294,26 @@ public class SimulationController implements Initializable {
         labelPortfolioValue.setText(String.format("Portfolio: $%.2f", portfolioValue));
         labelBalance.setText(String.format("Balance: $%.2f", balance));
     }
+
+
+    public static String extractCore(String raw) {
+        String startTag = "<Start>";
+        String endTag = "<Finish>";
+
+        int s = raw.indexOf(startTag);
+        if (s >= 0){
+            String after = raw.substring(s + startTag.length());
+            int f = after.indexOf(endTag);
+            if (f >= 0){
+                return after.substring(0, f).trim();
+            }else {
+                return after.trim();
+            }
+        }
+        return raw.trim();
+
+    }
+
+
+
 }

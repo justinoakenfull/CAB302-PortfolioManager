@@ -1,0 +1,9 @@
+#scrollReview .viewport {
+  -fx-background-color: #39393939;
+}
+
+
+#scrollReview {
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+}

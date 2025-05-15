@@ -1,69 +1,94 @@
 package com.javarepowizards.portfoliomanager.services;
 
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class OllamaService {
+    private static final String TAGS_URL     = "http://localhost:11434/api/tags";
+    private static final String GENERATE_URL = "http://localhost:11434/api/generate";
 
-    private final String apiURL;
     private final String modelName;
 
-
     public OllamaService() {
-        this("http://localhost:11434/api/generate", "llama3.2:latest");
-    }
-
-    public OllamaService(String apiURL, String modelName) {
-        this.apiURL = apiURL;
-        this.modelName = modelName;
+        this.modelName = detectDefaultModel();
     }
 
 
-    public String generateResponse(String prompt) throws IOException{
+    private String detectDefaultModel() {
+        try {
+            HttpURLConnection conn = (HttpURLConnection) new URL(TAGS_URL).openConnection();
+            conn.setRequestMethod("GET");
 
-        URL url = new URL(apiURL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setDoOutput(true);
+            int status = conn.getResponseCode();
+            InputStream in = status < 400
+                    ? conn.getInputStream()
+                    : conn.getErrorStream();
 
-        // create request JSON
-        JSONObject requestJson = new JSONObject();
-        requestJson.put("model", modelName);
-        requestJson.put("prompt", prompt);
-        requestJson.put("stream", false);
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+            }
+            if (status >= 400) {
+                throw new IOException("HTTP " + status + ": " + sb);
+            }
 
+            JSONArray models = new JSONObject(sb.toString()).getJSONArray("models");
+            if (models.isEmpty()) {
+                throw new IllegalStateException("No Ollama models installed locally");
+            }
 
-        // send request ong
-        try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = requestJson.toString().getBytes(StandardCharsets.UTF_8);
-            os.write(input, 0, input.length);
+            return models.getJSONObject(0).getString("name");
+
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to detect Ollama model", e);
+        }
+    }
+
+    /**
+     * Sends the given prompt to /api/generate using the detected model.
+     */
+    public String generateResponse(String prompt) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) new URL(GENERATE_URL).openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+
+        JSONObject req = new JSONObject()
+                .put("model", modelName)
+                .put("prompt", prompt)
+                .put("stream", false);
+
+        try (var os = conn.getOutputStream()) {
+            os.write(req.toString().getBytes(StandardCharsets.UTF_8));
         }
 
-        // read full response
+        int status = conn.getResponseCode();
+        InputStream in = status < 400
+                ? conn.getInputStream()
+                : conn.getErrorStream();
 
-        StringBuilder raw = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)))
-        {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
-                raw.append(line);
+                sb.append(line);
             }
         }
 
-        // Parse and return
-        JSONObject resp = new JSONObject(raw.toString());
-        return resp.getString("response");
-    }
+        if (status >= 400) {
+            throw new IOException("HTTP " + status + ": " + sb);
+        }
 
+        return new JSONObject(sb.toString()).getString("response");
+    }
 }
