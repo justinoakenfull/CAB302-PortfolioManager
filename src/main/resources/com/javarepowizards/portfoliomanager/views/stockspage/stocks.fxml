@@ -15,7 +15,7 @@
                 <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
             </VBox.margin>
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="240.0">
-                <Label styleClass="heading-title" text="Stocks" underline="true">
+                <Label prefHeight="58.0" prefWidth="160.0" styleClass="heading-title" text="Stocks" underline="true">
                     <font>
                         <Font name="Arial Bold" size="40.0" />
                     </font>
@@ -190,7 +190,7 @@
                             </font>
                         </Button>
                     </HBox>
-                    <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0" prefWidth="205.0" text="No Stock Selected!" textAlignment="CENTER" textFill="RED">
+                    <Label alignment="CENTER" fx:id="buyFeedbackLabel" contentDisplay="CENTER" prefHeight="35.0" prefWidth="205.0" text="No Stock Selected!" textAlignment="CENTER" textFill="RED">
                         <font>
                             <Font size="24.0" />
                         </font>

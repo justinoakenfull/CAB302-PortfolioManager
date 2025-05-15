@@ -197,3 +197,14 @@
 .stock-table .table-cell {
     -fx-alignment: CENTER;
 }
+
+
+.buy-feedback-label-selected {
+    -fx-font-size: 16px;
+    -fx-font-family: "Arial";
+}
+
+.buy-feedback-label-none {
+    -fx-font-size: 24px;
+    -fx-font-family: "Arial";
+}
