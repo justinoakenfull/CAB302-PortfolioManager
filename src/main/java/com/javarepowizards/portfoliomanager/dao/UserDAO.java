@@ -272,11 +272,4 @@ public class UserDAO implements IUserDAO {
 
         return user;
     }
-
-
-    // TODO: Get user holdings.
-
-
-
-    // TODO: Add user holdings.
 }

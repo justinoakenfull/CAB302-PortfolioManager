@@ -199,10 +199,6 @@
     -fx-text-fill: white;
 }
 
-/* ──────────────────────────────────────────────────────────────
-   DARK WATCHLIST TABLE  (matches the second screenshot)
-   ──────────────────────────────────────────────────────────────*/
-
 /* Outer frame & body */
 .table-view.watchlist-table {
     -fx-background-color: #1e232b;          /* frame */
