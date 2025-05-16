@@ -16,6 +16,9 @@ public interface IUserDAO {
     void updateEmail(int userId, String email);
     void updateUsername(int userId, String username);
     void updatePassword(int userId, String newPassword);
+    void updateFullName(int userId, String fName, String lName) throws SQLException;
 
     Optional<User> getCurrentUser();
+
+
 }

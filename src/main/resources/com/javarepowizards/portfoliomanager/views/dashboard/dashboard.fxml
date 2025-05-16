@@ -34,7 +34,7 @@
 
                 <Label text="Watchlist"  styleClass="panel-label"/>
 
-            <TableView fx:id ="watchlistTable" styleClass = "watchlist-table" VBox.vgrow = "ALWAYS">
+            <TableView fx:id ="watchlistTable" styleClass = "table-view watchlist-table" VBox.vgrow = "ALWAYS">
                 <columns>
                     <TableColumn fx:id="tickerColumn"  text="Ticker"  prefWidth="100"/>
                     <TableColumn fx:id="nameColumn"   text="Name"   prefWidth="150"/>
@@ -44,7 +44,6 @@
                     <TableColumn fx:id="changePercentColumn" text="Change %" prefWidth="90"/>
                     <TableColumn fx:id="priceColumn" text="Price" prefWidth="90"/>
                     <TableColumn fx:id="volumeColumn"   text="Volume"   prefWidth="100"/>
-                    <TableColumn fx:id="removeColumn"    text="Remove"/>
                 </columns>
             </TableView>
 

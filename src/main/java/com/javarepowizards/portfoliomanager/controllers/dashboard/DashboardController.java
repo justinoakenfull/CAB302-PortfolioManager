@@ -3,12 +3,14 @@ package com.javarepowizards.portfoliomanager.controllers.dashboard;
 
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.services.Session;
 import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -30,7 +32,8 @@ import javafx.scene.layout.Pane;
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.services.PortfolioInitializer;
 import java.time.LocalDate;
-
+import java.util.stream.Collectors;
+import java.io.IOException;
 
 /**
  * Controller class for Dashboard view.
@@ -39,25 +42,37 @@ import java.time.LocalDate;
 public class DashboardController {
 
     // Label that displays rotating investment tips
-    @FXML private  Label quickTipsLabel;
-    @FXML private Pane portfolioPieContainer;
+    @FXML
+    private Label quickTipsLabel;
+    @FXML
+    private Pane portfolioPieContainer;
 
     // Tableview and columns for the watchlist section
-    @FXML private TableView<WatchlistRow> watchlistTable;
-    @FXML private TableColumn<WatchlistRow, Double> changeColumn;
-    @FXML private TableColumn<WatchlistRow, String> tickerColumn;
-    @FXML private TableColumn<WatchlistRow, String> nameColumn;
-    @FXML private TableColumn<WatchlistRow, Double> openColumn;
-    @FXML private TableColumn<WatchlistRow, Double> closeColumn;
-    @FXML private TableColumn<WatchlistRow, Double> changePercentColumn;
-    @FXML private TableColumn<WatchlistRow, Double> priceColumn;
-    @FXML private TableColumn<WatchlistRow, Long> volumeColumn;
-    @FXML private TableColumn<WatchlistRow, Button> removeColumn;
+    @FXML
+    private TableView<WatchlistRow> watchlistTable;
+    @FXML
+    private TableColumn<WatchlistRow, Double> changeColumn;
+    @FXML
+    private TableColumn<WatchlistRow, String> tickerColumn;
+    @FXML
+    private TableColumn<WatchlistRow, String> nameColumn;
+    @FXML
+    private TableColumn<WatchlistRow, Double> openColumn;
+    @FXML
+    private TableColumn<WatchlistRow, Double> closeColumn;
+    @FXML
+    private TableColumn<WatchlistRow, Double> changePercentColumn;
+    @FXML
+    private TableColumn<WatchlistRow, Double> priceColumn;
+    @FXML
+    private TableColumn<WatchlistRow, Long> volumeColumn;
+
 
     private final IWatchlistDAO watchlistDAO = AppContext.getService(IWatchlistDAO.class);
+
+   // private final IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
     private final StockRepository repo = AppContext.getService(StockRepository.class);
-    private final int currentUserId = 1;
-    private final StockDAO stockDAO = StockDAO.getInstance();
+
 
     /**
      * Called automatically when the FXML is loaded
@@ -70,92 +85,125 @@ public class DashboardController {
 
 
         // Bind column widths to resize proportionately with the table
+        watchlistTable.getColumns().forEach(col -> {
+            col.setResizable(false);
+            col.setReorderable(false);
+        });
+
+        watchlistTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
         bindColumnWidths();
-        refreshWatchlist();
-        watchlistDAO.addListener(this :: refreshWatchlist);
+        configureTableColumns();
+
+        // Whenever the DAO signals a change, reload
+        watchlistDAO.addListener(this::loadWatchlist);
+        loadWatchlist();
+
+
+        // Build portfolio pie-chart from real DAO
         buildPortfolioPieChart();
 
     }
 
-    /**
-     * Dynamically binds each table's column's width to a percentage
-     * of the total table width for a responsive layout
-     */
     private void bindColumnWidths() {
-        tickerColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.11));
-        nameColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.15));
-        openColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.10));
-        closeColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.10));
-        changePercentColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.10));
-        priceColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.10));
-        volumeColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.12));
-        removeColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.12));
+        var total = watchlistTable.widthProperty();
+        double pct = 1.0 / 8;
 
+        tickerColumn.prefWidthProperty().bind(total.multiply(pct));
+        nameColumn.prefWidthProperty().bind(total.multiply(pct));
+        openColumn.prefWidthProperty().bind(total.multiply(pct));
+        closeColumn.prefWidthProperty().bind(total.multiply(pct));
+        changePercentColumn.prefWidthProperty().bind(total.multiply(pct));
+        priceColumn.prefWidthProperty().bind(total.multiply(pct));
+        volumeColumn.prefWidthProperty().bind(total.multiply(pct));
+    }
+
+    private void configureTableColumns() {
 
         tickerColumn.setCellValueFactory(c -> c.getValue().shortNameProperty());
         nameColumn.setCellValueFactory(c -> c.getValue().displayNameProperty());
-
         openColumn.setCellValueFactory(c -> c.getValue().openProperty().asObject());
         closeColumn.setCellValueFactory(c -> c.getValue().closeProperty().asObject());
         changeColumn.setCellValueFactory(c -> c.getValue().changeProperty().asObject());
         changePercentColumn.setCellValueFactory(c -> c.getValue().changePercentProperty().asObject());
         priceColumn.setCellValueFactory(c -> c.getValue().priceProperty().asObject());
         volumeColumn.setCellValueFactory(c -> c.getValue().volumeProperty().asObject());
-        removeColumn.setCellValueFactory(c ->
-                new ReadOnlyObjectWrapper<>(c.getValue().removeProperty().get()));
 
+
+        // apply two-decimal place rounding & currency factories
         openColumn.setCellFactory(TableCellFactories.numericFactory(2, false));
         closeColumn.setCellFactory(TableCellFactories.numericFactory(2, false));
         changeColumn.setCellFactory(TableCellFactories.numericFactory(2, true));
         changePercentColumn.setCellFactory(TableCellFactories.numericFactory(2, true));
-        priceColumn.setCellFactory(TableCellFactories.currencyFactory(new Locale ("en", "AU"), 2));
+        priceColumn.setCellFactory(TableCellFactories.currencyFactory(new Locale("en", "AU"), 2));
     }
 
+    private void loadWatchlist() {
+        int userId = Session.getCurrentUser().getUserId();
+        List<WatchlistRow> rows = new ArrayList<>();
 
-    private void refreshWatchlist() {
         try {
-            List<StockName> symbols = watchlistDAO.listForUser(currentUserId);
-            List<WatchlistRow> rows = new ArrayList<>();
-            Set<String> available = repo.availableTickers();
+            // Fetch all symbols in user’s watchlist from database
+            List<StockName> symbols = watchlistDAO.listForUser(userId);
 
-            for (StockName sym : symbols) {
-                if (!available.contains(sym.getSymbol())) continue;
-                IStock stock = repo.getByTicker(sym.getSymbol());
+            for (StockName symbol : symbols) {
+                // skip if no CSV history
+                if (!repo.availableTickers().contains(symbol.getSymbol())) {
+                    continue;
+                }
 
+                IStock stock;
+                try {
+                    // may throw IOException
+                    stock = repo.getByTicker(symbol.getSymbol());
+                } catch (IOException ioe) {
+                    // log & skip bad entries
+                    ioe.printStackTrace();
+                    continue;
+                }
 
-                rows.add(new WatchlistRow(stock, () -> {
-                    try {watchlistDAO.removeForUser(currentUserId,sym); }
-                    catch (SQLException ignored) {}
-
-                }));
-
+                // wrap each IStock in  WatchlistRow
+                rows.add(new WatchlistRow(
+                        stock,
+                        () -> {
+                        }
+                ));
             }
+
+            // add stocks to the TableView
             watchlistTable.setItems(FXCollections.observableArrayList(rows));
-        } catch (Exception ex) {
-            ex.printStackTrace();
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            // TODO: show JavaFx Alert
         }
     }
 
-    private void buildPortfolioPieChart(){
-        StockDAO stockDAO = StockDAO.getInstance();
-        PortfolioDAO portfolioDAO = PortfolioInitializer.createDummyPortfolio(stockDAO, LocalDate.of(2023, 12, 29));
-        List<PortfolioEntry> entries = portfolioDAO.getHoldings();
 
-        double totalValue = entries.stream()
-                .mapToDouble(PortfolioEntry::getMarketValue)
-                .sum();
-
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-
-        for (PortfolioEntry entry : entries) {
-            double value = entry.getMarketValue();
-            pieData.add(new PieChart.Data(entry.getStock().getSymbol(),value));
+    private void buildPortfolioPieChart() {
+        int userId = Session.getCurrentUser().getUserId();
+        List<StockName> symbols;
+        try {
+            symbols = watchlistDAO.listForUser(userId);
+        } catch (SQLException e) {
+            // handle error - think need to come back to
+            return;
         }
 
-        PieChart chart = new PieChart(pieData);
-        chart.setLegendVisible(true);
+        // Count occurrences of each symbol
+        Map<String, Long> counts = symbols.stream()
+                .map(StockName::getSymbol)
+                .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
+
+        ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
+        counts.forEach((sym, cnt) ->
+                data.add(new PieChart.Data(sym, cnt))
+        );
+
+        PieChart chart = new PieChart(data);
+        chart.setLegendVisible(false);
         chart.setLabelsVisible(true);
 
+        // stretch to fill the Pane
         chart.minWidthProperty().bind(portfolioPieContainer.widthProperty());
         chart.minHeightProperty().bind(portfolioPieContainer.heightProperty());
         chart.maxWidthProperty().bind(portfolioPieContainer.widthProperty());
@@ -164,5 +212,13 @@ public class DashboardController {
         portfolioPieContainer.getChildren().setAll(chart);
     }
 }
+
+
+
+
+
+
+
+
 
 

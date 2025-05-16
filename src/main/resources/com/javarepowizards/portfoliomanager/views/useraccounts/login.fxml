@@ -26,7 +26,7 @@
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
                 <!--SKIP BUTTON CHANGE THIS LATER-->
-            <Button fx:id="dummyLogin" onAction="#loadDashboard" prefHeight="25.0" prefWidth="65.0" text="Skip" GridPane.halignment="CENTER" />
+            <Button fx:id="dummyLogin" onAction="#skipLogin" prefHeight="25.0" prefWidth="65.0" text="Skip" GridPane.halignment="CENTER" />
                 <!--SKIP BUTTON CHANGE THIS LATER-->
                 <Button fx:id="registerButton" onAction="#switchToRegister" prefHeight="25.0" prefWidth="65.0" text="Register" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                <font>

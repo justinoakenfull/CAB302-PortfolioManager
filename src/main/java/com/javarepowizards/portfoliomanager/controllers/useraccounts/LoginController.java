@@ -35,6 +35,7 @@ public class LoginController implements Initializable {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
+    @FXML private Button dummyLogin;
 
     @Autowired
     private IAuthService authService;
@@ -113,6 +114,7 @@ public class LoginController implements Initializable {
         }
     }
 
+    // Unused - Consider deletion (Note: Currently being used for skip button so idk)
     @FXML
     private void loadDashboard() {
         try {
@@ -146,5 +148,42 @@ public class LoginController implements Initializable {
     private boolean isEmail(String input) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return Pattern.compile(emailRegex).matcher(input).matches();
+    }
+
+    // Skip button brings us here, auto logs into the default account test test1234
+    @FXML
+    private void skipLogin() throws SQLException {
+
+        String username = "test";
+        String password = "test1234";
+
+        try{
+            Optional<User> userOpt = isEmail(username)
+                    ? userDAO.getUserByEmail(username)
+                    : userDAO.getUserByUsername(username);
+
+
+            Session.setCurrentUser(userOpt.get());
+
+
+            // —— swap in the “shell” with nav bar ——
+            NavigationService.loadScene(
+                    /* source node */   dummyLogin,
+                    /* fxml path */     "hello-view.fxml",
+                    /* controller init */ ctrl -> {
+                        // no extra setup: MainController.initialize()
+                        // will automatically fire and load the dashboard
+                    },
+                    /* title */         "Dashboard",
+                    /* width */         1200,
+                    /* height */        800
+            );
+
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
     }
 }

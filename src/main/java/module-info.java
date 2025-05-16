@@ -14,6 +14,8 @@ module com.javarepowizards.portfoliomanager {
     requires java.sql;
     requires spring.security.crypto;
     requires com.opencsv;
+    requires org.json;
+    requires java.compiler;
 
     opens com.javarepowizards.portfoliomanager to javafx.fxml;
     exports com.javarepowizards.portfoliomanager;

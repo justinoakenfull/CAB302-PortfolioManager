@@ -5,48 +5,64 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox alignment="TOP_CENTER" styleClass="flow-pane" stylesheets="@userAccountsProfile.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.UserAccountsController">
-         <children>
-            <VBox prefHeight="200.0" prefWidth="192.0">
-               <children>
-                  <Region maxHeight="192.0" prefHeight="192.0" prefWidth="200.0" />
-                  <TextField promptText="Full Name">
-                     <font>
-                        <Font name="Arial" size="12.0" />
-                     </font></TextField>
-                  <Region maxHeight="16.0" prefHeight="16.0" prefWidth="200.0" />
-                  <TextField fx:id="usernameField" promptText="Username">
-                     <font>
-                        <Font name="Arial" size="12.0" />
-                     </font></TextField>
-                  <Region maxHeight="16.0" prefHeight="16.0" prefWidth="200.0" />
-                  <TextField fx:id="emailField" promptText="Email">
-                     <font>
-                        <Font name="Arial" size="12.0" />
-                     </font></TextField>
-                  <Region maxHeight="16.0" prefHeight="16.0" prefWidth="200.0" />
-                  <Button onAction="#updateUserInfo" prefWidth="160.0" text="Update Details">
-                     <VBox.margin>
-                        <Insets left="16.0" right="16.0" />
-                     </VBox.margin></Button>
-                  <Region prefHeight="96.0" prefWidth="200.0" />
-            <PasswordField fx:id="oldPasswordField" promptText="Current Password" />
-            <PasswordField fx:id="newPasswordField" promptText="New Password">
-               <VBox.margin>
-                  <Insets bottom="16.0" top="16.0" />
-               </VBox.margin>
-            </PasswordField>
-            <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password">
-               <VBox.margin>
-                  <Insets bottom="8.0" />
-               </VBox.margin>
-            </PasswordField>
-                  <Button alignment="CENTER" onAction="#updateUserPassword" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="192.0" text="Update Password" textAlignment="CENTER">
-                     <font>
-                        <Font name="Arial" size="12.0" />
-                     </font>
-                  </Button>
-               </children>
-            </VBox>
-         </children>
+<HBox alignment="TOP_CENTER" styleClass="flow-pane" stylesheets="@userAccountsProfile.css"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.UserAccountsController">
+   <VBox prefHeight="200.0" prefWidth="192.0">
+      <Region maxHeight="192.0" prefHeight="192.0" prefWidth="200.0"/>
+      <HBox maxHeight="32.0" prefHeight="32.0" prefWidth="200.0">
+         <TextField fx:id="fNameField" promptText="First Name">
+            <font>
+               <Font name="Arial" size="12.0"/>
+            </font>
+            <HBox.margin>
+               <Insets right="8.0"/>
+            </HBox.margin>
+         </TextField>
+         <TextField fx:id="lNameField" promptText="Last Name">
+            <font>
+               <Font name="Arial" size="12.0"/>
+            </font>
+            <HBox.margin>
+               <Insets left="8.0"/>
+            </HBox.margin>
+         </TextField>
       </HBox>
+      <Region maxHeight="16.0" prefHeight="16.0" prefWidth="200.0"/>
+      <TextField fx:id="usernameField" promptText="Username">
+         <font>
+            <Font name="Arial" size="12.0"/>
+         </font>
+      </TextField>
+      <Region maxHeight="16.0" prefHeight="16.0" prefWidth="200.0"/>
+      <TextField fx:id="emailField" promptText="Email">
+         <font>
+            <Font name="Arial" size="12.0"/>
+         </font>
+      </TextField>
+      <Region maxHeight="16.0" prefHeight="16.0" prefWidth="200.0"/>
+      <Button onAction="#updateUserInfo" prefWidth="160.0" text="Update Details">
+         <VBox.margin>
+            <Insets left="16.0" right="16.0"/>
+         </VBox.margin>
+      </Button>
+      <Region prefHeight="96.0" prefWidth="200.0"/>
+      <PasswordField fx:id="oldPasswordField" promptText="Current Password"/>
+      <PasswordField fx:id="newPasswordField" promptText="New Password">
+         <VBox.margin>
+            <Insets bottom="16.0" top="16.0"/>
+         </VBox.margin>
+      </PasswordField>
+      <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password">
+         <VBox.margin>
+            <Insets bottom="8.0"/>
+         </VBox.margin>
+      </PasswordField>
+      <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#updateUserPassword"
+              prefWidth="192.0" text="Update Password" textAlignment="CENTER">
+         <font>
+            <Font name="Arial" size="12.0"/>
+         </font>
+      </Button>
+   </VBox>
+</HBox>
