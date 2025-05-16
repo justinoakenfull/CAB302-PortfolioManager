@@ -3,6 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
+<?import javafx.geometry.Insets?>
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController"
@@ -26,7 +27,8 @@
         </rowConstraints>
 
         <!-- Watchlist Widget -->
-        <VBox GridPane.columnIndex="0"
+        <VBox fx:id="tableContainer"
+              GridPane.columnIndex="0"
               GridPane.rowIndex="0"
               GridPane.rowSpan="2"
               spacing="10"
@@ -34,18 +36,10 @@
 
                 <Label text="Watchlist"  styleClass="panel-label"/>
 
-            <TableView fx:id ="watchlistTable" styleClass = "watchlist-table" VBox.vgrow = "ALWAYS">
-                <columns>
-                    <TableColumn fx:id="tickerColumn"  text="Ticker"  prefWidth="100"/>
-                    <TableColumn fx:id="nameColumn"   text="Name"   prefWidth="150"/>
-                    <TableColumn fx:id="openColumn"   text="Open"   prefWidth="90"/>
-                    <TableColumn fx:id="closeColumn"  text="Close"  prefWidth="90"/>
-                    <TableColumn fx:id="changeColumn" text="Change" prefWidth="90"/>
-                    <TableColumn fx:id="changePercentColumn" text="Change %" prefWidth="90"/>
-                    <TableColumn fx:id="priceColumn" text="Price" prefWidth="90"/>
-                    <TableColumn fx:id="volumeColumn"   text="Volume"   prefWidth="100"/>
-                    <TableColumn fx:id="removeColumn"    text="Remove"/>
-                </columns>
+            <TableView fx:id="watchlistTable" styleClass="watchlist-table" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                <opaqueInsets>
+                    <Insets />
+                </opaqueInsets>
             </TableView>
 
         </VBox>
