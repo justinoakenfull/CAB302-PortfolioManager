@@ -5,6 +5,7 @@
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
@@ -13,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<HBox alignment="TOP_CENTER" styleClass="flow-pane" stylesheets="@watchlist.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistController">
+<HBox alignment="TOP_CENTER" styleClass="flow-pane" stylesheets="@watchlist.css" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistController">
     <children>
           <VBox prefHeight="800.0" HBox.hgrow="ALWAYS">
               <children>
@@ -41,7 +42,6 @@
                   </HBox>
                   <VBox fx:id="tableContainer" prefHeight="800" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                       <children>
-                          <Button fx:id="addStockButton" alignment="BOTTOM_RIGHT" onAction="#onAddStock" prefHeight="100" styleClass="btn" text="Add Stock" HBox.hgrow="ALWAYS" />
                           <TableView fx:id="tableView" styleClass="watchlist-table" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                               <opaqueInsets>
                                   <Insets />
@@ -147,9 +147,9 @@
                   <Insets bottom="30.0" />
                </VBox.margin>
                   </VBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
+                  <VBox prefWidth="100.0">
                       <children>
-                          <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="card">
+                          <VBox alignment="TOP_CENTER" prefWidth="378.0" styleClass="card">
                               <children>
                                   <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Company Snapshot" textAlignment="CENTER">
                                       <font>
@@ -164,12 +164,11 @@
                            </styleClass>
                                   </Text>
                                   <Separator prefWidth="200.0" styleClass="balance-text" />
-                                  <VBox prefHeight="200.0" prefWidth="100.0">
+                                  <VBox>
                                       <children>
-                                          <Text fx:id="snapshotText" styleClass="company-snapshot-text" text="Select a stock to see its description here…" wrappingWidth="300.0">
-                                 <VBox.margin>
-                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                 </VBox.margin></Text>
+                                          <ScrollPane fx:id="snapshotScrollPane" fitToWidth="true" hbarPolicy="NEVER" minViewportHeight="205.0" pannable="true" styleClass="snapshot-scrollpane" VBox.vgrow="ALWAYS">
+                                              <Text fx:id="snapshotText" styleClass="company-snapshot-text" text="Select a stock to see its description here…" wrappingWidth="330.0" />
+                                          </ScrollPane>
                                       </children>
                                       <opaqueInsets>
                                           <Insets />
@@ -178,7 +177,7 @@
                                   <Separator prefWidth="200.0" />
                                   <HBox nodeOrientation="RIGHT_TO_LEFT" prefHeight="100.0" prefWidth="200.0">
                                       <children>
-                                          <Button fx:id="viewStockButton" mnemonicParsing="false" styleClass="btn" text="View Stock" onAction="#onViewStock">
+                                          <Button fx:id="viewStockButton" mnemonicParsing="false" onAction="#onViewStock" styleClass="btn" text="View Stock">
                                               <HBox.margin>
                                                   <Insets right="30.0" top="30.0" />
                                               </HBox.margin>
@@ -186,6 +185,9 @@
                                       </children>
                                   </HBox>
                               </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
                           </VBox>
                       </children>
                       <VBox.margin>
