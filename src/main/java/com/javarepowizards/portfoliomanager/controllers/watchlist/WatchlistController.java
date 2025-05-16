@@ -46,6 +46,7 @@ public class WatchlistController implements Initializable {
     @FXML private TableView<WatchlistRow> tableView;
     @FXML private Button    addStockButton;
     @FXML private Text snapshotText;
+    @FXML private ScrollPane snapshotScrollPane;
     @FXML private Button    viewStockButton;
 
     private IWatchlistDAO watchlistDAO;
@@ -66,8 +67,11 @@ public class WatchlistController implements Initializable {
         repo = AppContext.getService(StockRepository.class);
         IUserDAO userDAO = AppContext.getService(IUserDAO.class);
         currentUserId = userDAO.getCurrentUser().isPresent() ? userDAO.getCurrentUser().get().getUserId() : 1;
-
-        //System.out.println("Current user ID: " + currentUserId);
+        snapshotText.wrappingWidthProperty()
+                .bind(snapshotScrollPane.widthProperty().subtract(20));
+        snapshotText.textProperty().addListener((obs, old, neo) ->
+                snapshotScrollPane.setVvalue(0)
+        );
 
         try {
             refreshTable();
@@ -166,12 +170,17 @@ public class WatchlistController implements Initializable {
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        snapshotText.setText(selectedStock.getShortDescription());
+                        setSnapshotText(selectedStock.getShortDescription());
 
                     } else {
-                        snapshotText.setText("An error getting the stock or description occurred.");
+                        setSnapshotText("An error getting the stock or description occurred.");
                     }
                 });
+    }
+
+    private void setSnapshotText(String description) {
+        snapshotText.setText(description);
+
     }
 
 
