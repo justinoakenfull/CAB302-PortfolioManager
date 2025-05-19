@@ -13,6 +13,7 @@ import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 
 import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
@@ -58,6 +59,7 @@ public class DashboardController {
     private final StockRepository repo = AppContext.getService(StockRepository.class);
     private final int currentUserId = 1;
     private final StockDAO stockDAO = StockDAO.getInstance();
+    private final IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
 
     /**
      * Called automatically when the FXML is loaded
@@ -152,6 +154,7 @@ public class DashboardController {
             pieData.add(new PieChart.Data(entry.getStock().getSymbol(),value));
         }
 
+        // build & size a new chart
         PieChart chart = new PieChart(pieData);
         chart.setLegendVisible(true);
         chart.setLabelsVisible(true);

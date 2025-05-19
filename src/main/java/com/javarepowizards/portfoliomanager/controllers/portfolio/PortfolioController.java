@@ -16,7 +16,7 @@ public class PortfolioController {
     @FXML private Text totalValueText;
     @FXML private Text changePctText;
 
-    // pull the DAO by its interface (registered in MainApplication)
+    // pull the DAO by interface (registered in MainApplication)
     private final IUserDAO userDAO = AppContext.getService(IUserDAO.class);
     private final int currentUserId = Session.getCurrentUser().getUserId();
 

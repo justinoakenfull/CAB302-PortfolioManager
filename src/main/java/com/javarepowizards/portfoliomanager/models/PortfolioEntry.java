@@ -13,7 +13,7 @@ public class PortfolioEntry {
 
     public StockName getStock() { return stock; }
     public double getPurchasePrice() { return purchasePrice; }
-    public double getAmountHeld() { return amountHeld; }
+    public int getAmountHeld() { return (int) amountHeld; }
 
     public double getBuyPrice() {return purchasePrice;}
     public double getQuantity() {return amountHeld;}

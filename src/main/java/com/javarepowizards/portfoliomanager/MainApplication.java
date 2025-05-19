@@ -51,6 +51,11 @@ public class MainApplication extends Application {
         // Initialize UserDAO since other services might depend on it
         IUserDAO userDAO = new UserDAO(dbConnection);
         AppContext.registerService(IUserDAO.class, userDAO);
+
+
+        // register the PortfolioDAO under its interface
+        PortfolioDAO portfolioDAO = new PortfolioDAO(dbConnection);
+        AppContext.registerService(IPortfolioDAO.class, portfolioDAO);
     }
 
     private void initializeAuthService() {

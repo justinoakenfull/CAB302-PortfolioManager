@@ -66,18 +66,18 @@ public class UserDAO implements IUserDAO {
             """);
 
             // --- holdings table: always drop & recreate with composite PK ---
-            stmt.execute("DROP TABLE IF EXISTS user_holdings");
+            //stmt.execute("DROP TABLE IF EXISTS user_holdings");
             stmt.execute("""
-                CREATE TABLE user_holdings (
-                  user_id INTEGER NOT NULL,
-                  ticker   VARCHAR(10) NOT NULL,
-                  holding_amount INTEGER NOT NULL,
-                  holding_value  DECIMAL(15,2) NOT NULL,
-                  PRIMARY KEY (user_id, ticker),
-                  FOREIGN KEY (user_id) REFERENCES user_auth(user_id) 
-                    ON DELETE CASCADE
-                )
-            """);
+            CREATE TABLE IF NOT EXISTS user_holdings (
+              user_id         INTEGER     NOT NULL,
+              ticker          VARCHAR(10) NOT NULL,
+              holding_amount  INTEGER     NOT NULL,
+              holding_value   DECIMAL(15,2) NOT NULL,
+              PRIMARY KEY (user_id, ticker),
+              FOREIGN KEY (user_id) REFERENCES user_auth(user_id) 
+                ON DELETE CASCADE
+            )
+        """);
         }
     }
 
