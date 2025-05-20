@@ -134,7 +134,7 @@
                                         </TableColumn>
                                         <TableColumn fx:id="changeCol"
                                                      prefWidth="75.0"
-                                                     text="Change % (24hr)">
+                                                     text="Portfolio %">
                                             <styleClass>
                                                 <String fx:value="column-header" />
                                                 <String fx:value="column-header-background" />
