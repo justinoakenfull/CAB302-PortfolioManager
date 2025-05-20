@@ -3,10 +3,7 @@ package com.javarepowizards.portfoliomanager;
 import com.javarepowizards.portfoliomanager.dao.*;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
-import com.javarepowizards.portfoliomanager.models.*;
-import com.javarepowizards.portfoliomanager.services.AuthService;
-import com.javarepowizards.portfoliomanager.services.IAuthService;
-import com.javarepowizards.portfoliomanager.services.PortfolioInitializer;
+import com.javarepowizards.portfoliomanager.services.*;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -75,16 +72,17 @@ public class MainApplication extends Application {
     }
 
     private void initializeWatchlist() throws SQLException {
-        IDatabaseConnection dbConnection = AppContext.getService(IDatabaseConnection.class);
-        IWatchlistDAO watchlistDAO = new WatchlistDAO(dbConnection); // Concrete class, but variable type is interface
-        StockRepository repo = AppContext.getService(StockRepository.class);
+        //construct & register the DAO
+        IWatchlistDAO watchlistDAO = new WatchlistDAO(AppContext.getService(IDatabaseConnection.class));
+        AppContext.registerService(IWatchlistDAO.class, watchlistDAO);
 
-        Watchlist watchlist = new Watchlist(repo, watchlistDAO, 1); // Default user ID
-        watchlist.refresh();
-
-        AppContext.registerService(IWatchlistDAO.class, watchlistDAO); // Register interface
-        AppContext.registerService(Watchlist.class, watchlist);
-
+        //construct & register the application service
+        WatchlistService watchlistService =
+                new WatchlistService(
+                        AppContext.getService(StockRepository.class),
+                        watchlistDAO,
+                        AppContext.getService(IUserDAO.class));
+        AppContext.registerService(IWatchlistService.class, watchlistService);
     }
 
     private void initializePortfolio() {

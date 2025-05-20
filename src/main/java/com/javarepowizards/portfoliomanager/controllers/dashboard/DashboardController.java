@@ -74,10 +74,6 @@ public class DashboardController implements Initializable {
         }
     }
 
-
-
-
-
     private void refreshTable() throws IOException, SQLException {
 
         List<StockName> symbols = watchlistDAO.listForUser(currentUserId);
@@ -135,17 +131,14 @@ public class DashboardController implements Initializable {
 
         TableView<WatchlistRow> table = TableViewFactory.create(cols);
 
-        // 1) copy over the style class from FXML
+
         table.getStyleClass().add("watchlist-table");
 
-        // 2) re-apply the drop shadow (if you want it)
         table.setEffect(watchlistTable.getEffect());
 
-        // 3) preserve the layout constraints
         HBox.setHgrow(table, Priority.ALWAYS);
         VBox.setVgrow(table, Priority.ALWAYS);
 
-        // 4) swap it in
         tableContainer.getChildren().setAll(table);
         watchlistTable = table;
         table.setItems(model);
