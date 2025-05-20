@@ -34,11 +34,12 @@ import java.util.*;
  */
 public class WatchlistController implements Initializable {
 
-    @FXML private VBox      tableContainer;
+    @FXML private ProgressIndicator progressIndicator;
+    @FXML private VBox tableContainer;
     @FXML private TableView<WatchlistRow> tableView;
     @FXML private Text snapshotText;
     @FXML private ScrollPane snapshotScrollPane;
-    @FXML private Button    viewStockButton;
+    @FXML private Button viewStockButton;
 
     private IWatchlistService watchlistService;
 
@@ -134,7 +135,7 @@ public class WatchlistController implements Initializable {
                 setSnapshotText("No stock selected.");
             } else {
                 StockName sym = StockName.fromString(newRow.shortNameProperty().get());
-
+                toggleProgress();
                 setSnapshotText("Loading description…");
 
                 Thread t = startAIThread(sym);
@@ -152,18 +153,38 @@ public class WatchlistController implements Initializable {
             }
         };
 
-        descTask.setOnSucceeded(e -> setSnapshotText(descTask.getValue()));descTask.setOnFailed(e -> {
+        descTask.setOnSucceeded(
+                e ->
+                {
+                    setSnapshotText(descTask.getValue());
+                    toggleProgress();
+                });
+        descTask.setOnFailed(e -> {
             Throwable ex = descTask.getException();
             String msg = "Failed to load description";
             if (ex != null) {
                 msg += ": " + ex.getClass().getSimpleName()
                         + (ex.getMessage() != null ? " – " + ex.getMessage() : "");
-                //ex.printStackTrace();
+                ex.printStackTrace();
             }
-            setSnapshotText(msg);
+            setSnapshotText(descTask.getValue());
+            toggleProgress();
         });
 
         return new Thread(descTask);
+    }
+
+    private void toggleProgress() {
+        if (progressIndicator.isVisible()) {
+            progressIndicator.setVisible(false);
+            progressIndicator.setMinHeight(0);
+            progressIndicator.setMaxHeight(0);
+        } else {
+            progressIndicator.setVisible(true);
+            progressIndicator.setMinHeight(100);
+            progressIndicator.setMaxHeight(100);
+        }
+
     }
 
     private void setSnapshotText(String description) {

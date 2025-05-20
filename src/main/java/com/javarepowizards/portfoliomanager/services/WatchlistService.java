@@ -178,7 +178,8 @@ public class WatchlistService implements IWatchlistService {
             );
             try {
                 String raw = ollamaService.generateResponse(prompt).trim();
-                return extractBetweenTags(raw);
+                return extractBetweenTags(raw)
+                        .orElseGet(stock::getLongDescription);
             } catch (IOException e) {
                 // LLM failed; fall back to stored text
             }
@@ -219,7 +220,8 @@ public class WatchlistService implements IWatchlistService {
             );
             try {
                 String raw = ollamaService.generateResponse(prompt).trim();
-                return extractBetweenTags(raw);
+                return extractBetweenTags(raw)
+                        .orElseGet(stock::getShortDescription);
             } catch (IOException e) {
                 // LLM failed; fall back to stored text
             }
@@ -242,27 +244,24 @@ public class WatchlistService implements IWatchlistService {
     }
 
     /**
-     * Extracts and returns the substring between the first occurrence of
-     * the markers "<start>" and "<finish>" in the given text.
+     * Attempts to extract the substring between the last <start>…<finish> tags.
      *
-     * @param text the full text containing the tags
-     * @return the trimmed content between the start and finish tags
-     * @throws IllegalArgumentException if either tag is missing or in the wrong order
+     * @param text the full text containing one or more pairs of tags
+     * @return an Optional containing the trimmed content between the last valid tags,
+     *         or Optional.empty() if the tags weren’t found or in the wrong order
      */
-    private String extractBetweenTags(String text) {
-        final String START = "<start>";
+    private Optional<String> extractBetweenTags(String text) {
+        final String START  = "<start>";
         final String FINISH = "<finish>";
 
-        System.out.println(text);
-        int i1 = text.indexOf(START);
-        int i2 = text.indexOf(FINISH);
+        int end   = text.lastIndexOf(FINISH);
+        int start = (end >= 0) ? text.lastIndexOf(START, end - 1) : -1;
 
-        if (i1 < 0 || i2 < 0 || i1 + START.length() > i2) {
-            throw new IllegalArgumentException(
-                    "Text does not contain valid <start>…<finish> markers"
-            );
+        if (start < 0 || end < 0 || start + START.length() > end) {
+            return Optional.empty();
         }
 
-        return text.substring(i1 + START.length(), i2).trim();
+        return Optional.of(text.substring(start + START.length(), end).trim());
     }
+
 }
