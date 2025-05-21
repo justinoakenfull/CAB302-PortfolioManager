@@ -77,7 +77,6 @@ public class WatchlistService implements IWatchlistService {
         for (StockName sym : symbols) {
             String ticker = sym.getSymbol();
             if (!available.contains(ticker)) {
-                System.err.println("No CSV history for " + ticker + ", skipping");
                 continue;
             }
 
