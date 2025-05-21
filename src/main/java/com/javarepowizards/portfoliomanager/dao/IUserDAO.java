@@ -20,13 +20,15 @@ public interface IUserDAO {
     void updateUsername(int userId, String username);
     void updatePassword(int userId, String newPassword);
     void updateFullName(int userId, String fName, String lName) throws SQLException;
-    // Register a purchase (or top-up an existing holding)
-    void upsertHolding(int userId,
-                       StockName stock,
-                       int quantity,
-                       double totalValue) throws SQLException;
 
-    List<PortfolioEntry> getHoldingsForUser(int userId) throws SQLException;
+
+//    // Register a purchase (or top-up an existing holding)
+//    void upsertHolding(int userId,
+//                       StockName stock,
+//                       int quantity,
+//                       double totalValue) throws SQLException;
+//
+//    List<PortfolioEntry> getHoldingsForUser(int userId) throws SQLException;
 
 
 

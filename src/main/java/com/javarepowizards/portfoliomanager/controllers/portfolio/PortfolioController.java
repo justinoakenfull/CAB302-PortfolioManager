@@ -1,7 +1,9 @@
 package com.javarepowizards.portfoliomanager.controllers.portfolio;
 
 import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.application.Platform;
@@ -25,14 +27,13 @@ public class PortfolioController {
     @FXML private PieChart pieChart;               // the donut showing holdings distribution
     @FXML private Text totalValueText;             // displays total portfolio value
     @FXML private Text changePctText;              // placeholder for overall change %
-
     @FXML private TableView<PortfolioEntry> portfolioTable;              // bottom table
     @FXML private TableColumn<PortfolioEntry,String> stockCol;          // stock name column
     @FXML private TableColumn<PortfolioEntry,String> changeCol;         // % of portfolio column
     @FXML private TableColumn<PortfolioEntry,Number> balanceCol;        // $ value column
 
     // grab the user DAO and current user’s ID from our AppContext/session
-    private final IUserDAO userDAO = AppContext.getService(IUserDAO.class);
+    private final IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
     private final int currentUserId = Session.getCurrentUser().getUserId();
 
     @FXML
@@ -92,7 +93,7 @@ public class PortfolioController {
     private void refreshPortfolio() {
         List<PortfolioEntry> holdings;
         try {
-            holdings = userDAO.getHoldingsForUser(currentUserId);
+            holdings = portfolioDAO.getHoldingsForUser(currentUserId);
         } catch (Exception e) {
             e.printStackTrace();
             return;  // bail out on error

@@ -18,7 +18,7 @@ public class PortfolioDAO implements IPortfolioDAO {
     private List<PortfolioEntry> holdings;    // only non-null in in-memory mode
     private final double availableBalance;    // only meaningful in in-memory mode
 
-    //DB-backed constructor (used by Spring)
+    //DB-backed constructorS
     @Autowired
     public PortfolioDAO(IDatabaseConnection dbConnection) {
         try {
@@ -33,10 +33,27 @@ public class PortfolioDAO implements IPortfolioDAO {
 
     // In-memory constructor (for dummy/testing use)
     public PortfolioDAO(List<PortfolioEntry> holdings, double availableBalance) {
+        // Protect against accidental use in production
+        if (!isTestContext()) {
+            throw new IllegalStateException("In-memory PortfolioDAO should only be used in tests or simulations.");
+        }
+
         this.conn = null;
         this.dbMode = false;
         this.holdings = holdings;
         this.availableBalance = availableBalance;
+    }
+
+    private boolean isTestContext() {
+        // Check if the call is from a test or dummy class
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        for (StackTraceElement frame : stack) {
+            String cls = frame.getClassName();
+            if (cls.contains("Test") || cls.contains("PortfolioInitializer")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -127,6 +144,54 @@ public class PortfolioDAO implements IPortfolioDAO {
             throw new RuntimeException("Failed to upsert holding for user " + userId, e);
         }
     }
+
+    public List<PortfolioEntry> getHoldingsForUser(int userId) {
+        String sql = """
+        SELECT ticker, holding_amount, holding_value
+          FROM user_holdings
+         WHERE user_id = ?
+    """;
+        List<PortfolioEntry> holdings = new ArrayList<>();
+        try (PreparedStatement p = conn.prepareStatement(sql)) {
+            p.setInt(1, userId);
+            try (ResultSet rs = p.executeQuery()) {
+                while (rs.next()) {
+                    int amt = rs.getInt("holding_amount");
+                    double val = rs.getDouble("holding_value");
+                    double avg = amt > 0 ? val / amt : 0.0;
+                    holdings.add(new PortfolioEntry(
+                            StockName.fromString(rs.getString("ticker")),
+                            avg,
+                            amt
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch holdings for user " + userId, e);
+        }
+        return holdings;
+    }
+
+    public void upsertHolding(int userId, StockName stock, int quantity, double totalValue) {
+        String sql = """
+        INSERT INTO user_holdings (user_id, ticker, holding_amount, holding_value)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(user_id, ticker) DO UPDATE
+          SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
+              holding_value  = user_holdings.holding_value  + excluded.holding_value
+    """;
+        try (PreparedStatement p = conn.prepareStatement(sql)) {
+            p.setInt(1, userId);
+            p.setString(2, stock.getSymbol());
+            p.setInt(3, quantity);
+            p.setDouble(4, totalValue);
+            p.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to upsert holding for user " + userId, e);
+        }
+    }
+
+
 
     @Override
     public double getTotalPortfolioValue() {

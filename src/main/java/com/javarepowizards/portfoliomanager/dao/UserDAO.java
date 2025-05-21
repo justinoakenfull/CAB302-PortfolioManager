@@ -264,48 +264,4 @@ public class UserDAO implements IUserDAO {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public List<PortfolioEntry> getHoldingsForUser(int userId) throws SQLException {
-        String sql = """
-            SELECT ticker, holding_amount, holding_value
-              FROM user_holdings
-             WHERE user_id = ?
-        """;
-        var holdings = new ArrayList<PortfolioEntry>();
-        try (PreparedStatement p = connection.prepareStatement(sql)) {
-            p.setInt(1, userId);
-            try (ResultSet rs = p.executeQuery()) {
-                while (rs.next()) {
-                    int amt = rs.getInt("holding_amount");
-                    double val = rs.getDouble("holding_value");
-                    double avg = amt > 0 ? val / amt : 0.0;
-                    holdings.add(new PortfolioEntry(
-                            StockName.fromString(rs.getString("ticker")),
-                            avg,
-                            amt
-                    ));
-                }
-            }
-        }
-        return holdings;
-    }
-
-    @Override
-    public void upsertHolding(int userId, StockName stock, int quantity, double totalValue) throws SQLException {
-        String sql = """
-            INSERT INTO user_holdings (user_id, ticker, holding_amount, holding_value)
-            VALUES (?, ?, ?, ?)
-            ON CONFLICT(user_id, ticker) DO UPDATE
-              SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
-                  holding_value  = user_holdings.holding_value  + excluded.holding_value
-        """;
-        try (PreparedStatement p = connection.prepareStatement(sql)) {
-            p.setInt(1, userId);
-            p.setString(2, stock.getSymbol());
-            p.setInt(3, quantity);
-            p.setDouble(4, totalValue);
-            p.executeUpdate();
-        }
-    }
 }

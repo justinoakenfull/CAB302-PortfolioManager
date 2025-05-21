@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.stocks;
 
 import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
@@ -40,7 +41,7 @@ public class StocksController implements Initializable {
     @FXML private TextField stockSearchField;
 
     // Data access objects and current user ID
-    private PortfolioDAO portfolioDAO;
+    private IPortfolioDAO portfolioDAO;
     private IUserDAO userDAO;
     private StockRepository stockRepository;
     private IWatchlistDAO watchlistDAO;
@@ -54,7 +55,7 @@ public class StocksController implements Initializable {
         // Retrieve DAOs from the application context
         watchlistDAO    = AppContext.getService(IWatchlistDAO.class);
         userDAO         = AppContext.getService(IUserDAO.class);
-        portfolioDAO    = AppContext.getService(PortfolioDAO.class);
+        portfolioDAO = AppContext.getService(IPortfolioDAO.class);
         stockRepository = AppContext.getService(StockRepository.class);
 
         // Determine the current user's ID (default to 1 if not present)
@@ -178,17 +179,13 @@ public class StocksController implements Initializable {
             portfolioDAO.addToHoldings(entry);
             // Persist to database
             double totalValue = price * quantity;
-            userDAO.upsertHolding(currentUserId, stockName, quantity, totalValue);
+            portfolioDAO.upsertHolding(currentUserId, stockName, quantity, totalValue);
 
             buyFeedbackLabel.setText("Bought " + quantity + " " + stockName.getSymbol());
             buyFeedbackLabel.setTextFill(Color.LIGHTGREEN);
         } catch (NumberFormatException ex) {
             buyFeedbackLabel.setText("Invalid quantity.");
             buyFeedbackLabel.setTextFill(Color.RED);
-        } catch (SQLException ex) {
-            buyFeedbackLabel.setText("Error saving purchase.");
-            buyFeedbackLabel.setTextFill(Color.RED);
-            ex.printStackTrace();
         } catch (Exception ex) {
             buyFeedbackLabel.setText("Error: " + ex.getMessage());
             buyFeedbackLabel.setTextFill(Color.RED);
