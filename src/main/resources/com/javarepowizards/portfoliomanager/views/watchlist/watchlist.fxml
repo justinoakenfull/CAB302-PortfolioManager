@@ -5,6 +5,7 @@
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableView?>
@@ -166,6 +167,11 @@
                                   <Separator prefWidth="200.0" styleClass="balance-text" />
                                   <VBox>
                                       <children>
+                              <HBox alignment="TOP_CENTER" blendMode="ADD" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <ProgressIndicator fx:id="progressIndicator" visible="false" />
+                                 </children>
+                              </HBox>
                                           <ScrollPane fx:id="snapshotScrollPane" fitToWidth="true" hbarPolicy="NEVER" minViewportHeight="205.0" pannable="true" styleClass="snapshot-scrollpane" VBox.vgrow="ALWAYS">
                                               <Text fx:id="snapshotText" styleClass="company-snapshot-text" text="Select a stock to see its description here…" wrappingWidth="330.0" />
                                           </ScrollPane>
