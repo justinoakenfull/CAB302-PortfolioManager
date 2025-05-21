@@ -103,6 +103,29 @@ public class WatchlistService implements IWatchlistService {
     }
 
     /**
+     * Adds the given stock symbol to the current user's watchlist.
+     * If the symbol is already present, this is a no-op.
+     *
+     * @param Stock the IStock to add
+     * @throws SQLException if there is an error persisting the new entry
+     * @throws IllegalStateException if no user is logged in
+     */
+    @Override
+    public void addStock(IStock Stock) throws SQLException {
+        int userId = resolveCurrentUserId();
+
+        try {
+            StockName sym = StockName.fromString(Stock.getTicker());
+            watchlistDAO.addForUser(userId, sym);
+        }
+        catch (Exception e) {
+            return;
+        }
+
+
+    }
+
+    /**
      * Removes the given stock symbol from the current user's watchlist.
      * If the symbol was not present, this is a no-op.
      *
@@ -114,6 +137,27 @@ public class WatchlistService implements IWatchlistService {
     public void removeStock(StockName symbol) throws SQLException {
         int userId = resolveCurrentUserId();
         watchlistDAO.removeForUser(userId, symbol);
+    }
+
+    /**
+     * Removes the given stock symbol from the current user's watchlist.
+     * If the symbol was not present, this is a no-op.
+     *
+     * @param Stock the StockName to remove
+     * @throws SQLException if there is an error deleting the entry
+     * @throws IllegalStateException if no user is logged in
+     */
+    @Override
+    public void removeStock(IStock Stock) throws SQLException {
+        int userId = resolveCurrentUserId();
+
+        try {
+            StockName sym = StockName.fromString(Stock.getTicker());
+            watchlistDAO.removeForUser(userId, sym);
+        }
+        catch (Exception e) {
+            return;
+        }
     }
 
     /**
@@ -261,6 +305,11 @@ public class WatchlistService implements IWatchlistService {
         }
 
         return Optional.of(text.substring(start + START.length(), end).trim());
+    }
+
+    @Override
+    public List<StockName> getWatchlistSymbols() throws SQLException {
+        return watchlistDAO.listForUser(resolveCurrentUserId());
     }
 
 }

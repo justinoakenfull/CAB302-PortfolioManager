@@ -12,7 +12,11 @@ public interface IWatchlistService {
 
     void addStock(StockName symbol) throws SQLException;
 
+    void addStock(IStock stock) throws SQLException;
+
     void removeStock(StockName symbol) throws SQLException;
+
+    void removeStock(IStock stock) throws SQLException;
 
     List<StockName> getAddableSymbols() throws IOException, SQLException;
 
@@ -21,4 +25,6 @@ public interface IWatchlistService {
     String getLongDescription(StockName sym) throws IOException;
 
     IStock getStock(StockName sym) throws IOException;
+
+    List<StockName> getWatchlistSymbols() throws SQLException;
 }
