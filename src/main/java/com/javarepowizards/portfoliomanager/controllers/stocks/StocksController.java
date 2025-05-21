@@ -8,6 +8,7 @@ import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -51,15 +52,15 @@ public class StocksController implements Initializable {
     private PortfolioDAO portfolioDAO;                // DAO for managing portfolio entries
     private StockRepository stockRepository;          // Repository for fetching stock data
 
-    @Autowired
-    IWatchlistDAO watchlistDAO;
+    // Watchlist Service Refactor
+    private IWatchlistService watchlistService;
 
     private int currentUserId;
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        watchlistDAO = AppContext.getService(IWatchlistDAO.class);
+        watchlistService = AppContext.getService(IWatchlistService.class);
         IUserDAO userDAO = AppContext.getService(IUserDAO.class);
         currentUserId = userDAO.getCurrentUser().isPresent() ? userDAO.getCurrentUser().get().getUserId() : 1;
 
@@ -208,13 +209,13 @@ public class StocksController implements Initializable {
                             StockName stockName = StockName.fromString(ticker);
 
                             try {
-                                List<StockName> favorites = watchlistDAO.listForUser(currentUserId);
+                                List<StockName> favorites = watchlistService.getWatchlistSymbols();
                                 if (favorites.contains(stockName)) {
-                                    watchlistDAO.removeForUser(currentUserId, stockName);
+                                    watchlistService.removeStock(stockName);
                                     btn.setGraphic(unfavourited);
                                     btn.setTooltip(new Tooltip("Add to favourites"));
                                 } else {
-                                    watchlistDAO.addForUser(currentUserId, stockName);
+                                    watchlistService.addStock(stockName);
                                     btn.setGraphic(favourite);
                                     btn.setTooltip(new Tooltip("Remove from favourites"));
                                 }
@@ -234,7 +235,7 @@ public class StocksController implements Initializable {
                             StockName stockName = StockName.fromString(ticker);
 
                             try {
-                                List<StockName> favourites = watchlistDAO.listForUser(currentUserId);
+                                List<StockName> favourites = watchlistService.getWatchlistSymbols();
                                 boolean isFavourite = favourites.contains(stockName);
 
                                 btn.setGraphic(isFavourite ? favourite : unfavourited);

@@ -10,6 +10,7 @@ import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
 import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
@@ -53,16 +54,16 @@ public class DashboardController implements Initializable {
     @FXML private TableView<WatchlistRow> watchlistTable;
 
 
-    private IWatchlistDAO watchlistDAO;
+    // Watchlist Service refactor
+    private IWatchlistService watchlistService;
+
     private StockRepository repo;
-    private int currentUserId;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.watchlistDAO = AppContext.getService(IWatchlistDAO.class);
+        this.watchlistService = AppContext.getService(IWatchlistService.class);
         this.repo = AppContext.getService(StockRepository.class);
         IUserDAO userDAO = AppContext.getService(IUserDAO.class);
-        currentUserId = userDAO.getCurrentUser().isPresent() ? userDAO.getCurrentUser().get().getUserId() : 1;
         buildPortfolioPieChart();
         //Start rotating investment tips
         new QuickTips(quickTipsLabel).start();
@@ -76,21 +77,21 @@ public class DashboardController implements Initializable {
 
     private void refreshTable() throws IOException, SQLException {
 
-        List<StockName> symbols = watchlistDAO.listForUser(currentUserId);
+        List<IStock> watchlistStocks = watchlistService.getWatchlist();
         List<WatchlistRow> rows = new ArrayList<>();
 
         Set<String> available = repo.availableTickers();
 
-        for (StockName sym : symbols) {
-            String ticker = sym.getSymbol();
+        for (IStock stock : watchlistStocks) {
+            String ticker = stock.getTicker();
             if (!available.contains(ticker)) {
                 System.err.println("No CSV history for " + ticker + ", skipping");
                 continue;
             }
-            IStock stock = repo.getByTicker(ticker);
+
             rows.add(new WatchlistRow(stock, () -> {
                 try {
-                    watchlistDAO.removeForUser(currentUserId, sym);
+                    watchlistService.removeStock(stock);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
