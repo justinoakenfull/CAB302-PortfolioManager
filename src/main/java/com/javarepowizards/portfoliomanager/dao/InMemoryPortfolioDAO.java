@@ -76,6 +76,14 @@ public class InMemoryPortfolioDAO implements IPortfolioDAO {
     }
 
     @Override
+    public void sellHolding(int userId, StockName stock, double marketValue) {
+        // Dummy implementation for in-memory mode
+        holdings.removeIf(entry -> entry.getStock().equals(stock));
+        System.out.println("Simulated in-memory sell of " + stock.getSymbol() + " for $" + marketValue);
+    }
+
+
+    @Override
     public void upsertHolding(int userId, StockName stock, int quantity, double totalValue) {
 
         holdings.add(new PortfolioEntry(stock, totalValue / quantity, quantity));

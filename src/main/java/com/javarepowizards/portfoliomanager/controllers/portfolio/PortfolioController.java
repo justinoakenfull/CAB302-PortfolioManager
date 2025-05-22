@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.portfolio;
 
 import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.services.Session;
@@ -12,12 +13,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
+import java.sql.PreparedStatement;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -32,6 +31,8 @@ public class PortfolioController implements Initializable {
     @FXML private TableColumn<PortfolioEntry,String> stockCol;          // stock name column
     @FXML private TableColumn<PortfolioEntry,String> changeCol;         // % of portfolio column
     @FXML private TableColumn<PortfolioEntry,Number> balanceCol;        // $ value column
+    @FXML private TableColumn<PortfolioEntry, Void> sellCol;
+
 
     // grab the user DAO and current user’s ID from our AppContext/session
     private IPortfolioDAO portfolioDAO;
@@ -41,7 +42,7 @@ public class PortfolioController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         portfolioDAO = AppContext.getService(IPortfolioDAO.class);
         currentUserId = Session.getCurrentUser().getUserId();
-
+        setupSellColumn();
         setupTableColumns();
         refreshPortfolio();
     }
@@ -49,6 +50,41 @@ public class PortfolioController implements Initializable {
     /**
      * Configures each TableColumn’s cell factory.
      */
+    private void setupSellColumn() {
+        sellCol.setCellFactory(col -> new TableCell<>() {
+            private final Button btn = new Button("Sell");
+
+
+            {
+                btn.getStyleClass().add("sell-button");
+                btn.setOnAction(e -> {
+                    PortfolioEntry entry = getTableView().getItems().get(getIndex());
+                    handleSell(entry);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                }
+            }
+        });
+    }
+
+    private void handleSell(PortfolioEntry entry) {
+        try {
+            portfolioDAO.sellHolding(currentUserId, entry.getStock(), entry.getMarketValue());
+            refreshPortfolio();  // Keep this here since it's UI-related
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void setupTableColumns() {
         // show stock display name (e.g. "BHP Group Ltd")
         stockCol.setCellValueFactory(c ->
