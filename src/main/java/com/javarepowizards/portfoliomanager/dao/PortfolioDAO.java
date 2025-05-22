@@ -23,6 +23,7 @@ public class PortfolioDAO implements IPortfolioDAO {
     public PortfolioDAO(IDatabaseConnection dbConnection) {
         try {
             this.conn = dbConnection.getConnection();
+            createTables(); // Add this line
         } catch (SQLException e) {
             throw new RuntimeException("Unable to obtain DB connection", e);
         }
@@ -66,10 +67,10 @@ public class PortfolioDAO implements IPortfolioDAO {
         // DB-mode: pull from user_holdings
         int userId = Session.getCurrentUser().getUserId();
         String sql = """
-          SELECT ticker, holding_amount, holding_value
-            FROM user_holdings
-           WHERE user_id = ?
-        """;
+                  SELECT ticker, holding_amount, holding_value
+                    FROM user_holdings
+                   WHERE user_id = ?
+                """;
         List<PortfolioEntry> out = new ArrayList<>();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -77,9 +78,9 @@ public class PortfolioDAO implements IPortfolioDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String ticker = rs.getString("ticker");
-                    int qty       = rs.getInt("holding_amount");
-                    double val    = rs.getDouble("holding_value");
-                    double avg    = qty > 0 ? val/qty : 0.0;
+                    int qty = rs.getInt("holding_amount");
+                    double val = rs.getDouble("holding_value");
+                    double avg = qty > 0 ? val / qty : 0.0;
 
                     out.add(new PortfolioEntry(
                             StockName.fromString(ticker),
@@ -126,13 +127,13 @@ public class PortfolioDAO implements IPortfolioDAO {
         // DB-mode: upsert into user_holdings
         int userId = Session.getCurrentUser().getUserId();
         String sql = """
-          INSERT INTO user_holdings 
-            (user_id, ticker, holding_amount, holding_value)
-          VALUES (?, ?, ?, ?)
-          ON CONFLICT(user_id, ticker) DO UPDATE
-            SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
-                holding_value  = user_holdings.holding_value  + excluded.holding_value
-        """;
+                  INSERT INTO user_holdings 
+                    (user_id, ticker, holding_amount, holding_value)
+                  VALUES (?, ?, ?, ?)
+                  ON CONFLICT(user_id, ticker) DO UPDATE
+                    SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
+                        holding_value  = user_holdings.holding_value  + excluded.holding_value
+                """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -147,10 +148,10 @@ public class PortfolioDAO implements IPortfolioDAO {
 
     public List<PortfolioEntry> getHoldingsForUser(int userId) {
         String sql = """
-        SELECT ticker, holding_amount, holding_value
-          FROM user_holdings
-         WHERE user_id = ?
-    """;
+                    SELECT ticker, holding_amount, holding_value
+                      FROM user_holdings
+                     WHERE user_id = ?
+                """;
         List<PortfolioEntry> holdings = new ArrayList<>();
         try (PreparedStatement p = conn.prepareStatement(sql)) {
             p.setInt(1, userId);
@@ -174,12 +175,12 @@ public class PortfolioDAO implements IPortfolioDAO {
 
     public void upsertHolding(int userId, StockName stock, int quantity, double totalValue) {
         String sql = """
-        INSERT INTO user_holdings (user_id, ticker, holding_amount, holding_value)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT(user_id, ticker) DO UPDATE
-          SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
-              holding_value  = user_holdings.holding_value  + excluded.holding_value
-    """;
+                    INSERT INTO user_holdings (user_id, ticker, holding_amount, holding_value)
+                    VALUES (?, ?, ?, ?)
+                    ON CONFLICT(user_id, ticker) DO UPDATE
+                      SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
+                          holding_value  = user_holdings.holding_value  + excluded.holding_value
+                """;
         try (PreparedStatement p = conn.prepareStatement(sql)) {
             p.setInt(1, userId);
             p.setString(2, stock.getSymbol());
@@ -190,7 +191,6 @@ public class PortfolioDAO implements IPortfolioDAO {
             throw new RuntimeException("Failed to upsert holding for user " + userId, e);
         }
     }
-
 
 
     @Override
@@ -207,7 +207,7 @@ public class PortfolioDAO implements IPortfolioDAO {
         // DB-mode: balance + SUM(holding_value)
         int userId = Session.getCurrentUser().getUserId();
         double cash = getAvailableBalance();
-        String sql  = "SELECT SUM(holding_value) AS total FROM user_holdings WHERE user_id = ?";
+        String sql = "SELECT SUM(holding_value) AS total FROM user_holdings WHERE user_id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -217,6 +217,24 @@ public class PortfolioDAO implements IPortfolioDAO {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to compute total for user " + userId, e);
+        }
+    }
+
+    public void createTables() {
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS user_holdings (
+                          user_id         INTEGER     NOT NULL,
+                          ticker          VARCHAR(10) NOT NULL,
+                          holding_amount  INTEGER     NOT NULL,
+                          holding_value   DECIMAL(15,2) NOT NULL,
+                          PRIMARY KEY (user_id, ticker),
+                          FOREIGN KEY (user_id) REFERENCES user_auth(user_id) 
+                            ON DELETE CASCADE
+                        )
+                    """);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create user_holdings table", e);
         }
     }
 }
