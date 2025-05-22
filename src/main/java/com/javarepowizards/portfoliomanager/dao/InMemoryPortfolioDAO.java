@@ -77,7 +77,7 @@ public class InMemoryPortfolioDAO implements IPortfolioDAO {
 
     @Override
     public void upsertHolding(int userId, StockName stock, int quantity, double totalValue) {
-        // This assumes you store a list of PortfolioEntry like PortfolioDAO does.
+
         holdings.add(new PortfolioEntry(stock, totalValue / quantity, quantity));
     }
 

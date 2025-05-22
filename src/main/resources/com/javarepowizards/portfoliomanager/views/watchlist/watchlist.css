@@ -80,6 +80,25 @@
     -fx-fill: white;
 }
 
+.snapshot-scrollpane {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-padding: 4;
+}
+
+.snapshot-scrollpane .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.snapshot-scrollpane .scroll-bar:vertical {
+    -fx-opacity: 0.8;
+}
+.snapshot-scrollpane .scroll-bar .thumb {
+    -fx-background-color: #3A3F44;
+    -fx-background-radius: 4px;
+}
+
 .balance-text {
     -fx-fill: white;
     -fx-text-fill: white;
@@ -179,10 +198,6 @@
     -fx-control-inner-background: #2b2b2b;
     -fx-text-fill: white;
 }
-
-/* ──────────────────────────────────────────────────────────────
-   DARK WATCHLIST TABLE  (matches the second screenshot)
-   ──────────────────────────────────────────────────────────────*/
 
 /* Outer frame & body */
 .table-view.watchlist-table {

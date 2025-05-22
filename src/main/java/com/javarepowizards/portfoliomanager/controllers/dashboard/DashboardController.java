@@ -3,30 +3,37 @@ package com.javarepowizards.portfoliomanager.controllers.dashboard;
 
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.services.IWatchlistService;
+import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
 import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
 import javafx.collections.FXCollections;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 
 import javafx.collections.ObservableList;
+import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.Locale;
-import javafx.util.Callback;
-import javafx.scene.control.TableCell;
+
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.layout.Pane;
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.services.PortfolioInitializer;
@@ -37,105 +44,112 @@ import java.time.LocalDate;
  * Controller class for Dashboard view.
  * Manages the quick tips section and watchlist table display
  */
-public class DashboardController {
+public class DashboardController implements Initializable {
 
+    @FXML private VBox tableContainer;
     // Label that displays rotating investment tips
     @FXML private  Label quickTipsLabel;
     @FXML private Pane portfolioPieContainer;
 
     // Tableview and columns for the watchlist section
     @FXML private TableView<WatchlistRow> watchlistTable;
-    @FXML private TableColumn<WatchlistRow, Double> changeColumn;
-    @FXML private TableColumn<WatchlistRow, String> tickerColumn;
-    @FXML private TableColumn<WatchlistRow, String> nameColumn;
-    @FXML private TableColumn<WatchlistRow, Double> openColumn;
-    @FXML private TableColumn<WatchlistRow, Double> closeColumn;
-    @FXML private TableColumn<WatchlistRow, Double> changePercentColumn;
-    @FXML private TableColumn<WatchlistRow, Double> priceColumn;
-    @FXML private TableColumn<WatchlistRow, Long> volumeColumn;
-    @FXML private TableColumn<WatchlistRow, Button> removeColumn;
 
-    private final IWatchlistDAO watchlistDAO = AppContext.getService(IWatchlistDAO.class);
-    private final StockRepository repo = AppContext.getService(StockRepository.class);
-    private final int currentUserId = 1;
-    private final StockDAO stockDAO = StockDAO.getInstance();
+
+    // Watchlist Service refactor
+    private IWatchlistService watchlistService;
     private final IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
 
-    /**
-     * Called automatically when the FXML is loaded
-     * Initialises quick tips and sets dynamic widths for table columns
-     */
-    @FXML
-    public void initialize() {
+    private StockRepository repo;
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.watchlistService = AppContext.getService(IWatchlistService.class);
+        this.repo = AppContext.getService(StockRepository.class);
+        IUserDAO userDAO = AppContext.getService(IUserDAO.class);
+        buildPortfolioPieChart();
         //Start rotating investment tips
         new QuickTips(quickTipsLabel).start();
-
-
-        // Bind column widths to resize proportionately with the table
-        bindColumnWidths();
-        refreshWatchlist();
-        watchlistDAO.addListener(this :: refreshWatchlist);
-        buildPortfolioPieChart();
-
-    }
-
-    /**
-     * Dynamically binds each table's column's width to a percentage
-     * of the total table width for a responsive layout
-     */
-    private void bindColumnWidths() {
-        tickerColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.11));
-        nameColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.15));
-        openColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.10));
-        closeColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.10));
-        changePercentColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.10));
-        priceColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.10));
-        volumeColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.12));
-        removeColumn.prefWidthProperty().bind(watchlistTable.widthProperty().multiply(0.12));
-
-
-        tickerColumn.setCellValueFactory(c -> c.getValue().shortNameProperty());
-        nameColumn.setCellValueFactory(c -> c.getValue().displayNameProperty());
-
-        openColumn.setCellValueFactory(c -> c.getValue().openProperty().asObject());
-        closeColumn.setCellValueFactory(c -> c.getValue().closeProperty().asObject());
-        changeColumn.setCellValueFactory(c -> c.getValue().changeProperty().asObject());
-        changePercentColumn.setCellValueFactory(c -> c.getValue().changePercentProperty().asObject());
-        priceColumn.setCellValueFactory(c -> c.getValue().priceProperty().asObject());
-        volumeColumn.setCellValueFactory(c -> c.getValue().volumeProperty().asObject());
-        removeColumn.setCellValueFactory(c ->
-                new ReadOnlyObjectWrapper<>(c.getValue().removeProperty().get()));
-
-        openColumn.setCellFactory(TableCellFactories.numericFactory(2, false));
-        closeColumn.setCellFactory(TableCellFactories.numericFactory(2, false));
-        changeColumn.setCellFactory(TableCellFactories.numericFactory(2, true));
-        changePercentColumn.setCellFactory(TableCellFactories.numericFactory(2, true));
-        priceColumn.setCellFactory(TableCellFactories.currencyFactory(new Locale ("en", "AU"), 2));
-    }
-
-
-    private void refreshWatchlist() {
         try {
-            List<StockName> symbols = watchlistDAO.listForUser(currentUserId);
-            List<WatchlistRow> rows = new ArrayList<>();
-            Set<String> available = repo.availableTickers();
+            refreshTable();
 
-            for (StockName sym : symbols) {
-                if (!available.contains(sym.getSymbol())) continue;
-                IStock stock = repo.getByTicker(sym.getSymbol());
-
-
-                rows.add(new WatchlistRow(stock, () -> {
-                    try {watchlistDAO.removeForUser(currentUserId,sym); }
-                    catch (SQLException ignored) {}
-
-                }));
-
-            }
-            watchlistTable.setItems(FXCollections.observableArrayList(rows));
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private void refreshTable() throws IOException, SQLException {
+
+        List<IStock> watchlistStocks = watchlistService.getWatchlist();
+        List<WatchlistRow> rows = new ArrayList<>();
+
+        Set<String> available = repo.availableTickers();
+
+        for (IStock stock : watchlistStocks) {
+            String ticker = stock.getTicker();
+            if (!available.contains(ticker)) {
+                System.err.println("No CSV history for " + ticker + ", skipping");
+                continue;
+            }
+
+            rows.add(new WatchlistRow(stock, () -> {
+                try {
+                    watchlistService.removeStock(stock);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    refreshTable();
+                } catch (IOException | SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
+        }
+        ObservableList<WatchlistRow> model = FXCollections.observableArrayList(rows);
+        // 2) describe columns
+        List<ColumnConfig<WatchlistRow,?>> cols = List.of(
+                new ColumnConfig<>("Ticker",
+                        WatchlistRow::shortNameProperty),
+                new ColumnConfig<>("Name",
+                        WatchlistRow::displayNameProperty),
+                new ColumnConfig<>("Open",
+                        r -> r.openProperty().asObject(),
+                        TableCellFactories.numericFactory(2,false)),
+                new ColumnConfig<>("Close",
+                        r -> r.closeProperty().asObject(),
+                        TableCellFactories.numericFactory(2,false)),
+                new ColumnConfig<>("Change",
+                        r -> r.changeProperty().asObject(),
+                        TableCellFactories.numericFactory(2,true)),
+                new ColumnConfig<>("Change %",
+                        r -> r.changePercentProperty().asObject(),
+                        TableCellFactories.numericFactory(2,true)),
+                new ColumnConfig<>("Price",
+                        r -> r.priceProperty().asObject(),
+                        TableCellFactories.currencyFactory(new Locale("en","AU"), 2)),
+                new ColumnConfig<>("Volume",
+                        r -> r.volumeProperty().asObject(),
+                        TableCellFactories.longFactory())
+        );
+
+
+        TableView<WatchlistRow> table = TableViewFactory.create(cols);
+
+
+        table.getStyleClass().add("watchlist-table");
+
+        table.setEffect(watchlistTable.getEffect());
+
+        HBox.setHgrow(table, Priority.ALWAYS);
+        VBox.setVgrow(table, Priority.ALWAYS);
+
+        tableContainer.getChildren().setAll(table);
+        watchlistTable = table;
+        table.setItems(model);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        table.getColumns().forEach(col ->
+                col.getStyleClass().add("column-header-background")
+        );
     }
 
     private void buildPortfolioPieChart(){
@@ -166,6 +180,8 @@ public class DashboardController {
 
         portfolioPieContainer.getChildren().setAll(chart);
     }
+
+
 }
 
 

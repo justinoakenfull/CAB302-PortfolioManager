@@ -1,23 +1,20 @@
 package com.javarepowizards.portfoliomanager.controllers.watchlist;
-//Random change to see if github actions still spams discord
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IUserDAO;
-import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
-import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
 import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -37,20 +34,14 @@ import java.util.*;
  */
 public class WatchlistController implements Initializable {
 
-    /**
-     * A drop-shadow effect that can be applied to the watchlist table
-     * for enhanced visual styling.
-     */
-    public DropShadow dropShadow;
-    @FXML private VBox      tableContainer;
+    @FXML private ProgressIndicator progressIndicator;
+    @FXML private VBox tableContainer;
     @FXML private TableView<WatchlistRow> tableView;
-    @FXML private Button    addStockButton;
     @FXML private Text snapshotText;
-    @FXML private Button    viewStockButton;
+    @FXML private ScrollPane snapshotScrollPane;
+    @FXML private Button viewStockButton;
 
-    private IWatchlistDAO watchlistDAO;
-    private StockRepository repo;
-    private int currentUserId;
+    private IWatchlistService watchlistService;
 
     /**
      * Initializes the controller after its root element has been processed.
@@ -62,12 +53,12 @@ public class WatchlistController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        watchlistDAO = AppContext.getService(IWatchlistDAO.class);
-        repo = AppContext.getService(StockRepository.class);
-        IUserDAO userDAO = AppContext.getService(IUserDAO.class);
-        currentUserId = userDAO.getCurrentUser().isPresent() ? userDAO.getCurrentUser().get().getUserId() : 1;
-
-        //System.out.println("Current user ID: " + currentUserId);
+        this.watchlistService = AppContext.getService(IWatchlistService.class);
+        snapshotText.wrappingWidthProperty()
+                .bind(snapshotScrollPane.widthProperty().subtract(20));
+        snapshotText.textProperty().addListener((obs, old, neo) ->
+                snapshotScrollPane.setVvalue(0)
+        );
 
         try {
             refreshTable();
@@ -78,33 +69,24 @@ public class WatchlistController implements Initializable {
 
     private void refreshTable() throws IOException, SQLException {
 
-        List<StockName> symbols = watchlistDAO.listForUser(currentUserId);
+        List<IStock> stocks = watchlistService.getWatchlist();
+
         List<WatchlistRow> rows = new ArrayList<>();
 
-        Set<String> available = repo.availableTickers();
-
-        for (StockName sym : symbols) {
-            String ticker = sym.getSymbol();
-            if (!available.contains(ticker)) {
-                System.err.println("No CSV history for " + ticker + ", skipping");
-                continue;
-            }
-            IStock stock = repo.getByTicker(ticker);
+        for (IStock stock : stocks) {
+            StockName sym = StockName.fromString(stock.getTicker());
             rows.add(new WatchlistRow(stock, () -> {
                 try {
-                    watchlistDAO.removeForUser(currentUserId, sym);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
+                    watchlistService.removeStock(sym);
                     refreshTable();
-                } catch (IOException | SQLException e) {
-                    throw new RuntimeException(e);
+                } catch (SQLException | IOException ex) {
+                    throw new RuntimeException("Failed to remove stock", ex);
                 }
             }));
         }
+
         ObservableList<WatchlistRow> model = FXCollections.observableArrayList(rows);
-        // 2) describe columns
+
         List<ColumnConfig<WatchlistRow,?>> cols = List.of(
                 new ColumnConfig<>("Ticker",
                         WatchlistRow::shortNameProperty),
@@ -132,20 +114,13 @@ public class WatchlistController implements Initializable {
                         WatchlistRow::removeProperty)
         );
 
-
         TableView<WatchlistRow> table = TableViewFactory.create(cols);
 
-        // 1) copy over the style class from FXML
         table.getStyleClass().add("watchlist-table");
-
-        // 2) re-apply the drop shadow (if you want it)
         table.setEffect(tableView.getEffect());
-
-        // 3) preserve the layout constraints
         HBox.setHgrow(table, Priority.ALWAYS);
         VBox.setVgrow(table, Priority.ALWAYS);
 
-        // 4) swap it in
         tableContainer.getChildren().setAll(table);
         tableView = table;
         table.setItems(model);
@@ -155,57 +130,103 @@ public class WatchlistController implements Initializable {
                 col.getStyleClass().add("column-header-background")
         );
 
-        table.getSelectionModel()
-                .selectedItemProperty()
-                .addListener((obs, oldRow, newRow) -> {
-                    if (newRow != null) {
-                        String ticker = newRow.shortNameProperty().get();
-                        IStock selectedStock;
-                        try {
-                            selectedStock = repo.getByTicker(ticker);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        snapshotText.setText(selectedStock.getShortDescription());
+        table.getSelectionModel().selectedItemProperty().addListener((obs, oldRow, newRow) -> {
+            if (newRow == null) {
+                setSnapshotText("No stock selected.");
+            } else {
+                StockName sym = StockName.fromString(newRow.shortNameProperty().get());
+                toggleProgress();
+                setSnapshotText("Loading description…");
 
-                    } else {
-                        snapshotText.setText("An error getting the stock or description occurred.");
-                    }
+                Thread t = startAIThread(sym);
+                t.setDaemon(true);
+                t.start();
+            }
+        });
+    }
+
+    private Thread startAIThread(StockName sym) {
+        Task<String> descTask = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return watchlistService.getShortDescription(sym);
+            }
+        };
+
+        descTask.setOnSucceeded(
+                e ->
+                {
+                    setSnapshotText(descTask.getValue());
+                    toggleProgress();
                 });
+        descTask.setOnFailed(e -> {
+            Throwable ex = descTask.getException();
+            String msg = "Failed to load description";
+            if (ex != null) {
+                msg += ": " + ex.getClass().getSimpleName()
+                        + (ex.getMessage() != null ? " – " + ex.getMessage() : "");
+                ex.printStackTrace();
+            }
+            setSnapshotText(descTask.getValue());
+            toggleProgress();
+        });
+
+        return new Thread(descTask);
+    }
+
+    private void toggleProgress() {
+        if (progressIndicator.isVisible()) {
+            progressIndicator.setVisible(false);
+            progressIndicator.setMinHeight(0);
+            progressIndicator.setMaxHeight(0);
+        } else {
+            progressIndicator.setVisible(true);
+            progressIndicator.setMinHeight(100);
+            progressIndicator.setMaxHeight(100);
+        }
+
+    }
+
+    private void setSnapshotText(String description) {
+        snapshotText.setText(description);
     }
 
 
     @FXML
     private void onAddStock() {
-        ChoiceDialog<StockName> dlg = new ChoiceDialog<>(StockName.values()[0], List.of(StockName.values()));
-        dlg.setTitle("Add to Watchlist");
-        dlg.setHeaderText("Select a stock to watch");
-        dlg.setContentText("Symbol:");
-        dlg.showAndWait().ifPresent(sym -> {
-            try {
-                watchlistDAO.addForUser(currentUserId, sym);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        try {
+            List<StockName> choices = watchlistService.getAddableSymbols();
+            if (choices.isEmpty()) {
+                new Alert(Alert.AlertType.INFORMATION, "You’ve already added every available stock.")
+                        .showAndWait();
+                return;
             }
-            try {
-                refreshTable();
-            } catch (IOException | SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+
+            ChoiceDialog<StockName> dlg =
+                    new ChoiceDialog<>(choices.getFirst(), choices);
+            dlg.setTitle("Add to Watchlist");
+            dlg.setHeaderText("Select a stock to watch");
+            dlg.setContentText("Symbol:");
+            dlg.showAndWait().ifPresent(sym -> {
+                try {
+                    watchlistService.addStock(sym);
+                    refreshTable();
+                } catch (SQLException | IOException ex) {
+                    throw new RuntimeException("Failed to add stock", ex);
+                }
+            });
+
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException("Unable to load watchlist for adding stocks", e);
+        }
     }
 
     @FXML
     private void onViewStock() {
-        var selected = tableView.getSelectionModel().getSelectedItem();
+        WatchlistRow selected = tableView.getSelectionModel().getSelectedItem();
         if (selected == null) return;
-        String ticker = selected.shortNameProperty().get();
-        IStock stock;
-        try {
-            stock = repo.getByTicker(ticker);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        StockName ticker = StockName.fromString(selected.shortNameProperty().get());
 
         String resource = "/com/javarepowizards/portfoliomanager/views/watchlist/WatchlistModal.fxml";
         URL fxmlUrl = getClass().getResource(resource);
@@ -216,18 +237,17 @@ public class WatchlistController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
-
             WatchlistModalController modal = loader.getController();
-            modal.initData(stock);
+            modal.initData(ticker);
 
             Stage dialog = new Stage();
             dialog.initOwner(viewStockButton.getScene().getWindow());
             dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.setTitle(stock.getTicker() + " Details");
+            dialog.setTitle(ticker + " Details");
             dialog.setScene(new Scene(root));
             dialog.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | SQLException e) {
+            throw new RuntimeException("Failed to open details modal", e);
         }
     }
 }

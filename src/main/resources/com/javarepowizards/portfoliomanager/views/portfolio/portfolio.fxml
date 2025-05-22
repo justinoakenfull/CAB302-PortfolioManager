@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Text?>
 
 <HBox styleClass="flow-pane" stylesheets="@portfolio.css"
-      xmlns="http://javafx.com/javafx/23.0.1"
+
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.javarepowizards.portfoliomanager.controllers.portfolio.PortfolioController">
     <children>

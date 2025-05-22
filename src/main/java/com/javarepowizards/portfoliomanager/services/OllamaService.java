@@ -17,13 +17,24 @@ public class OllamaService {
     private final String modelName;
 
     public OllamaService() {
-        this.modelName = detectDefaultModel();
+        String detected = null;
+        try {
+            detected = detectDefaultModel();
+        } catch (IllegalStateException e) {
+            // log.warn("Ollama not reachable; AI features disabled", e);
+        }
+        this.modelName = detected;
     }
 
 
     private String detectDefaultModel() {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(TAGS_URL).openConnection();
+
+            //set timeout values (in ms?)
+            conn.setConnectTimeout(2000);
+            conn.setReadTimeout(5000);
+
             conn.setRequestMethod("GET");
 
             int status = conn.getResponseCode();
@@ -58,6 +69,12 @@ public class OllamaService {
      * Sends the given prompt to /api/generate using the detected model.
      */
     public String generateResponse(String prompt) throws IOException {
+        if (modelName == null) {
+            // This shouldnt be hit cause we shouldnt call it if there is no model
+            // but we want to make sure we don't crash if no ollama model is running.
+            return "";
+        }
+
         HttpURLConnection conn = (HttpURLConnection) new URL(GENERATE_URL).openConnection();
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");

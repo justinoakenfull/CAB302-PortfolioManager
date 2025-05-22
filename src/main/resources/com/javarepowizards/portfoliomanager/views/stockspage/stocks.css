@@ -1,17 +1,15 @@
-/* Root background */
+
 .flow-pane {
     -fx-background-color: #2A2A2A;
     -fx-padding: 20;
 }
 
-/* Title bar */
 .heading-title {
     -fx-text-fill: white;
     -fx-font-size: 40px;
     -fx-font-weight: bold;
 }
 
-/* "Add Stock" button */
 .button {
     -fx-background-color: #0d89d1;
     -fx-text-fill: white;
@@ -24,54 +22,55 @@
     -fx-background-color: #0b78b0;
 }
 
-/* Table styling */
 .stock-table {
-    -fx-background-color: #393939;
+    -fx-background-color: #1b2027;
+    -fx-control-inner-background: #1b2027;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
     -fx-border-color: #3a3f44;
     -fx-border-width: 1px;
-    -fx-background-insets: 0 0 0 0;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0.1, 0, 2);
-    -fx-padding: 0px;
     -fx-font-size: 16px;
 }
 
-/* Header row: darker background, light text */
 .stock-table .column-header-background {
-    -fx-background-color: #2c2f33;
+    -fx-background-color: #1b2027;
     -fx-background-radius: 8px 8px 0 0;
 }
 .stock-table .column-header,
 .stock-table .column-header .label {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
+    -fx-text-fill: #e1e5ee;
     -fx-alignment: CENTER;
     -fx-background-color: transparent;
 }
 
-/* Zebra striping: two shades of dark grey */
-.stock-table .table-row-cell:odd {
-    -fx-background-color: #393939;
-}
-.stock-table .table-row-cell:even {
-    -fx-background-color: #2b2f33;
+.stock-table .table-row-cell {
+    -fx-background-color: #1b2027;
 }
 
-/* Selection highlight: a subtle lighter grey */
+.stock-table .table-row-cell:hover {
+    -fx-background-color: #252b33;
+}
 .stock-table .table-row-cell:selected {
-    -fx-background-color: #4e565a;
+    -fx-background-color: #2d343d;
 }
 
-/* Center-align and ensure cell text is light */
 .stock-table .table-cell {
     -fx-alignment: CENTER;
-    -fx-text-fill: white;
+    -fx-text-fill: #e1e5ee;
+    -fx-font-size: 14px;
+    -fx-padding: 4 8 4 8;
 }
 
-.stock-table .button {
-    -fx-font-size: 16px;
+.stock-table .change-positive {
+    -fx-text-fill: #1db954;
+}
+.stock-table .change-negative {
+    -fx-text-fill: #ff6961;
 }
 
 .company-snapshot-title {
@@ -109,7 +108,7 @@
     -fx-padding: 16px;
 }
 
-/* Dialog background & border */
+
 .dialog-pane {
     -fx-background-color: #2B2F33;
     -fx-border-color:   #3A3F44;
@@ -119,7 +118,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0, 0, 4);
 }
 
-/* Header (title bar) */
+
 .dialog-pane .header-panel {
     -fx-background-color: #2C2F33;
 }
@@ -129,7 +128,7 @@
     -fx-font-weight: bold;
 }
 
-/* Content area (labels, list) */
+
 .dialog-pane .content {
     -fx-text-fill: #E0E0E0;
 }
@@ -137,7 +136,6 @@
     -fx-text-fill: #E0E0E0;
 }
 
-/* The ChoiceDialog's ListView */
 .dialog-pane .list-view {
     -fx-background-color: #23272A;
     -fx-border-color:   #3A3F44;
@@ -150,7 +148,6 @@
     -fx-background-color: #3A3F44;
 }
 
-/* OK/Cancel buttons */
 .dialog-pane .button-bar .button {
     -fx-background-color: #0D89D1;
     -fx-text-fill: white;
@@ -184,18 +181,12 @@
     -fx-text-fill: #0d89d1;
 }
 
-/* Action button in table */
 .image-button {
     -fx-background-color: transparent;
 }
 
 .image-button:hover {
-    -fx-background-color: transparent
-}
-
-/* Make sure buttons in table cells are centered */
-.stock-table .table-cell {
-    -fx-alignment: CENTER;
+    -fx-background-color: transparent;
 }
 
 

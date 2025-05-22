@@ -1,0 +1,43 @@
+.topbar {
+    -fx-background-color: #2A2A2A;
+    -fx-padding: 0 16px;
+    -fx-pref-height: 56px;
+}
+
+.settings {
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+    -fx-background-radius: 16px;
+    -fx-background-color: #0D89D1FF;
+    -fx-text-fill: #ffffff;
+    -fx-alignment: center;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.topbar .menu {
+    -fx-alignment: center;
+    -fx-spacing: 4px;
+    -fx-hgrow: always;
+}
+
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-pref-width: 100px;
+}
+
+.menu-item:hover {
+    -fx-background-color: #4e565a;
+}
+
+.menu-item.active {
+    -fx-background-color: #0D89D1FF;
+    -fx-text-fill: #ffffff;
+}
