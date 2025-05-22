@@ -2,8 +2,6 @@ package com.javarepowizards.portfoliomanager.controllers.portfolio;
 
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.dao.IUserDAO;
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.application.Platform;
@@ -11,6 +9,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.TableCell;
@@ -19,9 +18,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.text.Text;
 
+import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class PortfolioController {
+public class PortfolioController implements Initializable {
 
     //FXML-injected controls
     @FXML private PieChart pieChart;               // the donut showing holdings distribution
@@ -33,13 +34,16 @@ public class PortfolioController {
     @FXML private TableColumn<PortfolioEntry,Number> balanceCol;        // $ value column
 
     // grab the user DAO and current user’s ID from our AppContext/session
-    private final IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
-    private final int currentUserId = Session.getCurrentUser().getUserId();
+    private IPortfolioDAO portfolioDAO;
+    private int currentUserId;
 
-    @FXML
-    public void initialize() {
-        setupTableColumns();   // wire up columns (ticker → name, %, $)
-        refreshPortfolio();    // fetch from DB and render pie + table
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        portfolioDAO = AppContext.getService(IPortfolioDAO.class);
+        currentUserId = Session.getCurrentUser().getUserId();
+
+        setupTableColumns();
+        refreshPortfolio();
     }
 
     /**
