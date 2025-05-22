@@ -23,7 +23,7 @@ public class PortfolioDAO implements IPortfolioDAO {
     public PortfolioDAO(IDatabaseConnection dbConnection) {
         try {
             this.conn = dbConnection.getConnection();
-            createTables(); // Add this line
+            createTables();
         } catch (SQLException e) {
             throw new RuntimeException("Unable to obtain DB connection", e);
         }
