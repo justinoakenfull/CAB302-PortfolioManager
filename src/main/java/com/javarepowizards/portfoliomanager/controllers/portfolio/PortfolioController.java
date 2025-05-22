@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.portfolio;
 
 import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
@@ -13,12 +14,10 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 public class PortfolioController {
@@ -31,6 +30,8 @@ public class PortfolioController {
     @FXML private TableColumn<PortfolioEntry,String> stockCol;          // stock name column
     @FXML private TableColumn<PortfolioEntry,String> changeCol;         // % of portfolio column
     @FXML private TableColumn<PortfolioEntry,Number> balanceCol;        // $ value column
+    @FXML private TableColumn<PortfolioEntry, Void> sellCol;
+
 
     // grab the user DAO and current user’s ID from our AppContext/session
     private final IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
@@ -40,11 +41,68 @@ public class PortfolioController {
     public void initialize() {
         setupTableColumns();   // wire up columns (ticker → name, %, $)
         refreshPortfolio();    // fetch from DB and render pie + table
+        setupSellColumn();
+
+
+
     }
 
     /**
      * Configures each TableColumn’s cell factory.
      */
+    private void setupSellColumn() {
+        sellCol.setCellFactory(col -> new TableCell<>() {
+            private final Button btn = new Button("Sell");
+
+
+            {
+                btn.getStyleClass().add("sell-button");
+                btn.setOnAction(e -> {
+                    PortfolioEntry entry = getTableView().getItems().get(getIndex());
+                    handleSell(entry);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                }
+            }
+        });
+    }
+
+    private void handleSell(PortfolioEntry entry) {
+        int userId = currentUserId;
+        int quantityToSell = entry.getAmountHeld(); // Sell full amount
+        double valueToSubtract = entry.getMarketValue(); // Entire value
+
+        try (PreparedStatement ps = AppContext.getService(IDatabaseConnection.class).getConnection().prepareStatement("""
+        DELETE FROM user_holdings WHERE user_id = ? AND ticker = ?
+    """)) {
+            ps.setInt(1, userId);
+            ps.setString(2, entry.getStock().getSymbol());
+            ps.executeUpdate();
+            PreparedStatement updateBalance = AppContext.getService(IDatabaseConnection.class).getConnection().prepareStatement("""
+        UPDATE user_balances
+        SET balance = balance + ?
+        WHERE user_id = ?
+    """);
+            updateBalance.setDouble(1, valueToSubtract);
+            updateBalance.setInt(2, userId);
+            updateBalance.executeUpdate();
+            updateBalance.close();
+
+            refreshPortfolio(); // Refresh pie chart and table
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private void setupTableColumns() {
         // show stock display name (e.g. "BHP Group Ltd")
         stockCol.setCellValueFactory(c ->

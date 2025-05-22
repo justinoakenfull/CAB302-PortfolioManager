@@ -217,3 +217,17 @@
     -fx-fill: white;
     -fx-font-size: 16px;
 }
+.sell-button {
+    -fx-background-color: #c62828; /* strong red */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4px;
+    -fx-font-size: 14px;
+    -fx-padding: 8 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 0, 2);
+}
+
+.sell-button:hover {
+    -fx-background-color: #b71c1c; /* darker on hover */
+}
+

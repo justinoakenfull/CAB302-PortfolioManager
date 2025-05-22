@@ -148,6 +148,12 @@
                                                 <String fx:value="column-header-background" />
                                             </styleClass>
                                         </TableColumn>
+                                        <TableColumn fx:id="sellCol" prefWidth="75.0" text="Sell">
+                                            <styleClass>
+                                                <String fx:value="column-header" />
+                                                <String fx:value="column-header-background" />
+                                            </styleClass>
+                                        </TableColumn>
                                     </columns>
                                     <VBox.margin>
                                         <Insets top="30.0" />
