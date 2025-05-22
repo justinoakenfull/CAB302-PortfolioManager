@@ -16,6 +16,7 @@ import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
 import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
 import javafx.collections.FXCollections;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
@@ -56,6 +57,7 @@ public class DashboardController implements Initializable {
 
     // Watchlist Service refactor
     private IWatchlistService watchlistService;
+    private final IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
 
     private StockRepository repo;
 
@@ -69,7 +71,7 @@ public class DashboardController implements Initializable {
         new QuickTips(quickTipsLabel).start();
         try {
             refreshTable();
-            
+
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -166,6 +168,7 @@ public class DashboardController implements Initializable {
             pieData.add(new PieChart.Data(entry.getStock().getSymbol(),value));
         }
 
+        // build & size a new chart
         PieChart chart = new PieChart(pieData);
         chart.setLegendVisible(true);
         chart.setLabelsVisible(true);

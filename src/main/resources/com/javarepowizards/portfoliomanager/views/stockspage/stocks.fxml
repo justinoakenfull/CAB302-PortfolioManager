@@ -23,7 +23,10 @@
             </HBox>
             <Region HBox.hgrow="ALWAYS" />
             <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="557.0">
-                <TextField maxHeight="32.0" maxWidth="256.0" prefHeight="24.0" prefWidth="196.0" promptText="Search Stock..">
+                <TextField fx:id="stockSearchField"
+                           maxHeight="32.0" maxWidth="256.0"
+                           prefHeight="24.0" prefWidth="196.0"
+                           promptText="Search Stock..">
                     <font>
                         <Font name="Arial" size="12.0" />
                     </font>
