@@ -237,4 +237,25 @@ public class PortfolioDAO implements IPortfolioDAO {
             throw new RuntimeException("Failed to create user_holdings table", e);
         }
     }
+
+
+    @Override
+    public void sellHolding(int userId, StockName stock, double marketValue) throws SQLException {
+        String deleteSQL = "DELETE FROM user_holdings WHERE user_id = ? AND ticker = ?";
+        String updateSQL = "UPDATE user_balances SET balance = balance + ? WHERE user_id = ?";
+
+        try (
+                PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL);
+                PreparedStatement updateStmt = conn.prepareStatement(updateSQL)
+        ) {
+            deleteStmt.setInt(1, userId);
+            deleteStmt.setString(2, stock.getSymbol());
+            deleteStmt.executeUpdate();
+
+            updateStmt.setDouble(1, marketValue);
+            updateStmt.setInt(2, userId);
+            updateStmt.executeUpdate();
+        }
+    }
 }
+

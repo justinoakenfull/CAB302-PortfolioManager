@@ -42,9 +42,6 @@ public class PortfolioController {
         setupTableColumns();   // wire up columns (ticker → name, %, $)
         refreshPortfolio();    // fetch from DB and render pie + table
         setupSellColumn();
-
-
-
     }
 
     /**
@@ -76,32 +73,14 @@ public class PortfolioController {
     }
 
     private void handleSell(PortfolioEntry entry) {
-        int userId = currentUserId;
-        int quantityToSell = entry.getAmountHeld(); // Sell full amount
-        double valueToSubtract = entry.getMarketValue(); // Entire value
-
-        try (PreparedStatement ps = AppContext.getService(IDatabaseConnection.class).getConnection().prepareStatement("""
-        DELETE FROM user_holdings WHERE user_id = ? AND ticker = ?
-    """)) {
-            ps.setInt(1, userId);
-            ps.setString(2, entry.getStock().getSymbol());
-            ps.executeUpdate();
-            PreparedStatement updateBalance = AppContext.getService(IDatabaseConnection.class).getConnection().prepareStatement("""
-        UPDATE user_balances
-        SET balance = balance + ?
-        WHERE user_id = ?
-    """);
-            updateBalance.setDouble(1, valueToSubtract);
-            updateBalance.setInt(2, userId);
-            updateBalance.executeUpdate();
-            updateBalance.close();
-
-            refreshPortfolio(); // Refresh pie chart and table
+        try {
+            portfolioDAO.sellHolding(currentUserId, entry.getStock(), entry.getMarketValue());
+            refreshPortfolio();  // Keep this here since it's UI-related
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
 
     private void setupTableColumns() {
         // show stock display name (e.g. "BHP Group Ltd")
