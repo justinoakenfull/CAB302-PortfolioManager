@@ -89,7 +89,6 @@ public class WatchlistService implements IWatchlistService {
                 continue;
             }
 
-            // 3. load the domain object
             IStock stock = stockRepo.getByTicker(ticker);
             result.add(stock);
         }
