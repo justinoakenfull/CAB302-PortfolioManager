@@ -1,6 +1,5 @@
 module:com.javarepowizards.portfoliomanager
 com.javarepowizards.portfoliomanager
-com.javarepowizards.portfoliomanager.config
 com.javarepowizards.portfoliomanager.controllers.dashboard
 com.javarepowizards.portfoliomanager.controllers.portfolio
 com.javarepowizards.portfoliomanager.controllers.simulation

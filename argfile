@@ -2,7 +2,6 @@
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/ui/TableViewFactory.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/ui/TableCellFactories.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/ui/QuickTips.java'
-'/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/config/SecurityConfig.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/infrastructure/PriceHistoryLoader.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/infrastructure/OpenCsvAsxLoader.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/infrastructure/InMemoryStockRepository.java'
