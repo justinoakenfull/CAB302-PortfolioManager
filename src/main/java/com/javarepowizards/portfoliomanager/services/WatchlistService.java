@@ -2,8 +2,10 @@ package com.javarepowizards.portfoliomanager.services;
 
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
+import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.User;
 
@@ -107,11 +109,9 @@ public class WatchlistService implements IWatchlistService {
      * If the symbol is already present, this is a no-op.
      *
      * @param Stock the IStock to add
-     * @throws SQLException if there is an error persisting the new entry
-     * @throws IllegalStateException if no user is logged in
      */
     @Override
-    public void addStock(IStock Stock) throws SQLException {
+    public void addStock(IStock Stock) {
         int userId = resolveCurrentUserId();
 
         try {
@@ -119,10 +119,8 @@ public class WatchlistService implements IWatchlistService {
             watchlistDAO.addForUser(userId, sym);
         }
         catch (Exception e) {
-            return;
+            e.printStackTrace();
         }
-
-
     }
 
     /**
@@ -144,11 +142,9 @@ public class WatchlistService implements IWatchlistService {
      * If the symbol was not present, this is a no-op.
      *
      * @param Stock the StockName to remove
-     * @throws SQLException if there is an error deleting the entry
-     * @throws IllegalStateException if no user is logged in
      */
     @Override
-    public void removeStock(IStock Stock) throws SQLException {
+    public void removeStock(IStock Stock) {
         int userId = resolveCurrentUserId();
 
         try {
@@ -156,7 +152,7 @@ public class WatchlistService implements IWatchlistService {
             watchlistDAO.removeForUser(userId, sym);
         }
         catch (Exception e) {
-            return;
+            e.printStackTrace();
         }
     }
 
@@ -168,10 +164,9 @@ public class WatchlistService implements IWatchlistService {
      * @throws IllegalStateException if no user is present
      */
     private int resolveCurrentUserId() {
-        return Optional.ofNullable(userDAO.getCurrentUser()
-                        .orElseThrow(() -> new IllegalStateException("No user logged in")))
+        return userDAO.getCurrentUser()
                 .map(User::getUserId)
-                .get();
+                .orElseThrow(() -> new IllegalStateException("No user logged in"));
     }
 
     /**
@@ -300,7 +295,7 @@ public class WatchlistService implements IWatchlistService {
         int end   = text.lastIndexOf(FINISH);
         int start = (end >= 0) ? text.lastIndexOf(START, end - 1) : -1;
 
-        if (start < 0 || end < 0 || start + START.length() > end) {
+        if (start < 0 || start + START.length() > end) {
             return Optional.empty();
         }
 
@@ -312,4 +307,35 @@ public class WatchlistService implements IWatchlistService {
         return watchlistDAO.listForUser(resolveCurrentUserId());
     }
 
+    /**
+     * Formats a raw percent like 1.2345 into “+1.23%” or “-2.50%”.
+     *
+     * @param pct the raw percent
+     * @return formatted percent string
+     */
+    @Override
+    public String formatPercent(double pct) {
+        return String.format("%+,.2f%%", pct);
+    }
+
+    /**
+     * Calculates change % = (close - open) / open * 100 for a given portfolio entry.
+     *
+     * @param entry the portfolio entry to compute for
+     * @return the live change percent
+     */
+    @Override
+    public double computeChangePercent(PortfolioEntry entry) {
+        StockName name = StockName.fromString(entry.getStock().getSymbol());
+        IStock stock;
+        try {
+            stock = stockRepo.getByTicker(name.getSymbol());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        PriceRecord rec = stock.getCurrentRecord();
+        double open  = rec.getOpen();
+        double close = rec.getClose();
+        return ((close - open) / open) * 100.0;
+    }
 }
