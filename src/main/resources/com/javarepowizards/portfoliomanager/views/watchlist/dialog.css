@@ -1,0 +1,54 @@
+/* Dialog background & border */
+.dialog-pane {
+    -fx-background-color: #2B2F33;
+    -fx-border-color:   #3A3F44;
+    -fx-border-width: 1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0, 0, 4);
+}
+
+/* Header (title bar) */
+.dialog-pane .header-panel {
+    -fx-background-color: #2C2F33;
+}
+.dialog-pane .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* Content area (labels, list) */
+.dialog-pane .content {
+    -fx-text-fill: #E0E0E0;
+}
+.dialog-pane .content .label {
+    -fx-text-fill: #E0E0E0;
+}
+
+/* The ChoiceDialog’s ListView */
+.dialog-pane .list-view {
+    -fx-background-color: #23272A;
+    -fx-border-color:   #3A3F44;
+}
+.dialog-pane .list-cell {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: transparent;
+}
+.dialog-pane .list-cell:selected {
+    -fx-background-color: #3A3F44;
+}
+
+/* OK/Cancel buttons */
+.dialog-pane .button-bar .button {
+    -fx-background-color: #0D89D1;
+    -fx-text-fill: white;
+    -fx-background-radius: 4px;
+    -fx-padding: 6 20;
+}
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: #0B78B0;
+}
+.dialog-pane .button-bar .button:cancel {
+    -fx-background-color: #dc3545;
+}

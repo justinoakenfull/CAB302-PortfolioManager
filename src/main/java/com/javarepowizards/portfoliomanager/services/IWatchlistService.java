@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.services;
 
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
+import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 
 import java.io.IOException;
@@ -27,4 +28,8 @@ public interface IWatchlistService {
     IStock getStock(StockName sym) throws IOException;
 
     List<StockName> getWatchlistSymbols() throws SQLException;
+
+    String formatPercent(double pct);
+
+    double computeChangePercent(PortfolioEntry entry);
 }
