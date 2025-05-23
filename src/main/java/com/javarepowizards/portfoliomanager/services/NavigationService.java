@@ -18,10 +18,23 @@ public class NavigationService {
     private static final String basePath = "/com/javarepowizards/portfoliomanager/views/";
 
 
+    /**
+     * Constructor for NavigationService.
+     *
+     * @param contentArea The StackPane where the views will be loaded.
+     */
+
     public NavigationService(StackPane contentArea) {
         this.contentArea = contentArea;
     }
 
+    /**
+     * Loads a new view into the content area.
+     *
+     * @param relativeFxmlPath The relative path to the FXML file.
+     * @param controllerInit A consumer to initialize the controller.
+     * @param <T> The type of the controller.
+     */
     public <T> void loadView(String relativeFxmlPath, Consumer<T> controllerInit) {
         String fullPath = basePath + relativeFxmlPath;
         URL fxmlUrl = getClass().getResource(fullPath);
@@ -41,6 +54,16 @@ public class NavigationService {
 
     }
 
+    /**
+     * Loads a new scene in the current window.
+     *
+     * @param sourceNode The node from which to get the current stage.
+     * @param relativeFxmlPath The relative path to the FXML file.
+     * @param controllerInit A consumer to initialize the controller.
+     * @param windowTitle The title of the new window.
+     * @param width The width of the new window.
+     * @param height The height of the new window.
+     */
 
     public static <T> void loadScene (Node sourceNode, String relativeFxmlPath, Consumer<T> controllerInit, String windowTitle, double width, double height) {
         String fullPath = basePath + relativeFxmlPath;
