@@ -1,6 +1,6 @@
 package com.javarepowizards.portfoliomanager.operations.simulation;
 
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
+
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockData;
@@ -96,7 +96,7 @@ public class PortfolioSimulation {
             individualSimulations.add(simPrices);
         }
 
-        // Now aggregate the simulated prices of each stock into a portfolio value per day.
+        //  aggregate the simulated prices of each stock into a portfolio value per day.
         List<Double> portfolioValues = new ArrayList<>();
 
         // Calculate Day 0 portfolio value (cash + each stock's initial value).
