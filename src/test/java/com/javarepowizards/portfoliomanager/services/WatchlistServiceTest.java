@@ -7,7 +7,6 @@ import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.User;
-import com.javarepowizards.portfoliomanager.services.Session;
 import com.opencsv.exceptions.CsvValidationException;
 import org.junit.jupiter.api.*;
 
@@ -32,6 +31,7 @@ class WatchlistServiceTest {
     private IWatchlistService watchlistService;
     private IWatchlistDAO     watchlistDAO;
     private IUserDAO          userDAO;
+    private IPortfolioDAO     portfolioDAO;
     private Connection        connection;
     private StockRepository   stockRepo;
 
@@ -54,6 +54,9 @@ class WatchlistServiceTest {
         watchlistDAO = new WatchlistDAO(dbConn);
         AppContext.registerService(IWatchlistDAO.class, watchlistDAO);
 
+        portfolioDAO = new PortfolioDAO(dbConn);
+        AppContext.registerService(IPortfolioDAO.class, portfolioDAO);
+
         URL priceCsv = getClass().getResource(
                 "/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv"
         );
@@ -65,7 +68,7 @@ class WatchlistServiceTest {
         stockRepo = new InMemoryStockRepository(pricePath, descPath);
         AppContext.initStockRepository(stockRepo);
 
-        WatchlistService svc = new WatchlistService(stockRepo, watchlistDAO, userDAO);
+        WatchlistService svc = new WatchlistService(stockRepo, watchlistDAO, userDAO, portfolioDAO);
         AppContext.registerService(IWatchlistService.class, svc);
         watchlistService = AppContext.getService(IWatchlistService.class);
     }
@@ -169,7 +172,7 @@ class WatchlistServiceTest {
                 () -> assertThrows(NullPointerException.class,
                         watchlistService::getWatchlistSymbols),
                 () -> assertThrows(NullPointerException.class,
-                        watchlistService::getAddableSymbols)
+                        () -> watchlistService.getAddableSymbols())
         );
     }
 }

@@ -110,4 +110,5 @@ public class WatchlistRow {
      * @return the ObjectProperty containing the remove Button
      */
     public ObjectProperty<Button> removeProperty(){ return remove; }
+
 }

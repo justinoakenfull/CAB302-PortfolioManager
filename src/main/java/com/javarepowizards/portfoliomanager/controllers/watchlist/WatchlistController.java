@@ -1,7 +1,5 @@
 package com.javarepowizards.portfoliomanager.controllers.watchlist;
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.services.IWatchlistService;
@@ -9,7 +7,6 @@ import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
 import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -34,8 +31,9 @@ import java.util.*;
 
 /**
  * Controller for the Watchlist view.
- * Manages the retrieval of a user's watchlist from the DAO, displays it in a table,
- * and handles user interactions such as adding or viewing stock details.
+ * Manages the UI components and interactions for displaying and modifying
+ * the user's watchlist, including stock removal, addition, and detail viewing.
+ * Retrieves data from the IWatchlistService and binds it to the UI.
  */
 public class WatchlistController implements Initializable {
 
@@ -55,11 +53,11 @@ public class WatchlistController implements Initializable {
     private static final Locale AU_LOCALE = Locale.forLanguageTag("en-AU");
 
     /**
-     * Initializes the controller after its root element has been processed.
-     * Sets up DAO instances, determines the current user ID, logs it,
-     * and populates the watchlist table.
+     * Initializes the controller after its FXML elements have been injected.
+     * Retrieves the watchlist service, binds UI properties,
+     * sets up the table columns, and loads initial data.
      *
-     * @param location  the location used to resolve relative paths for the root object, or null if unknown
+     * @param location the location used to resolve relative paths for the root object, or null if unknown
      * @param resources the resources used to localize the root object, or null if not localized
      */
     @Override
@@ -71,93 +69,77 @@ public class WatchlistController implements Initializable {
                 snapshotScrollPane.setVvalue(0)
         );
 
-        try {
-            refreshTable();
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException(e);
-        }
+        setupTable();
+        loadAll();
     }
 
-    private void refreshTable() throws IOException, SQLException {
 
-        List<IStock> stocks = watchlistService.getWatchlist();
-
-        List<WatchlistRow> rows = new ArrayList<>();
-
-        for (IStock stock : stocks) {
-            StockName sym = StockName.fromString(stock.getTicker());
-            rows.add(new WatchlistRow(stock, () -> {
-                try {
-                    watchlistService.removeStock(sym);
-                    refreshTable();
-                } catch (SQLException | IOException ex) {
-                    throw new RuntimeException("Failed to remove stock", ex);
-                }
-            }));
-        }
-
-        ObservableList<WatchlistRow> model = FXCollections.observableArrayList(rows);
-
+    /**
+     * Configures the watchlist table by creating columns,
+     * adding cell factories, styling, and selection listeners.
+     */
+    private void setupTable() {
         List<ColumnConfig<WatchlistRow,?>> cols = List.of(
-                new ColumnConfig<>("Ticker",
-                        WatchlistRow::shortNameProperty),
-                new ColumnConfig<>("Name",
-                        WatchlistRow::displayNameProperty),
-                new ColumnConfig<>("Open",
-                        r -> r.openProperty().asObject(),
-                        TableCellFactories.numericFactory(2,false)),
-                new ColumnConfig<>("Close",
-                        r -> r.closeProperty().asObject(),
-                        TableCellFactories.numericFactory(2,false)),
-                new ColumnConfig<>("Change",
-                        r -> r.changeProperty().asObject(),
-                        TableCellFactories.numericFactory(2,true)),
-                new ColumnConfig<>("Change %",
-                        r -> r.changePercentProperty().asObject(),
-                        TableCellFactories.numericFactory(2,true)),
-                new ColumnConfig<>("Price",
-                        r -> r.priceProperty().asObject(),
+                new ColumnConfig<>("Ticker",    WatchlistRow::shortNameProperty),
+                new ColumnConfig<>("Name",      WatchlistRow::displayNameProperty),
+                new ColumnConfig<>("Open",      r -> r.openProperty().asObject(),
+                        TableCellFactories.numericFactory(2, false)),
+                new ColumnConfig<>("Close",     r -> r.closeProperty().asObject(),
+                        TableCellFactories.numericFactory(2, false)),
+                new ColumnConfig<>("Change",    r -> r.changeProperty().asObject(),
+                        TableCellFactories.numericFactory(2, true)),
+                new ColumnConfig<>("Change %",  r -> r.changePercentProperty().asObject(),
+                        TableCellFactories.numericFactory(2, true)),
+                new ColumnConfig<>("Price",     r -> r.priceProperty().asObject(),
                         TableCellFactories.currencyFactory(AU_LOCALE, 2)),
-                new ColumnConfig<>("Volume",
-                        r -> r.volumeProperty().asObject(),
+                new ColumnConfig<>("Volume",    r -> r.volumeProperty().asObject(),
                         TableCellFactories.longFactory()),
-                new ColumnConfig<>("Remove",
-                        WatchlistRow::removeProperty)
+                new ColumnConfig<>("Remove",    WatchlistRow::removeProperty)
         );
 
-        TableView<WatchlistRow> table = TableViewFactory.create(cols);
-
-        table.getStyleClass().add("watchlist-table");
-        table.setEffect(tableView.getEffect());
-        HBox.setHgrow(table, Priority.ALWAYS);
-        VBox.setVgrow(table, Priority.ALWAYS);
-
-        tableContainer.getChildren().setAll(table);
-        tableView = table;
-        table.setItems(model);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
-        table.getColumns().forEach(col ->
+        TableView<WatchlistRow> tv = TableViewFactory.create(cols);
+        tv.getStyleClass().add("watchlist-table");
+        tv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        tv.getColumns().forEach(col ->
                 col.getStyleClass().add("column-header-background")
         );
+        tv.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldRow, newRow) -> onRowSelected(newRow)
+        );
 
-        table.getSelectionModel().selectedItemProperty().addListener((obs, oldRow, newRow) -> {
-            if (newRow == null) {
-                setSnapshotText("No stock selected.");
-            } else {
-                StockName sym = StockName.fromString(newRow.shortNameProperty().get());
-                toggleProgress();
-                setSnapshotText("Loading description…");
-
-                Thread t = startAIThread(sym);
-                t.setDaemon(true);
-                t.start();
-            }
-        });
-
-        buildPortfolioPieChart();
+        HBox.setHgrow(tv, Priority.ALWAYS);
+        VBox.setVgrow(tv, Priority.ALWAYS);
+        tableContainer.getChildren().setAll(tv);
+        tableView = tv;
     }
 
+
+    /**
+     * Handles row selection in the watchlist table.
+     * Triggers loading of the selected stock's short description asynchronously.
+     *
+     * @param row the selected WatchlistRow, or null if no selection
+     */
+    private void onRowSelected(WatchlistRow row) {
+        if (row == null) {
+            snapshotText.setText("No stock selected.");
+        } else {
+            StockName sym = StockName.fromString(row.shortNameProperty().get());
+            toggleProgress();
+            snapshotText.setText("Loading description…");
+
+            Thread t = startAIThread(sym);
+            t.setDaemon(true);
+            t.start();
+        }
+    }
+
+    /**
+     * Starts a background thread to fetch the short description of a stock.
+     *
+     * @param sym the StockName representing the selected stock
+     * @return a daemon Thread executing the description retrieval task
+     */
     private Thread startAIThread(StockName sym) {
         Task<String> descTask = new Task<>() {
             @Override
@@ -169,39 +151,107 @@ public class WatchlistController implements Initializable {
         descTask.setOnSucceeded(
                 e ->
                 {
-                    setSnapshotText(descTask.getValue());
+                    snapshotText.setText(descTask.getValue());
                     toggleProgress();
                 });
         descTask.setOnFailed(e -> {
             Throwable ex = descTask.getException();
+
             if (ex != null) {
-                ex.printStackTrace();
+                return;
             }
-            setSnapshotText(descTask.getValue());
+
+            snapshotText.setText(descTask.getValue());
             toggleProgress();
         });
 
         return new Thread(descTask);
     }
 
-    private void toggleProgress() {
-        if (progressIndicator.isVisible()) {
-            progressIndicator.setVisible(false);
-            progressIndicator.setMinHeight(0);
-            progressIndicator.setMaxHeight(0);
-        } else {
-            progressIndicator.setVisible(true);
-            progressIndicator.setMinHeight(100);
-            progressIndicator.setMaxHeight(100);
+    /**
+     * Loads all watchlist data into the UI components: table, pie chart, and balance cards.
+     * Sets up removal buttons and applies chart colors.
+     *
+     * @throws RuntimeException if an I/O or SQL exception occurs while loading data
+     */
+    private void loadAll() {
+        try {
+            List<WatchlistRow> rows = watchlistService.getWatchlistRows();
+            tableView.setItems(FXCollections.observableArrayList(rows));
+
+            for (WatchlistRow row : rows) {
+                Button removeBtn = row.removeProperty().get();
+                removeBtn.setOnAction(e -> {
+                    try {
+                        watchlistService.removeStock(
+                                StockName.fromString(row.shortNameProperty().get())
+                        );
+                        loadAll();
+                    } catch (SQLException ex) {
+                        throw new RuntimeException("Failed to remove stock", ex);
+                    }
+                });
+            }
+
+            tableView.setItems(FXCollections.observableArrayList(rows));
+
+            ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+                    watchlistService.getPortfolioPieData()
+            );
+
+            noStocksWarning.setVisible(pieData.isEmpty());
+
+            PieChart chart = new PieChart(pieData);
+            chart.setLegendVisible(false);
+            chart.setLabelsVisible(false);
+            bindChartSize(chart);
+            portfolioPieContainer.getChildren().setAll(chart);
+
+            List<Optional<PortfolioEntry>> picks = watchlistService.getBalancePicks();
+            List<Text> lbls = List.of(stockOneLabel, stockTwoLabel, stockThreeLabel, stockFourLabel);
+            List<Text> vals = List.of(stockOneValue, stockTwoValue, stockThreeValue, stockFourValue);
+            for (int i = 0; i < 4; i++) {
+                PortfolioEntry e = picks.get(i).orElse(null);
+                setCard(lbls.get(i), vals.get(i), e);
+            }
+
+            Platform.runLater(() -> applyLabelColors(chart));
+
+        } catch (IOException | SQLException ex) {
+            throw new RuntimeException("Failed to load Watchlist UI", ex);
         }
-
-    }
-
-    private void setSnapshotText(String description) {
-        snapshotText.setText(description);
     }
 
 
+    /**
+     * Binds the size properties of the given PieChart to its container's dimensions.
+     *
+     * @param chart the PieChart to bind
+     */
+    private void bindChartSize(PieChart chart) {
+        chart.minWidthProperty().bind(portfolioPieContainer.widthProperty());
+        chart.minHeightProperty().bind(portfolioPieContainer.heightProperty());
+        chart.maxWidthProperty().bind(portfolioPieContainer.widthProperty());
+        chart.maxHeightProperty().bind(portfolioPieContainer.heightProperty());
+    }
+
+    /**
+     * Toggles the visibility and size of the progress indicator.
+     * Shows it when hidden and hides it when visible.
+     */
+    private void toggleProgress() {
+        boolean visible = !progressIndicator.isVisible();
+        progressIndicator.setVisible(visible);
+        progressIndicator.setMinHeight(visible ? 100 : 0);
+        progressIndicator.setMaxHeight(visible ? 100 : 0);
+    }
+
+    /**
+     * Opens a dialog allowing the user to add a new stock to their watchlist.
+     * If no stocks remain to add, shows an informational alert.
+     *
+     * @throws RuntimeException if unable to load addable symbols or add a stock due to database errors
+     */
     @FXML
     private void onAddStock() {
         try {
@@ -216,7 +266,7 @@ public class WatchlistController implements Initializable {
                                         .getResource(dialogCss))
                                 .toExternalForm());
                 info.setTitle("Nothing to Add");
-                info.setHeaderText(null);  // or whatever header you like
+                info.setHeaderText(null);
                 info.showAndWait();
                 return;
             }
@@ -232,23 +282,27 @@ public class WatchlistController implements Initializable {
             dlg.showAndWait().ifPresent(sym -> {
                 try {
                     watchlistService.addStock(sym);
-                    refreshTable();
-                } catch (SQLException | IOException ex) {
+                    loadAll();
+                } catch (SQLException ex) {
                     throw new RuntimeException("Failed to add stock", ex);
                 }
             });
 
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             throw new RuntimeException("Unable to load watchlist for adding stocks", e);
         }
     }
 
+    /**
+     * Opens a modal window displaying detailed information about the selected stock.
+     *
+     * @throws RuntimeException if the FXML resource is not found or loading fails,
+     *                          or if a database error occurs while initializing modal data
+     */
     @FXML
     private void onViewStock() {
         WatchlistRow selected = tableView.getSelectionModel().getSelectedItem();
         if (selected == null) return;
-
-        StockName ticker = StockName.fromString(selected.shortNameProperty().get());
 
         String resource = "/com/javarepowizards/portfoliomanager/views/watchlist/WatchlistModal.fxml";
         URL fxmlUrl = getClass().getResource(resource);
@@ -260,6 +314,9 @@ public class WatchlistController implements Initializable {
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
             WatchlistModalController modal = loader.getController();
+
+            StockName ticker = StockName.fromString(selected.shortNameProperty().get());
+
             modal.initData(ticker);
 
             Stage dialog = new Stage();
@@ -273,149 +330,58 @@ public class WatchlistController implements Initializable {
         }
     }
 
-    @FXML
-    private void buildPortfolioPieChart(){
-        IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
-        List<PortfolioEntry> entries = portfolioDAO.getHoldings();
 
-        if (entries.isEmpty()) {
-            noStocksWarning.setVisible(true);
-            noStocksWarning.setMinHeight(100);
-            noStocksWarning.setMaxHeight(100);
-            return;
-        } else
-        {
-            noStocksWarning.setVisible(false);
-            noStocksWarning.setMinHeight(0);
-            noStocksWarning.setMaxHeight(0);
-        }
-
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-
-        for (PortfolioEntry entry : entries) {
-            double value = entry.getMarketValue();
-            pieData.add(new PieChart.Data(entry.getStock().getSymbol(),value));
-        }
-
-        PieChart chart = new PieChart(pieData);
-        chart.setLegendVisible(false);
-        chart.setLabelsVisible(false);
-
-        chart.minWidthProperty().bind(
-                Bindings.when(portfolioPieContainer.widthProperty().lessThan(4000))
-                        .then(portfolioPieContainer.widthProperty())
-                        .otherwise(4000));
-        chart.minHeightProperty().bind(
-                Bindings.when(portfolioPieContainer.heightProperty().lessThan(4000))
-                        .then(portfolioPieContainer.heightProperty())
-                        .otherwise(4000));
-        chart.maxWidthProperty().bind(
-                Bindings.when(portfolioPieContainer.widthProperty().lessThan(4000))
-                        .then(portfolioPieContainer.widthProperty())
-                        .otherwise(4000));
-        chart.maxHeightProperty().bind(
-                Bindings.when(portfolioPieContainer.heightProperty().lessThan(4000))
-                        .then(portfolioPieContainer.heightProperty())
-                        .otherwise(4000));
-        portfolioPieContainer.getChildren().setAll(chart);
-
-        updateBalanceCard(entries);
-
-        Platform.runLater(() -> applyLabelColors(chart));
-    }
-
-    private void setLabelFill(Text label, Map<String, Paint> colorMap) {
-        Paint p = colorMap.get(label.getText());
+    /**
+     * Sets the fill color of a Text label based on the provided colour map.
+     *
+     * @param label the Text node whose fill colour will be set
+     * @param colourMap a mapping of stock symbols to Paint colours
+     */
+    private void setLabelFill(Text label, Map<String, Paint> colourMap) {
+        Paint p = colourMap.get(label.getText());
         if (p != null) {
             label.setFill(p);
         }
     }
 
+    /**
+     * Applies the colours of the PieChart slices to the corresponding Text labels.
+     *
+     * @param chart the PieChart whose slice colours are applied
+     */
     private void applyLabelColors(PieChart chart) {
         chart.applyCss();
         chart.layout();
 
-        Map<String, Paint> colorMap = new HashMap<>();
-        for (PieChart.Data data : chart.getData()) {
-            Node node = data.getNode();
+        Map<String, Paint> colourMap = new HashMap<>();
+        for (PieChart.Data d : chart.getData()) {
+            Node n = d.getNode();
             Paint fill = null;
-
-            if (node instanceof Shape) {
-                fill = ((Shape) node).getFill();
-            } else if (node instanceof Region) {
-                Background bg = ((Region) node).getBackground();
-                if (bg != null && !bg.getFills().isEmpty()) {
+            if (n instanceof Shape) {
+                fill = ((Shape)n).getFill();
+            } else if (n instanceof Region) {
+                var bg = ((Region)n).getBackground();
+                if (bg!=null && !bg.getFills().isEmpty()) {
                     fill = bg.getFills().getFirst().getFill();
                 }
             }
-
-            if (fill != null) {
-                colorMap.put(data.getName(), fill);
-            } else {
-                System.out.println("Slice node for " + data.getName() +
-                        " is a " + node.getClass().getSimpleName());
-            }
+            colourMap.put(d.getName(), fill);
         }
 
-        setLabelFill(stockOneLabel,   colorMap);
-        setLabelFill(stockTwoLabel,   colorMap);
-        setLabelFill(stockThreeLabel, colorMap);
-        setLabelFill(stockFourLabel,  colorMap);
+        setLabelFill(stockOneLabel, colourMap);
+        setLabelFill(stockTwoLabel, colourMap);
+        setLabelFill(stockThreeLabel, colourMap);
+        setLabelFill(stockFourLabel, colourMap);
     }
 
 
     /**
-     * Refreshes the four balance-card entries without repeating any stock.
-     * Slot 1: highest positive change %
-     * Slot 2: change % closest to zero
-     * Slot 3: smallest non-zero change % by absolute value
-     * Slot 4: largest negative change %
+     * Populates a card slot with a portfolio entry's symbol and percentage change,
+     * or clears the card if no entry is provided.
      *
-     * @param entries the current portfolio entries
-     */
-    public void updateBalanceCard(List<PortfolioEntry> entries) {
-
-        List<PortfolioEntry> remaining = new ArrayList<>(entries);
-        List<Optional<PortfolioEntry>> picks = new ArrayList<>(4);
-
-        Optional<PortfolioEntry> highestPos = remaining.stream()
-                .filter(entry -> watchlistService.computeChangePercent(entry) > 0)
-                .max(Comparator.comparingDouble(watchlistService::computeChangePercent));
-        highestPos.ifPresent(remaining::remove);
-        picks.add(highestPos);
-
-        Optional<PortfolioEntry> closestZero = remaining.stream()
-                .min(Comparator.comparingDouble(entry -> Math.abs(watchlistService.computeChangePercent(entry))));
-        closestZero.ifPresent(remaining::remove);
-        picks.add(closestZero);
-
-        Optional<PortfolioEntry> smallestNonZero = remaining.stream()
-                .filter(entry -> watchlistService.computeChangePercent(entry) != 0)
-                .min(Comparator.comparingDouble(entry -> Math.abs(watchlistService.computeChangePercent(entry))));
-        smallestNonZero.ifPresent(remaining::remove);
-        picks.add(smallestNonZero);
-
-        Optional<PortfolioEntry> largestNeg = remaining.stream()
-                .filter(entry -> watchlistService.computeChangePercent(entry) < 0)
-                .min(Comparator.comparingDouble(watchlistService::computeChangePercent));
-        picks.add(largestNeg);
-
-        List<Text> labels = List.of(stockOneLabel, stockTwoLabel, stockThreeLabel, stockFourLabel);
-        List<Text> values = List.of(stockOneValue, stockTwoValue, stockThreeValue, stockFourValue);
-
-        for (int i = 0; i < picks.size(); i++) {
-            setCard(labels.get(i), values.get(i), picks.get(i).orElse(null));
-        }
-    }
-
-
-
-    /**
-     * Populates a single card slot, or shows “—” if no entry available.
-     *
-     * @param labelNode the ticker Text node
-     * @param valueNode the percent-change Text node
-     * @param entryOpt  the optional portfolio entry
+     * @param labelNode the Text node for the stock symbol
+     * @param valueNode the Text node for the percentage change
+     * @param entryOpt the PortfolioEntry to display, or null to clear
      */
     private void setCard(Text labelNode, Text valueNode, PortfolioEntry entryOpt) {
         if (entryOpt != null) {

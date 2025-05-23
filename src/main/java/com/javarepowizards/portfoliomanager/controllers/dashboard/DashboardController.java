@@ -26,6 +26,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
@@ -78,7 +79,16 @@ public class DashboardController implements Initializable {
 
     private void refreshTable() throws IOException, SQLException {
 
-        List<IStock> watchlistStocks = watchlistService.getWatchlist();
+        List<IStock> watchlistStocks = watchlistService.getWatchlistRows().stream()
+                .map(row -> {
+                    try {
+                        return watchlistService.getStock(
+                                StockName.fromString(row.shortNameProperty().get())
+                        );
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }).toList();
         List<WatchlistRow> rows = new ArrayList<>();
 
         Set<String> available = repo.availableTickers();

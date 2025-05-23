@@ -1,5 +1,7 @@
 package com.javarepowizards.portfoliomanager.services;
 
+import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
@@ -8,6 +10,8 @@ import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.User;
+import javafx.concurrent.Task;
+import javafx.scene.chart.PieChart;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -23,6 +27,7 @@ public class WatchlistService implements IWatchlistService {
     private final StockRepository stockRepo;
     private final IWatchlistDAO watchlistDAO;
     private final IUserDAO userDAO;
+    private final IPortfolioDAO portfolioDAO;
 
     private final OllamaService ollamaService;
     private final boolean ollamaAvailable;
@@ -36,10 +41,12 @@ public class WatchlistService implements IWatchlistService {
      */
     public WatchlistService(StockRepository stockRepo,
                             IWatchlistDAO watchlistDAO,
-                            IUserDAO userDAO) {
+                            IUserDAO userDAO,
+                            IPortfolioDAO portfolioDAO) {
         this.stockRepo    = stockRepo;
         this.watchlistDAO = watchlistDAO;
         this.userDAO      = userDAO;
+        this.portfolioDAO = portfolioDAO;
 
         // try and init ollama
 
@@ -82,7 +89,6 @@ public class WatchlistService implements IWatchlistService {
                 continue;
             }
 
-            // 3. load the domain object
             IStock stock = stockRepo.getByTicker(ticker);
             result.add(stock);
         }
@@ -95,7 +101,6 @@ public class WatchlistService implements IWatchlistService {
      *
      * @param symbol the StockName to add
      * @throws SQLException if there is an error persisting the new entry
-     * @throws IllegalStateException if no user is logged in
      */
     @Override
     public void addStock(StockName symbol) throws SQLException {
@@ -110,16 +115,10 @@ public class WatchlistService implements IWatchlistService {
      * @param Stock the IStock to add
      */
     @Override
-    public void addStock(IStock Stock) {
+    public void addStock(IStock Stock) throws SQLException {
         int userId = resolveCurrentUserId();
-
-        try {
-            StockName sym = StockName.fromString(Stock.getTicker());
-            watchlistDAO.addForUser(userId, sym);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        StockName sym = StockName.fromString(Stock.getTicker());
+        watchlistDAO.addForUser(userId, sym);
     }
 
     /**
@@ -217,8 +216,9 @@ public class WatchlistService implements IWatchlistService {
                 String raw = ollamaService.generateResponse(prompt).trim();
                 return extractBetweenTags(raw)
                         .orElseGet(stock::getLongDescription);
-            } catch (IOException e) {
+            } catch (IOException | IllegalStateException e) {
                 // LLM failed; fall back to stored text
+                //e.printStackTrace();
             }
         }
 
@@ -259,7 +259,7 @@ public class WatchlistService implements IWatchlistService {
                 String raw = ollamaService.generateResponse(prompt).trim();
                 return extractBetweenTags(raw)
                         .orElseGet(stock::getShortDescription);
-            } catch (IOException e) {
+            } catch (IOException | IllegalStateException e) {
                 // LLM failed; fall back to stored text
             }
         }
@@ -301,6 +301,13 @@ public class WatchlistService implements IWatchlistService {
         return Optional.of(text.substring(start + START.length(), end).trim());
     }
 
+
+    /**
+     * Returns the raw list of symbols in the user’s watchlist.
+     *
+     * @return list of StockName values in current watchlist
+     * @throws SQLException if there is an error querying the watchlist
+     */
     @Override
     public List<StockName> getWatchlistSymbols() throws SQLException {
         return watchlistDAO.listForUser(resolveCurrentUserId());
@@ -336,5 +343,87 @@ public class WatchlistService implements IWatchlistService {
         double open  = rec.getOpen();
         double close = rec.getClose();
         return ((close - open) / open) * 100.0;
+    }
+
+    /**
+     * Builds WatchlistRow objects for display in the UI table.
+     * Stocks without available data are skipped.
+     *
+     * @return list of WatchlistRow elements
+     * @throws IOException   if there is an error loading stock data
+     * @throws SQLException  if there is an error querying the watchlist
+     */
+    @Override
+    public List<WatchlistRow> getWatchlistRows() throws IOException, SQLException {
+        int userId = resolveCurrentUserId();
+        List<StockName> symbols = watchlistDAO.listForUser(userId);
+        Set<String> available = stockRepo.availableTickers();
+
+        List<WatchlistRow> rows = new ArrayList<>();
+        for (StockName sym : symbols) {
+            if (!available.contains(sym.getSymbol())) continue;
+            IStock stock = stockRepo.getByTicker(sym.getSymbol());
+            // Supply remove callback that simply calls back into this service
+            Runnable remover = () -> {
+                try {
+                    removeStock(sym);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+            rows.add(new WatchlistRow(stock, remover));
+        }
+        return rows;
+    }
+
+    /**
+     * Generates pie chart data for the user's portfolio holdings.
+     *
+     * @return list of PieChart.Data elements with symbol and market value
+     * @throws SQLException if there is an error retrieving holdings
+     */
+    @Override
+    public List<PieChart.Data> getPortfolioPieData() throws SQLException {
+        List<PortfolioEntry> entries = portfolioDAO.getHoldings();
+        return entries.stream()
+                .map(e -> new PieChart.Data(e.getStock().getSymbol(), e.getMarketValue()))
+                .toList();
+    }
+
+    /**
+     * Selects four portfolio entries for highlighting based on change criteria:
+     * highest gain, closest to zero, smallest non-zero change, and largest loss.
+     *
+     * @return list of up to four Optional entries in priority order
+     * @throws SQLException if there is an error retrieving holdings
+     */
+    @Override
+    public List<Optional<PortfolioEntry>> getBalancePicks() throws SQLException {
+        List<PortfolioEntry> remaining = new ArrayList<>(portfolioDAO.getHoldings());
+        List<Optional<PortfolioEntry>> picks = new ArrayList<>(4);
+
+        Optional<PortfolioEntry> highestPos = remaining.stream()
+                .filter(e -> computeChangePercent(e) > 0)
+                .max(Comparator.comparingDouble(this::computeChangePercent));
+        highestPos.ifPresent(remaining::remove);
+        picks.add(highestPos);
+
+        Optional<PortfolioEntry> closestZero = remaining.stream()
+                .min(Comparator.comparingDouble(e -> Math.abs(computeChangePercent(e))));
+        closestZero.ifPresent(remaining::remove);
+        picks.add(closestZero);
+
+        Optional<PortfolioEntry> smallestNonZero = remaining.stream()
+                .filter(e -> computeChangePercent(e) != 0)
+                .min(Comparator.comparingDouble(e -> Math.abs(computeChangePercent(e))));
+        smallestNonZero.ifPresent(remaining::remove);
+        picks.add(smallestNonZero);
+
+        Optional<PortfolioEntry> largestNeg = remaining.stream()
+                .filter(e -> computeChangePercent(e) < 0)
+                .min(Comparator.comparingDouble(this::computeChangePercent));
+        picks.add(largestNeg);
+
+        return picks;
     }
 }
