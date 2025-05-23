@@ -154,14 +154,24 @@ public class LoginController implements Initializable {
     @FXML
     private void skipLogin() throws SQLException {
 
-        String username = "test";
-        String password = "test1234";
+        final String username = "test";
+        final String email    = "test";
+        final String password = "test1234";
 
         try{
             Optional<User> userOpt = isEmail(username)
                     ? userDAO.getUserByEmail(username)
                     : userDAO.getUserByUsername(username);
 
+            if (userOpt.isEmpty()) {
+                String hashed = authService.hashPassword(password);
+                User newUser = new User(username, email, hashed);
+                boolean created = userDAO.createUser(newUser);
+                if (!created) {
+                    throw new RuntimeException("Failed to create test user");
+                }
+                userOpt = Optional.of(newUser);
+            }
 
             Session.setCurrentUser(userOpt.get());
 
