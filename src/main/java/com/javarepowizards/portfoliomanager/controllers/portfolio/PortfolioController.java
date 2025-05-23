@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.portfolio;
 
 import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.controllers.dashboard.DashboardController;
 import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
@@ -79,6 +80,8 @@ public class PortfolioController implements Initializable {
         try {
             portfolioDAO.sellHolding(currentUserId, entry.getStock(), entry.getMarketValue());
             refreshPortfolio();  // Keep this here since it's UI-related
+            AppContext.getService(DashboardController.class)
+                    .refreshPortfolioChart();
         } catch (Exception e) {
             e.printStackTrace();
         }

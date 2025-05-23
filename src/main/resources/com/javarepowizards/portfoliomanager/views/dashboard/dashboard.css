@@ -43,6 +43,16 @@
 -fx-text-fill: white;
 }
 
+.chart-pie-label {
+    -fx-fill: white;
+}
+
+.empty-holdings-label {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-alignment: center
+}
+
 
 /* Table styling */
 .watchlist-table {
@@ -135,4 +145,6 @@
    (TableCellFactories already add the style classes below) */
 .table-view.watchlist-table .change-positive { -fx-text-fill: #1db954; }
 .table-view.watchlist-table .change-negative { -fx-text-fill: #ff6961; }
+
+
 

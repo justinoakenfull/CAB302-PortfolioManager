@@ -11,6 +11,7 @@ import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.services.IWatchlistService;
+import com.javarepowizards.portfoliomanager.services.Session;
 import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
 import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
@@ -153,20 +154,41 @@ public class DashboardController implements Initializable {
     }
 
     private void buildPortfolioPieChart(){
-        StockDAO stockDAO = StockDAO.getInstance();
-        PortfolioDAO portfolioDAO = PortfolioInitializer.createDummyPortfolio(stockDAO, LocalDate.of(2023, 12, 29));
-        List<PortfolioEntry> entries = portfolioDAO.getHoldings();
+        portfolioPieContainer.getChildren().clear();
 
-        double totalValue = entries.stream()
-                .mapToDouble(PortfolioEntry::getMarketValue)
-                .sum();
+        int userId = Session.getCurrentUser().getUserId();
 
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-
-        for (PortfolioEntry entry : entries) {
-            double value = entry.getMarketValue();
-            pieData.add(new PieChart.Data(entry.getStock().getSymbol(),value));
+        List<PortfolioEntry> entries;
+        try {
+            entries = portfolioDAO.getHoldingsForUser(userId);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+             return;
         }
+
+        // if no holdings, show a message
+        if (entries.isEmpty()) {
+        Label msg = new Label("No holdings yet – start building your portfolio!");
+        msg.getStyleClass().add("empty-holdings-label");
+
+        // make label fill pane and be centred
+        msg.minWidthProperty().bind(portfolioPieContainer.widthProperty());
+        msg.minHeightProperty().bind(portfolioPieContainer.heightProperty());
+        msg.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        portfolioPieContainer.getChildren().setAll(msg);
+        return;
+
+        }
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+                entries.stream()
+                        .map(e -> new PieChart.Data(
+                                e.getStock().getSymbol(),
+                                e.getMarketValue()
+                        ))
+                        .toList()
+        );
 
         // build & size a new chart
         PieChart chart = new PieChart(pieData);
@@ -179,6 +201,10 @@ public class DashboardController implements Initializable {
         chart.maxHeightProperty().bind(portfolioPieContainer.heightProperty());
 
         portfolioPieContainer.getChildren().setAll(chart);
+    }
+
+    public void refreshPortfolioChart() {
+        buildPortfolioPieChart();
     }
 
 
