@@ -1,7 +1,6 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.MainController;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
 import com.javarepowizards.portfoliomanager.services.IAuthService;
@@ -65,35 +64,26 @@ public class LoginController implements Initializable {
                     ? userDAO.getUserByEmail(email)
                     : userDAO.getUserByUsername(email);
 
+            if (userOpt.isPresent() && authService.verifyPassword(password, userOpt.get().getPasswordHash())) {
+                Session.setCurrentUser(userOpt.get());
 
-
-            if (userOpt.isEmpty() ||
-                    !authService.verifyPassword(password, userOpt.get().getPasswordHash())) {
+                // —— swap in the “shell” with nav bar ——
+                NavigationService.loadScene(
+                        /* source node */   loginButton,
+                        /* fxml path */     "hello-view.fxml",
+                        /* controller init */ ctrl -> {
+                            // no extra setup: MainController.initialize()
+                            // will automatically fire and load the dashboard
+                        },
+                        /* title */         "Dashboard",
+                        /* width */         1200,
+                        /* height */        800
+                );
+            } else {
                 showAlert("Login Failed", "Invalid username/email or password.");
-                return;
             }
-
-            Session.setCurrentUser(userOpt.get());
-
-
-
-
-            // —— swap in the “shell” with nav bar ——
-            NavigationService.loadScene(
-                    /* source node */   loginButton,
-                    /* fxml path */     "hello-view.fxml",
-                    /* controller init */ ctrl -> {
-                        // no extra setup: MainController.initialize()
-                        // will automatically fire and load the dashboard
-                    },
-                    /* title */         "Dashboard",
-                    /* width */         1200,
-                    /* height */        800
-            );
-
         } catch (SQLException e) {
             showAlert("Database Error", "Could not verify credentials: " + e.getMessage());
-
         }
     }
 
@@ -108,29 +98,6 @@ public class LoginController implements Initializable {
 
             Stage stage = (Stage) currentScene.getWindow();
             stage.setTitle("Register");
-            stage.centerOnScreen();
-        } catch (IOException e) {
-            showAlert("Error: ", e.getMessage());
-        }
-    }
-
-    // Unused - Consider deletion (Note: Currently being used for skip button so idk)
-    @FXML
-    private void loadDashboard() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/hello-view.fxml"));
-            Parent newRoot = loader.load();
-
-            Scene currentScene = loginButton.getScene();
-            currentScene.setRoot(newRoot);
-
-            MainController mainController = loader.getController();
-            mainController.showDashboard();
-
-            Stage stage = (Stage) currentScene.getWindow();
-            stage.setTitle("Dashboard");
-            stage.setWidth(1920);
-            stage.setHeight(1080);
             stage.centerOnScreen();
         } catch (IOException e) {
             showAlert("Error: ", e.getMessage());
@@ -152,7 +119,7 @@ public class LoginController implements Initializable {
 
     // Skip button brings us here, auto logs into the default account test test1234
     @FXML
-    private void skipLogin() throws SQLException {
+    private void skipLogin() {
 
         final String username = "test";
         final String email    = "test";
