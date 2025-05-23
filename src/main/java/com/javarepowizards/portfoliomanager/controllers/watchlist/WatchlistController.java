@@ -8,6 +8,7 @@ import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
 import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,14 +16,14 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -209,7 +210,6 @@ public class WatchlistController implements Initializable {
             if (choices.isEmpty()) {
                 Alert info = new Alert(Alert.AlertType.INFORMATION,
                         "You’ve already added every available stock.");
-                // load your dialog.css into this alert’s dialog pane
                 info.getDialogPane()
                         .getStylesheets()
                         .add(Objects.requireNonNull(getClass()
@@ -298,9 +298,8 @@ public class WatchlistController implements Initializable {
         }
 
         PieChart chart = new PieChart(pieData);
-        chart.setLegendVisible(true);
-        chart.setLabelsVisible(true);
-
+        chart.setLegendVisible(false);
+        chart.setLabelsVisible(false);
 
         chart.minWidthProperty().bind(
                 Bindings.when(portfolioPieContainer.widthProperty().lessThan(4000))
@@ -321,7 +320,49 @@ public class WatchlistController implements Initializable {
         portfolioPieContainer.getChildren().setAll(chart);
 
         updateBalanceCard(entries);
+
+        Platform.runLater(() -> applyLabelColors(chart));
     }
+
+    private void setLabelFill(Text label, Map<String, Paint> colorMap) {
+        Paint p = colorMap.get(label.getText());
+        if (p != null) {
+            label.setFill(p);
+        }
+    }
+
+    private void applyLabelColors(PieChart chart) {
+        chart.applyCss();
+        chart.layout();
+
+        Map<String, Paint> colorMap = new HashMap<>();
+        for (PieChart.Data data : chart.getData()) {
+            Node node = data.getNode();
+            Paint fill = null;
+
+            if (node instanceof Shape) {
+                fill = ((Shape) node).getFill();
+            } else if (node instanceof Region) {
+                Background bg = ((Region) node).getBackground();
+                if (bg != null && !bg.getFills().isEmpty()) {
+                    fill = bg.getFills().getFirst().getFill();
+                }
+            }
+
+            if (fill != null) {
+                colorMap.put(data.getName(), fill);
+            } else {
+                System.out.println("Slice node for " + data.getName() +
+                        " is a " + node.getClass().getSimpleName());
+            }
+        }
+
+        setLabelFill(stockOneLabel,   colorMap);
+        setLabelFill(stockTwoLabel,   colorMap);
+        setLabelFill(stockThreeLabel, colorMap);
+        setLabelFill(stockFourLabel,  colorMap);
+    }
+
 
     /**
      * Refreshes the four balance-card entries without repeating any stock.

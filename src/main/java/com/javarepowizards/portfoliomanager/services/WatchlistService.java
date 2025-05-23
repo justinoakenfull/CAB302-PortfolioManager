@@ -86,7 +86,6 @@ public class WatchlistService implements IWatchlistService {
             IStock stock = stockRepo.getByTicker(ticker);
             result.add(stock);
         }
-
         return result;
     }
 

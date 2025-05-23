@@ -91,7 +91,6 @@ public class WatchlistModalController implements Initializable {
         Task<String> longDescTask = new Task<>() {
             @Override
             protected String call() throws Exception {
-                // calls your service synchronously
                 return watchlistService.getLongDescription(symbol);
             }
         };
@@ -104,7 +103,6 @@ public class WatchlistModalController implements Initializable {
 
     @FXML
     private void onClose() {
-        // close the modal Stage
         Stage stage = (Stage) stockTitle.getScene().getWindow();
         stage.close();
     }
