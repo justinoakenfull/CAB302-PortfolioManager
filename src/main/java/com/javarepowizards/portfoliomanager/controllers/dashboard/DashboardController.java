@@ -36,7 +36,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Pane;
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
-import com.javarepowizards.portfoliomanager.services.PortfolioInitializer;
 import java.time.LocalDate;
 
 
@@ -154,7 +153,6 @@ public class DashboardController implements Initializable {
 
     private void buildPortfolioPieChart(){
         StockDAO stockDAO = StockDAO.getInstance();
-        PortfolioDAO portfolioDAO = PortfolioInitializer.createDummyPortfolio(stockDAO, LocalDate.of(2023, 12, 29));
         List<PortfolioEntry> entries = portfolioDAO.getHoldings();
 
         double totalValue = entries.stream()

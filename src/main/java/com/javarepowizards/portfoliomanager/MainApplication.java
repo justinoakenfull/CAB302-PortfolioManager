@@ -30,7 +30,6 @@ public class MainApplication extends Application {
         initializeStockRepository();
         initializeWatchlist();
         initializeAuthService();
-        initializePortfolio();
 
         // Load the login screen
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
@@ -91,14 +90,8 @@ public class MainApplication extends Application {
         AppContext.registerService(IWatchlistService.class, watchlistService);
     }
 
-    private void initializePortfolio() {
-        StockDAO stockDAO = AppContext.getService(StockDAO.class);
 
-        LocalDate mostRecentDate = LocalDate.of(2023,12,29);
-        PortfolioDAO dummyPortfolio = PortfolioInitializer.createDummyPortfolio(stockDAO, mostRecentDate);
-        //AppContext.registerService(PortfolioDAO.class,portfolioDAO);
 
-    }
 
     public static void main(String[] args) {
         launch();
