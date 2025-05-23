@@ -1,10 +1,12 @@
 package com.javarepowizards.portfoliomanager.controllers.simulation;
 
+import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
 import com.javarepowizards.portfoliomanager.services.OllamaService;
 
+import com.javarepowizards.portfoliomanager.services.PortfolioStatistics;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
@@ -71,7 +73,7 @@ public class SimulationController implements Initializable {
     // References that must be provided externally (from MainController, for example)
     private IPortfolioDAO portfolioDAO;
     private StockDAO stockDAO;
-    private LocalDate mostRecentDate;
+    private LocalDate mostRecentDate = LocalDate.of(2023, 12, 29);
     private final OllamaService ollamaService = new OllamaService();
 
     private static final Pattern TAGGED_RESPONSE = Pattern.compile("(?s)(?<=<Start>)(.*?)(?=<Finish>)");
@@ -109,6 +111,22 @@ public class SimulationController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        this.portfolioDAO = AppContext.getService(IPortfolioDAO.class);
+        this.stockDAO = AppContext.getService(StockDAO.class);
+
+
+        initializeUI();
+
+        refreshPortfolioData();
+
+
+        // Set run simulation button action.
+        btnRunSimulation.setOnAction(e -> runSimulation());
+        progressIndicator.setVisible(false);
+    }
+
+    private void initializeUI(){
         // Set default labels and chart settings.
         labelBalance.setText("Balance: 0");
         labelPortfolioValue.setText("Portfolio:0 ");
@@ -117,28 +135,15 @@ public class SimulationController implements Initializable {
         labelCumulativeReturn.setText("Cumulative Return: N/A");
         xAxis.setLabel("Simulation Day");
         yAxis.setLabel("Portfolio Value ($)");
-
-        // Set run simulation button action.
-        btnRunSimulation.setOnAction(e -> runSimulation());
-        progressIndicator.setVisible(false);
     }
 
-    // Setter methods for dependencies.
-    public void setPortfolioDAO(IPortfolioDAO portfolioDAO) {
-        this.portfolioDAO = portfolioDAO;
-        refreshPortfolioData();
-    }
-
-    public void setStockDAO(StockDAO stockDAO) {
-        this.stockDAO = stockDAO;
-    }
-
-    public void setMostRecentDate(LocalDate mostRecentDate) {
-        this.mostRecentDate = mostRecentDate;
-    }
-
+    /**
+     * Refreshes the portfolio data displayed in the UI.
+     * This method updates the balance, portfolio value, and holdings list.
+     */
 
     public void refreshPortfolioData() {
+
         if (portfolioDAO != null) {
             double preValue = portfolioDAO.getTotalPortfolioValue();
             double preBalance = portfolioDAO.getAvailableBalance();
@@ -146,156 +151,163 @@ public class SimulationController implements Initializable {
             labelPortfolioValue.setText(String.format("Portfolio: $%.2f", preValue));
 
             List<String> rows = portfolioDAO.getHoldings().stream()
-                    .map(en -> String.format("%s: %.0f shares @ $%,.2f = $%,.2f",
+                    .map(en -> String.format("%s: %d shares @ $%,.2f = $%,.2f",
                             en.getStock().getSymbol(),
-                            en.getAmountHeld(),
+                            (int) en.getAmountHeld(),
                             en.getPurchasePrice(),
                             en.getMarketValue()))
                     .collect(Collectors.toList());
             listHoldings.getItems().setAll(rows);
         }
     }
+    /**
+     * Runs the portfolio simulation and updates the UI with the results.
+     * This method checks if the Ollama service is available, builds the simulation engine,
+     * prepares the UI for simulation, and handles success or failure of the simulation.
+     */
+
     private void runSimulation() {
 
+        if (!ollamaService.isServiceAvailable()) {           // ① guard clause
+            showOllamaWarning();
+            return;
+        }
 
-
-
-        // Retrieve simulation days from the slider.
         int simulationDays = (int) sliderSimulationDays.getValue();
+        PortfolioSimulation engine = buildSimEngine(simulationDays);
 
-        // Define simulation parameters.
-        double kMultiplier = 2.0;
-        double maxDailyMovement = 0.02;
-        double smoothingFactor = 0.3;
+        prepareUiForSimulation();
 
-        // Create the PortfolioSimulationEngine.
-        //
-        PortfolioSimulation portfolioEngine = new PortfolioSimulation(
-                portfolioDAO,      // The PortfolioDAO containing your dummy portfolio of 3 stocks.
-                stockDAO,          // The StockDAO for fetching historical data.
-                mostRecentDate,    // The most recent date (e.g., LocalDate.of(2023, 12, 29)).
-                simulationDays,    // Number of days to simulate.
-                kMultiplier,       // Multiplier for dynamic boundaries.
-                maxDailyMovement,  // Maximum allowed daily movement percentage.
-                smoothingFactor    // Smoothing factor for dynamic momentum updates.
-        );
-
-        // Run the simulation to obtain a list of portfolio values over time.
-        List<Double> portfolioValues = portfolioEngine.simulatePortfolio();
-
-        // Create a new data series for the LineChart.
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-        series.setName("Portfolio Value");
-
-        // Iterate over simulation results and add data points to the series.
-        for (int day = 0; day < portfolioValues.size(); day++) {
-            series.getData().add(new XYChart.Data<>(day, portfolioValues.get(day)));
-        }
-
-        // Clear any previous data from the LineChart and add the new series.
-        portfolioLineChart.getData().clear();
-        portfolioLineChart.getData().add(series);
-
-
-        double start = portfolioValues.get(0);
-        double end = portfolioValues.get(portfolioValues.size() - 1);
-        double cumulativeReturn = ((end - start) / start) * 100;
-
-
-        List<Double> rets = new ArrayList<>();
-        for (int i = 1; i < portfolioValues.size(); i++) {
-            double r = (portfolioValues.get(i) - portfolioValues.get(i-1)) / portfolioValues.get(i-1);
-            rets.add(r);
-        }
-        double avgRet = rets.stream().mapToDouble(d->d).average().orElse(0.0);
-        double annualisedRet = avgRet * simulationDays;
-
-        double variance = rets.stream()
-                .mapToDouble(d -> Math.pow(d - avgRet, 2))
-                .average()
-                .orElse(0.0);
-
-        double vol    = Math.sqrt(variance);
-        double annualisedVol = vol * Math.sqrt(simulationDays);
-
-        double annualisedSharpe = annualisedRet / annualisedVol;
-
-        labelCumulativeReturn.setText(String.format("%.2f%%", cumulativeReturn));
-        labelVolatility       .setText(String.format("%.2f%%", annualisedVol * 100));
-        labelSharpeRatio      .setText(String.format("%.2f",   annualisedSharpe));
-        labelPortfolioValue   .setText(String.format("Portfolio: $%,.2f", end));
-
-        double preBalance = portfolioDAO.getAvailableBalance();
-        double preValue = portfolioDAO.getTotalPortfolioValue();
-
-
-        // Prepare UI
-        btnRunSimulation.setDisable(true);
-        labelReview.setText("Loading AI Summary...");
-        labelReview.setStyle("-fx-text-fill: #FFFFFF;");
-        progressIndicator.setVisible(true);
-
-
-        List<String> rows = portfolioDAO.getHoldings().stream()
-                .map(en -> String.format("%s: %.0f shares @ $%,.2f = $%,.2f",
-                        en.getStock().getSymbol(),
-                        en.getAmountHeld(),
-                        en.getPurchasePrice(),
-                        en.getMarketValue()))
-                .collect(Collectors.toList());
-
-
-        String prompt = String.format(
-                PROMPT_TEMPLATE,
-                preBalance + preValue,       // e.g. 81755.59
-                rows,          // the String from step 1
-                end + preBalance,         // e.g. 76659.42
-                annualisedSharpe,           // e.g. –0.47
-                annualisedVol * 100,      // e.g. 12.17
-                cumulativeReturn // e.g. –6.23
-        );
-
-
-        // Create background task for ai
-        Task<String> aiTask = new Task<>() {
-           @Override
-            protected String call() throws Exception {
-               return ollamaService.generateResponse(prompt);
-           }
+        Task<List<Double>> simTask = new Task<>() {
+            @Override protected List<Double> call() {
+                return engine.simulatePortfolio();
+            }
         };
 
-        // On success update text are and reset UI
-        aiTask.setOnSucceeded(evt -> {
-            String raw = aiTask.getValue();
-            String core = extractCore(raw);
+        simTask.setOnSucceeded(evt ->
+                onSimSuccess(simTask.getValue(), simulationDays));
 
+        simTask.setOnFailed(evt ->
+                onSimFailure(simTask.getException()));
 
-            labelReview.setText(core);
-
-            btnRunSimulation.setDisable(false);
-            progressIndicator.setVisible(false);
-        });
-
-        // on failure
-        aiTask.setOnFailed(evt -> {
-            Throwable ex = aiTask.getException();
-            ex.printStackTrace();
-            textReview.setText("⚠️ AI call failed: " + aiTask.getException().getMessage());
-            btnRunSimulation.setDisable(false);
-            progressIndicator.setVisible(false);
-        });
-
-
-        new Thread(aiTask, "Ollama-Service-Thread").start();
-
+        new Thread(simTask, "Sim-Thread").start();
     }
 
-    private void updateOverview(double portfolioValue, double balance){
-        labelPortfolioValue.setText(String.format("Portfolio: $%.2f", portfolioValue));
-        labelBalance.setText(String.format("Balance: $%.2f", balance));
+// ------------------------------------------------------------------
+//   helpers
+// ------------------------------------------------------------------
+
+    /** Build the sim engine */
+    private PortfolioSimulation buildSimEngine(int days) {
+        double k  = 2.0, maxΔ = 0.02, α = 0.3;
+        return new PortfolioSimulation(
+                portfolioDAO, stockDAO, mostRecentDate,
+                days, k, maxΔ, α);
     }
 
+    /** What to do when simulation finishes without error. */
+    private void onSimSuccess(List<Double> values, int days) {
+        updateChart(values);                                   // graph
+        PortfolioStatistics.Metrics m =
+                PortfolioStatistics.compute(values, days);
+        updateMetricLabels(m, values.get(values.size() - 1));  // numbers
+        String prompt = buildPrompt(m, values.get(values.size() - 1));
+        fetchAiSummary(prompt);                                // AI call
+    }
 
+    /** on simulation failure. */
+    private void onSimFailure(Throwable ex) {
+        ex.printStackTrace();
+        labelReview.setText("⚠️ Simulation failed: " + ex.getMessage());
+        btnRunSimulation.setDisable(false);
+        progressIndicator.setVisible(false);
+    }
+
+    /** Disable button, show spinner, reset label. */
+    private void prepareUiForSimulation() {
+        btnRunSimulation.setDisable(true);
+        labelReview.setText("Loading AI Summary…");
+        labelReview.setStyle("-fx-text-fill:#FFFFFF;");
+        progressIndicator.setVisible(true);
+    }
+
+    /** Draw the line chart. */
+    private void updateChart(List<Double> vals) {
+        XYChart.Series<Number,Number> s = new XYChart.Series<>();
+        for (int d = 0; d < vals.size(); d++) {
+            s.getData().add(new XYChart.Data<>(d, vals.get(d)));
+        }
+        portfolioLineChart.getData().setAll(s);
+    }
+
+    /** Write numbers to the three metric labels + current value. */
+    private void updateMetricLabels(PortfolioStatistics.Metrics m,
+                                    double latestValue) {
+        labelCumulativeReturn.setText("%.2f%%".formatted(m.cumulativeReturnPct()));
+        labelVolatility      .setText("%.2f%%".formatted(m.annualisedVolatilityPct()));
+        labelSharpeRatio     .setText("%.2f".formatted(m.annualisedSharpe()));
+        labelPortfolioValue  .setText("Portfolio: $%,.2f".formatted(latestValue));
+        // labelBalance        .setText("Balance: $%,.2f".formatted(portfolioDAO.getAvailableBalance())); Cash Balance need to come back
+    }
+
+    /** Builds the prompt for AI . */
+    private String buildPrompt(PortfolioStatistics.Metrics m,
+                               double finalBalance) {
+        double starting = portfolioDAO.getAvailableBalance()
+                + portfolioDAO.getTotalPortfolioValue();
+
+        List<String> rows = portfolioDAO.getHoldings().stream()
+                .map(en -> "%s: %d shares @ $%,.2f = $%,.2f".formatted(
+                        en.getStock().getSymbol(),
+                        (int) en.getAmountHeld(),
+                        en.getPurchasePrice(),
+                        en.getMarketValue()))
+                .toList();
+
+        return PROMPT_TEMPLATE.formatted(
+                starting,
+                String.join("\n", rows),
+                finalBalance,
+                m.annualisedSharpe(),
+                m.annualisedVolatilityPct(),
+                m.cumulativeReturnPct());
+    }
+
+    /** Ollama request, update UI on success/fail. */
+    private void fetchAiSummary(String prompt) {
+        Task<String> aiTask = new Task<>() {
+            @Override protected String call() throws Exception {
+                return ollamaService.generateResponse(prompt);
+            }
+        };
+
+        aiTask.setOnSucceeded(e -> {
+            labelReview.setText(extractCore(aiTask.getValue()));
+            progressIndicator.setVisible(false);
+            btnRunSimulation.setDisable(false);
+        });
+
+        aiTask.setOnFailed(e -> {
+            labelReview.setText("⚠️ AI call failed: " + aiTask.getException().getMessage());
+            progressIndicator.setVisible(false);
+            btnRunSimulation.setDisable(false);
+        });
+
+        new Thread(aiTask, "Ollama-Thread").start();
+    }
+
+    /**  when Ollama isn’t running. */
+    private void showOllamaWarning() {
+        labelReview.setText("""
+        ⚠️ Ollama is not running.
+        Start Ollama Desktop or `ollama serve` to receive the AI summary.
+    """);
+        labelReview.setStyle("-fx-text-fill:#FFFFFF;");
+        progressIndicator.setVisible(false);
+        btnRunSimulation.setDisable(false);
+    }
+
+    /** Extractrs the core of the Ai response, inbetween the tags*/
     public static String extractCore(String raw) {
         String startTag = "<Start>";
         String endTag = "<Finish>";
@@ -313,7 +325,6 @@ public class SimulationController implements Initializable {
         return raw.trim();
 
     }
-
 
 
 }

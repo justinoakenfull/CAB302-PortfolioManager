@@ -50,7 +50,7 @@
                          -fx-border-radius: 10;
                          -fx-padding: 10;">
                 <Label text="Simulation Days:" style="-fx-text-fill: #FFFFFF;"/>
-                <Slider fx:id="sliderSimulationDays" min="1" max="365" value="30"
+                <Slider fx:id="sliderSimulationDays" min="1" max="365" value="365"
                         showTickLabels="true" showTickMarks="true" majorTickUnit="30" minorTickCount="4" blockIncrement="1" prefWidth="600"/>
                 <Button fx:id="btnRunSimulation" text="Run Simulation"
                         style="-fx-background-color: #39393939;
@@ -74,7 +74,10 @@
                 <!-- Left side: Metrics VBox  -->
                 <VBox spacing="5"
                       alignment="TOP_LEFT"
-                      prefWidth="200">
+                      prefWidth="200"
+                      minWidth="200"
+                      maxWidth="200"
+                    VBox.vgrow="NEVER">
                     <Label text="Sharpe Ratio:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
                     <Label fx:id="labelSharpeRatio" style="-fx-text-fill: #FFFFFF;"/>
                     <Label text="Volatility:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
@@ -94,6 +97,7 @@
                     <!-- ScrollPane  -->
                     <ScrollPane fx:id="scrollReview"
                                 fitToWidth="true"
+                                fitToHeight="false"
                                 hbarPolicy="NEVER"
                                 vbarPolicy="AS_NEEDED"
                                 HBox.hgrow="ALWAYS"

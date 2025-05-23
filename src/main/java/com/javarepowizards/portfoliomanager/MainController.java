@@ -4,7 +4,7 @@ import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.SimulationDifficulty;
 import com.javarepowizards.portfoliomanager.services.NavigationService;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.dao.InMemoryPortfolioDAO;
+
 
 
 import com.javarepowizards.portfoliomanager.services.Session;
@@ -64,7 +64,6 @@ public class MainController implements Initializable {
         );
 
         stockDAO = stockDAO.getInstance();
-        portfolioDAO = new InMemoryPortfolioDAO();
 
         // Initialize the NavigationService with the content area
         nav = new NavigationService(contentArea);
@@ -124,12 +123,7 @@ public class MainController implements Initializable {
     @FXML
     private void showSimulation(){
         setActivePage(menuButtons.get(4));
-        nav.loadView("simulation/simulation.fxml", controller -> {
-            var sim = (com.javarepowizards.portfoliomanager.controllers.simulation.SimulationController) controller;
-            sim.setPortfolioDAO(portfolioDAO);
-            sim.setStockDAO(stockDAO);
-            sim.setMostRecentDate(LocalDate.of(2023, 12, 29));
-        });
+        nav.loadView("simulation/simulation.fxml", controller -> {});
     }
 
     @FXML

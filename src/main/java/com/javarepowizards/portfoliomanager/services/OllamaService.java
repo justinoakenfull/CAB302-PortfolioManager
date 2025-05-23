@@ -70,9 +70,9 @@ public class OllamaService {
      */
     public String generateResponse(String prompt) throws IOException {
         if (modelName == null) {
+            throw new IllegalStateException("No Ollama model detected");
             // This shouldnt be hit cause we shouldnt call it if there is no model
             // but we want to make sure we don't crash if no ollama model is running.
-            return "";
         }
 
         HttpURLConnection conn = (HttpURLConnection) new URL(GENERATE_URL).openConnection();
@@ -107,5 +107,23 @@ public class OllamaService {
         }
 
         return new JSONObject(sb.toString()).getString("response");
+    }
+
+    public Boolean isServiceAvailable(){
+
+        if (modelName == null) {
+            return false;
+        }
+
+        try
+        {
+            HttpURLConnection conn = (HttpURLConnection) new URL(TAGS_URL).openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(500);
+            conn.setReadTimeout(500);
+            return conn.getResponseCode() == 200;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
