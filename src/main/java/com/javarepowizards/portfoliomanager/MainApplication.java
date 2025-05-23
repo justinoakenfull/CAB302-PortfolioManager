@@ -86,7 +86,8 @@ public class MainApplication extends Application {
                 new WatchlistService(
                         AppContext.getService(StockRepository.class),
                         watchlistDAO,
-                        AppContext.getService(IUserDAO.class));
+                        AppContext.getService(IUserDAO.class),
+                        AppContext.getService(IPortfolioDAO.class));
         AppContext.registerService(IWatchlistService.class, watchlistService);
     }
 
