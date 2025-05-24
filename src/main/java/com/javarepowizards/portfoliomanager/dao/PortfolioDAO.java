@@ -10,15 +10,32 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * <summary>Data Access Object for portfolio operations.</summary>
+ * <remarks>
+ * Supports both DB-backed and in-memory modes for retrieving and updating
+ * user holdings and balances.
+ * </remarks>
+ */
 @Repository
 public class PortfolioDAO implements IPortfolioDAO {
-    //shared fields
-    private final Connection conn;            // null if using in-memory mode
-    private final boolean dbMode;             // true=DB-backed, false=in-memory
-    private List<PortfolioEntry> holdings;    // only non-null in in-memory mode
-    private final double availableBalance;    // only meaningful in in-memory mode
 
-    //DB-backed constructorS
+    /** Connection to the SQL database (null if in-memory mode) */
+    private final Connection conn;
+
+    /** Indicates whether the DAO is using a real database */
+    private final boolean dbMode;
+
+    /** In-memory list of portfolio holdings (used only in testing) */
+    private List<PortfolioEntry> holdings;
+
+    /** Available balance (only meaningful in in-memory mode) */
+    private final double availableBalance;
+
+    /**
+     * <summary>Constructs a DB-backed PortfolioDAO</summary>
+     * @param dbConnection The database connection provider
+     */
     @Autowired
     public PortfolioDAO(IDatabaseConnection dbConnection) {
         try {
@@ -32,9 +49,12 @@ public class PortfolioDAO implements IPortfolioDAO {
         this.availableBalance = 0.0;
     }
 
-    // In-memory constructor (for dummy/testing use)
+    /**
+     * <summary>Constructs an in-memory PortfolioDAO for testing or simulation</summary>
+     * @param holdings Portfolio entries
+     * @param availableBalance Available balance in the test context
+     */
     public PortfolioDAO(List<PortfolioEntry> holdings, double availableBalance) {
-        // Protect against accidental use in production
         if (!isTestContext()) {
             throw new IllegalStateException("In-memory PortfolioDAO should only be used in tests or simulations.");
         }
@@ -45,8 +65,11 @@ public class PortfolioDAO implements IPortfolioDAO {
         this.availableBalance = availableBalance;
     }
 
+    /**
+     * <summary>Checks whether the DAO is being used in a test context</summary>
+     * @return true if used in test or simulation context, false otherwise
+     */
     private boolean isTestContext() {
-        // Check if the call is from a test or dummy class
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         for (StackTraceElement frame : stack) {
             String cls = frame.getClassName();
@@ -57,14 +80,16 @@ public class PortfolioDAO implements IPortfolioDAO {
         return false;
     }
 
+    /**
+     * <summary>Retrieves the list of portfolio holdings for the current user</summary>
+     * @return List of PortfolioEntry objects
+     */
     @Override
     public List<PortfolioEntry> getHoldings() {
         if (!dbMode) {
-            // in-memory: just return the list given
             return holdings;
         }
 
-        // DB-mode: pull from user_holdings
         int userId = Session.getCurrentUser().getUserId();
         String sql = """
                   SELECT ticker, holding_amount, holding_value
@@ -96,12 +121,16 @@ public class PortfolioDAO implements IPortfolioDAO {
         return out;
     }
 
+    /**
+     * <summary>Gets the available cash balance for the current user</summary>
+     * @return Available balance as a double
+     */
     @Override
     public double getAvailableBalance() {
         if (!dbMode) {
             return availableBalance;
         }
-        // DB-mode: read from user_balances
+
         int userId = Session.getCurrentUser().getUserId();
         String sql = "SELECT balance FROM user_balances WHERE user_id = ?";
 
@@ -115,6 +144,12 @@ public class PortfolioDAO implements IPortfolioDAO {
         }
     }
 
+    /**
+     * <summary>Deducts a specific amount from the user's balance</summary>
+     * @param userId User identifier
+     * @param amount Amount to deduct
+     * @throws SQLException If the SQL operation fails
+     */
     public void deductFromBalance(int userId, double amount) throws SQLException {
         String sql = "UPDATE user_balances SET balance = balance - ? WHERE user_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -126,6 +161,10 @@ public class PortfolioDAO implements IPortfolioDAO {
         }
     }
 
+    /**
+     * <summary>Adds a new holding or updates existing one for the user</summary>
+     * @param entry Portfolio entry to be added or updated
+     */
     @Override
     public void addToHoldings(PortfolioEntry entry) {
         if (!dbMode) {
@@ -156,6 +195,11 @@ public class PortfolioDAO implements IPortfolioDAO {
         }
     }
 
+    /**
+     * <summary>Fetches all holdings for a specific user</summary>
+     * @param userId User identifier
+     * @return List of PortfolioEntry objects
+     */
     public List<PortfolioEntry> getHoldingsForUser(int userId) {
         String sql = """
                     SELECT ticker, holding_amount, holding_value
@@ -183,6 +227,13 @@ public class PortfolioDAO implements IPortfolioDAO {
         return holdings;
     }
 
+    /**
+     * <summary>Inserts or updates a specific holding in the database</summary>
+     * @param userId User identifier
+     * @param stock Stock to update
+     * @param quantity Quantity of shares
+     * @param totalValue Total market value
+     */
     public void upsertHolding(int userId, StockName stock, int quantity, double totalValue) {
         String sql = """
                     INSERT INTO user_holdings (user_id, ticker, holding_amount, holding_value)
@@ -202,11 +253,13 @@ public class PortfolioDAO implements IPortfolioDAO {
         }
     }
 
-
+    /**
+     * <summary>Calculates the total value of the user's portfolio</summary>
+     * @return Total portfolio value including cash and holdings
+     */
     @Override
     public double getTotalPortfolioValue() {
         if (!dbMode) {
-            // in-memory: cash + sum of holdings
             double total = availableBalance;
             for (PortfolioEntry e : holdings) {
                 total += e.getMarketValue();
@@ -214,7 +267,6 @@ public class PortfolioDAO implements IPortfolioDAO {
             return total;
         }
 
-        // DB-mode: balance + SUM(holding_value)
         int userId = Session.getCurrentUser().getUserId();
         double cash = getAvailableBalance();
         String sql = "SELECT SUM(holding_value) AS total FROM user_holdings WHERE user_id = ?";
@@ -230,6 +282,9 @@ public class PortfolioDAO implements IPortfolioDAO {
         }
     }
 
+    /**
+     * <summary>Creates the user_holdings table if it does not exist</summary>
+     */
     public void createTables() {
         try (Statement stmt = conn.createStatement()) {
             stmt.execute("""
@@ -248,11 +303,17 @@ public class PortfolioDAO implements IPortfolioDAO {
         }
     }
 
-
+    /**
+     * <summary>Sells a specific holding and updates the user's balance</summary>
+     * @param userId User identifier
+     * @param stock Stock to sell
+     * @throws SQLException If an error occurs during SQL operations
+     */
     @Override
     public void sellHolding(int userId, StockName stock) throws SQLException {
         double marketValue = 0.0;
 
+        // Fetch current market value of the holding
         String selectSQL = "SELECT holding_value FROM user_holdings WHERE user_id = ? AND ticker = ?";
         try (PreparedStatement selectStmt = conn.prepareStatement(selectSQL)) {
             selectStmt.setInt(1, userId);
@@ -267,6 +328,7 @@ public class PortfolioDAO implements IPortfolioDAO {
             }
         }
 
+        // Delete holding and update user balance
         String deleteSQL = "DELETE FROM user_holdings WHERE user_id = ? AND ticker = ?";
         String updateSQL = "UPDATE user_balances SET balance = balance + ? WHERE user_id = ?";
 
@@ -274,18 +336,16 @@ public class PortfolioDAO implements IPortfolioDAO {
                 PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL);
                 PreparedStatement updateStmt = conn.prepareStatement(updateSQL)
         ) {
-            // Delete the holding first
             deleteStmt.setInt(1, userId);
             deleteStmt.setString(2, stock.getSymbol());
             deleteStmt.executeUpdate();
 
-            // Add back the market value
             updateStmt.setDouble(1, marketValue);
             updateStmt.setInt(2, userId);
             updateStmt.executeUpdate();
         }
     }
-
 }
+
 
 
