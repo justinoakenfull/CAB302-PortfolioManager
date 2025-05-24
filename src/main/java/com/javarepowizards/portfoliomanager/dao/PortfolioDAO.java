@@ -101,7 +101,6 @@ public class PortfolioDAO implements IPortfolioDAO {
         if (!dbMode) {
             return availableBalance;
         }
-
         // DB-mode: read from user_balances
         int userId = Session.getCurrentUser().getUserId();
         String sql = "SELECT balance FROM user_balances WHERE user_id = ?";
@@ -113,6 +112,17 @@ public class PortfolioDAO implements IPortfolioDAO {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load balance for user " + userId, e);
+        }
+    }
+
+    public void deductFromBalance(int userId, double amount) throws SQLException {
+        String sql = "UPDATE user_balances SET balance = balance - ? WHERE user_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, amount);
+            stmt.setInt(2, userId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
