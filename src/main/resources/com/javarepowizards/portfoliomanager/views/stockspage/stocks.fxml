@@ -193,6 +193,17 @@
                             </font>
                         </Button>
                     </HBox>
+                    <Label fx:id="pricePerShareLabel"
+                           text="Price: $0.00"
+                           alignment="CENTER"
+                           textAlignment="CENTER"
+                           wrapText="true"
+                           maxWidth="Infinity"
+                           style="-fx-font-size: 16px; -fx-text-fill: #cccccc; -fx-font-weight: normal;">
+                        <VBox.margin>
+                            <Insets top="6.0" bottom="4.0"/>
+                        </VBox.margin>
+                    </Label>
                     <Label fx:id="buyFeedbackLabel"
                            alignment="CENTER"
                            text="No Stock Selected!"

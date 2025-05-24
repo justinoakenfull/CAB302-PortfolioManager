@@ -48,6 +48,7 @@ public class StocksController implements Initializable {
     // @FXML private Label portfolioHeading;             // Heading label for portfolio pane
     @FXML private TableColumn<StockRow, Void> infoCol;
     @FXML private TableColumn<StockRow, Void> favouriteCol;
+    @FXML private Label pricePerShareLabel;
 
     // --- Data access objects ---
     private IPortfolioDAO portfolioDAO;               // DAO for managing portfolio entries
@@ -377,6 +378,7 @@ public class StocksController implements Initializable {
         } catch (NumberFormatException e) {
             stockQuantityField.setText("1");
         }
+        selectStocks();
     }
 
     // Decreases purchase amount by 1, minimum of 1, defaults to 1 on invalid input
@@ -390,6 +392,7 @@ public class StocksController implements Initializable {
         } catch (NumberFormatException e) {
             stockQuantityField.setText("1");
         }
+        selectStocks();
     }
 
     // Updates feedback label when a row is selected via info button
@@ -401,12 +404,21 @@ public class StocksController implements Initializable {
             buyFeedbackLabel.setText("No Stock Selected!");
             buyFeedbackLabel.setTextFill(Color.RED);
             buyFeedbackLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            pricePerShareLabel.setText(""); // Clear the price label
         } else {
             String name = selected.companyNameProperty().get();
             String ticker = selected.tickerProperty().get();
+            double price = selected.closeProperty().get();
             buyFeedbackLabel.setText(name + " (" + ticker + ")");
-            buyFeedbackLabel.setTextFill(Color.web("#1f75fe")); // Professional blue
+            buyFeedbackLabel.setTextFill(Color.web("#1f75fe"));
             buyFeedbackLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            try {
+                int quantity = Integer.parseInt(stockQuantityField.getText().trim());
+                double total = price * quantity;
+                pricePerShareLabel.setText(String.format("Total: $%.2f", total));
+            } catch (NumberFormatException e) {
+                pricePerShareLabel.setText("Total: $0.00");
+            }
         }
     }
 
