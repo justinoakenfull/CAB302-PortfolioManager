@@ -43,6 +43,12 @@
 -fx-text-fill: white;
 }
 
+.empty-holdings-label {
+-fx-text-fill: white;
+-fx-font-size: 18px;
+-fx-alignment: center
+}
+
 
 /* Table styling */
 .watchlist-table {
