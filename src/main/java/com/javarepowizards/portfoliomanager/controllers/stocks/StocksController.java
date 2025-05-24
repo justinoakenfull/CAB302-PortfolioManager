@@ -272,7 +272,7 @@ public class StocksController implements Initializable {
                     private final Button btn = new Button();
                     {
                         ImageView imageView = new ImageView(
-                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockInfo64x64.png")));
+                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockButtonAdd64x64.png")));
                         imageView.setFitWidth(32);
                         imageView.setFitHeight(32);
                         btn.setGraphic(imageView);
@@ -399,12 +399,14 @@ public class StocksController implements Initializable {
 
         if (selected == null) {
             buyFeedbackLabel.setText("No Stock Selected!");
-            buyFeedbackLabel.getStyleClass().add("buy-feedback-label-none");
             buyFeedbackLabel.setTextFill(Color.RED);
+            buyFeedbackLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         } else {
-            buyFeedbackLabel.setText(selected.companyNameProperty().get());
-            buyFeedbackLabel.getStyleClass().add("buy-feedback-label-selected");
-            buyFeedbackLabel.setTextFill(Color.GREEN);
+            String name = selected.companyNameProperty().get();
+            String ticker = selected.tickerProperty().get();
+            buyFeedbackLabel.setText(name + " (" + ticker + ")");
+            buyFeedbackLabel.setTextFill(Color.web("#1f75fe")); // Professional blue
+            buyFeedbackLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         }
     }
 

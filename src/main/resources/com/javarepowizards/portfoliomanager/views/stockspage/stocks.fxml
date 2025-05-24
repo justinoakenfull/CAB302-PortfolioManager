@@ -193,12 +193,17 @@
                             </font>
                         </Button>
                     </HBox>
-                    <Label alignment="CENTER" fx:id="buyFeedbackLabel" contentDisplay="CENTER" prefHeight="35.0" prefWidth="205.0" text="No Stock Selected!" textAlignment="CENTER" textFill="RED">
-                        <font>
-                            <Font size="24.0" />
-                        </font>
+                    <Label fx:id="buyFeedbackLabel"
+                           alignment="CENTER"
+                           text="No Stock Selected!"
+                           wrapText="true"
+                           textAlignment="CENTER"
+                           contentDisplay="CENTER"
+                           maxWidth="Infinity"
+                           prefWidth="280.0"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f75fe;">
                         <VBox.margin>
-                            <Insets left="45.0" right="32.0" />
+                            <Insets left="24.0" right="24.0" top="10.0" bottom="10.0"/>
                         </VBox.margin>
                     </Label>
                     <Region prefHeight="203.0" prefWidth="297.0" />
