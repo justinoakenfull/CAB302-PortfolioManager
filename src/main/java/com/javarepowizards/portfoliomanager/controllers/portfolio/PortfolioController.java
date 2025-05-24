@@ -4,47 +4,116 @@ import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
+import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.services.Session;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 
 import java.sql.PreparedStatement;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Controller for the Portfolio view.
+ * Manages the display of the user's holdings, pie chart distribution,
+ * and stock information descriptions.
+ */
 public class PortfolioController implements Initializable {
 
-    //FXML-injected controls
-    @FXML private PieChart pieChart;               // the donut showing holdings distribution
-    @FXML private Text totalValueText;             // displays total portfolio value
-    @FXML private Text changePctText;              // placeholder for overall change %
-    @FXML private TableView<PortfolioEntry> portfolioTable;              // bottom table
-    @FXML private TableColumn<PortfolioEntry,String> stockCol;          // stock name column
-    @FXML private TableColumn<PortfolioEntry,String> changeCol;         // % of portfolio column
-    @FXML private TableColumn<PortfolioEntry,Number> balanceCol;        // $ value column
+    /** Donut chart showing holdings distribution */
+    @FXML private PieChart pieChart;
+
+    /** Displays total portfolio value */
+    @FXML private Text totalValueText;
+
+    /** Placeholder for overall change percentage */
+    @FXML private Text changePctText;
+
+    /** Table showing all portfolio holdings */
+    @FXML private TableView<PortfolioEntry> portfolioTable;
+
+    /** Column for stock names */
+    @FXML private TableColumn<PortfolioEntry, String> stockCol;
+
+    /** Column showing each stock's percentage of portfolio */
+    @FXML private TableColumn<PortfolioEntry, String> changeCol;
+
+    /** Column showing market value of each stock holding */
+    @FXML private TableColumn<PortfolioEntry, Number> balanceCol;
+
+    /** Column containing the "Sell" buttons */
     @FXML private TableColumn<PortfolioEntry, Void> sellCol;
 
+    /** Text area displaying the selected stock's description */
+    @FXML private TextArea stockInfoText;
 
-    // grab the user DAO and current user’s ID from our AppContext/session
+    /** Portfolio data access object */
     private IPortfolioDAO portfolioDAO;
+
+    /** Currently logged-in user's ID */
     private int currentUserId;
 
+    /** Watchlist service used to retrieve stock descriptions */
+    private IWatchlistService watchlistService;
+
+    /**
+     * Initializes the controller.
+     * Sets up table columns, fetches data, and configures row selection listeners.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         portfolioDAO = AppContext.getService(IPortfolioDAO.class);
         currentUserId = Session.getCurrentUser().getUserId();
+        watchlistService = AppContext.getService(IWatchlistService.class);
+
         setupSellColumn();
         setupTableColumns();
         refreshPortfolio();
+
+        portfolioTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                loadStockDescription(newVal);
+            } else {
+                stockInfoText.setText("No stock selected.");
+            }
+        });
+    }
+
+    /**
+     * Loads the selected stock's description from the watchlist service.
+     * Executes the fetch in a background thread to avoid blocking the UI.
+     *
+     * @param entry The portfolio entry selected by the user
+     */
+    private void loadStockDescription(PortfolioEntry entry) {
+        StockName stock = entry.getStock();
+        stockInfoText.setText("Loading...");
+
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return watchlistService.getShortDescription(stock);
+            }
+        };
+
+        task.setOnSucceeded(e -> stockInfoText.setText(task.getValue()));
+        task.setOnFailed(e -> stockInfoText.setText("Failed to load description."));
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+
     }
 
     /**

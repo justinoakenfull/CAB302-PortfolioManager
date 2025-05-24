@@ -14,6 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.control.TextArea?>
 <HBox styleClass="flow-pane" stylesheets="@portfolio.css"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.javarepowizards.portfoliomanager.controllers.portfolio.PortfolioController">
@@ -148,13 +149,16 @@
                                         <String fx:value="card-title-text" />
                                     </styleClass>
                                 </Text>
+                                <VBox prefHeight="400.0" prefWidth="300.0">
+                                    <TextArea fx:id="stockInfoText"
+                                              VBox.vgrow="ALWAYS"
+                                              wrapText="true"
+                                              editable="false"
+                                              focusTraversable="false"
+                                              style="-fx-font-size: 14px; -fx-control-inner-background: #2b2b2b; -fx-text-fill: white;" />
+                                </VBox>
                                 <Separator prefWidth="200.0" styleClass="balance-text" />
                                 <VBox prefHeight="200.0" prefWidth="100.0">
-                                    <children>
-                                        <Text styleClass="card-text" text="CBA is Australia's largest bank…" wrappingWidth="300.0">
-                                            <VBox.margin><Insets bottom="10.0" top="10.0" /></VBox.margin>
-                                        </Text>
-                                    </children>
                                 </VBox>
                                 <Separator prefWidth="200.0" />
                             </children>
