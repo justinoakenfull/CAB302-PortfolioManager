@@ -6,6 +6,10 @@ import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
 import com.javarepowizards.portfoliomanager.services.OllamaService;
 
+
+import com.javarepowizards.portfoliomanager.services.SimulationServices;
+import com.javarepowizards.portfoliomanager.services.OllamaService;
+
 import com.javarepowizards.portfoliomanager.services.PortfolioStatistics;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,93 +23,43 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 
 import javafx.concurrent.Task;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextArea;
+
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.regex.Matcher;
 
 public class SimulationController implements Initializable {
 
 
 
-    @FXML
-    private LineChart<Number, Number> portfolioLineChart;
-    @FXML
-    private NumberAxis xAxis;
-    @FXML
-    private NumberAxis yAxis;
+    @FXML private LineChart<Number, Number> portfolioLineChart;
+    @FXML private NumberAxis xAxis;
+    @FXML private NumberAxis yAxis;
+    @FXML private Label labelBalance;
+    @FXML private Label labelPortfolioValue;
+    @FXML private Label labelSharpeRatio;
+    @FXML private Label labelVolatility;
+    @FXML private Label labelCumulativeReturn;
+    @FXML private Slider sliderSimulationDays;
+    @FXML private Button btnRunSimulation;
+    @FXML private Label labelReview;
 
-    @FXML
-    private Label labelBalance;
-    @FXML
-    private Label labelPortfolioValue;
-    @FXML
-    private Label labelSharpeRatio;
-    @FXML
-    private Label labelVolatility;
-    @FXML
-    private Label labelCumulativeReturn;
-
-    @FXML
-    private Slider sliderSimulationDays;
-    @FXML
-    private Button btnRunSimulation;
-    @FXML
-    private TextArea textReview;
-
-    @FXML
-    private Label labelReview;
-
-    @FXML
-    private ProgressIndicator progressIndicator;
-    @FXML
-    private ListView<String> listHoldings;
+    @FXML private ProgressIndicator progressIndicator;
+    @FXML private ListView<String> listHoldings;
 
     // References that must be provided externally (from MainController, for example)
     private IPortfolioDAO portfolioDAO;
     private StockDAO stockDAO;
     private LocalDate mostRecentDate = LocalDate.of(2023, 12, 29);
+
+    // OllamaService instance to handle AI interactions
     private final OllamaService ollamaService = new OllamaService();
-
-    private static final Pattern TAGGED_RESPONSE = Pattern.compile("(?s)(?<=<Start>)(.*?)(?=<Finish>)");
-
-    private static final String PROMPT_TEMPLATE= """
-            You are an AI tutor/grader built into a student investment-simulator. After I running the simulation, you use these results:
-            
-            • Starting balance: $%.2f \s
-            • Portfolio holdings:
-            %s
-            • Portfolio balance: $%.2f \s
-            • Sharpe ratio: %.2f \s
-            • Volatility: %.2f%% \s
-            • Cumulative return: %.2f%% \s
-            
-            Now respond **exactly** in the structure below, with no extra greetings or commentary, wrapped in <Start> and <Finish> tags:
-            
-            <Start>
-            Performance Summary & Review:
-            {Your detailed, creative overview—beyond just stats}
-            
-            Highlights:
-            - {Bullet-point insights}
-            
-            Tips for Improvement:
-            - {Actionable, portfolio-specific advice}
-            
-            Rating:
-            /10 with a brief comment
-            <Finish>
-            ""\";
-            """;
+    // SimulationServices instance to handle simulation logic
+    private SimulationServices services;
 
 
 
@@ -115,6 +69,7 @@ public class SimulationController implements Initializable {
         this.portfolioDAO = AppContext.getService(IPortfolioDAO.class);
         this.stockDAO = AppContext.getService(StockDAO.class);
 
+        this.services = new SimulationServices(portfolioDAO, stockDAO, mostRecentDate);
 
         initializeUI();
 
@@ -168,13 +123,13 @@ public class SimulationController implements Initializable {
 
     private void runSimulation() {
 
-        if (!ollamaService.isServiceAvailable()) {           // ① guard clause
+        if (!ollamaService.isServiceAvailable()) {           //  guard clause
             showOllamaWarning();
             return;
         }
 
         int simulationDays = (int) sliderSimulationDays.getValue();
-        PortfolioSimulation engine = buildSimEngine(simulationDays);
+        PortfolioSimulation engine = services.buildSimEngine(simulationDays);
 
         prepareUiForSimulation();
 
@@ -197,13 +152,6 @@ public class SimulationController implements Initializable {
 //   helpers
 // ------------------------------------------------------------------
 
-    /** Build the sim engine */
-    private PortfolioSimulation buildSimEngine(int days) {
-        double k  = 2.0, maxΔ = 0.02, α = 0.3;
-        return new PortfolioSimulation(
-                portfolioDAO, stockDAO, mostRecentDate,
-                days, k, maxΔ, α);
-    }
 
     /** What to do when simulation finishes without error. */
     private void onSimSuccess(List<Double> values, int days) {
@@ -211,7 +159,7 @@ public class SimulationController implements Initializable {
         PortfolioStatistics.Metrics m =
                 PortfolioStatistics.compute(values, days);
         updateMetricLabels(m, values.get(values.size() - 1));  // numbers
-        String prompt = buildPrompt(m, values.get(values.size() - 1));
+        String prompt = services.buildPrompt(m, values.get(values.size() - 1));
         fetchAiSummary(prompt);                                // AI call
     }
 
@@ -250,28 +198,7 @@ public class SimulationController implements Initializable {
         // labelBalance        .setText("Balance: $%,.2f".formatted(portfolioDAO.getAvailableBalance())); Cash Balance need to come back
     }
 
-    /** Builds the prompt for AI . */
-    private String buildPrompt(PortfolioStatistics.Metrics m,
-                               double finalBalance) {
-        double starting = portfolioDAO.getAvailableBalance()
-                + portfolioDAO.getTotalPortfolioValue();
 
-        List<String> rows = portfolioDAO.getHoldings().stream()
-                .map(en -> "%s: %d shares @ $%,.2f = $%,.2f".formatted(
-                        en.getStock().getSymbol(),
-                        (int) en.getAmountHeld(),
-                        en.getPurchasePrice(),
-                        en.getMarketValue()))
-                .toList();
-
-        return PROMPT_TEMPLATE.formatted(
-                starting,
-                String.join("\n", rows),
-                finalBalance,
-                m.annualisedSharpe(),
-                m.annualisedVolatilityPct(),
-                m.cumulativeReturnPct());
-    }
 
     /** Ollama request, update UI on success/fail. */
     private void fetchAiSummary(String prompt) {
@@ -282,7 +209,7 @@ public class SimulationController implements Initializable {
         };
 
         aiTask.setOnSucceeded(e -> {
-            labelReview.setText(extractCore(aiTask.getValue()));
+            labelReview.setText(services.extractCore(aiTask.getValue()));
             progressIndicator.setVisible(false);
             btnRunSimulation.setDisable(false);
         });
@@ -306,25 +233,5 @@ public class SimulationController implements Initializable {
         progressIndicator.setVisible(false);
         btnRunSimulation.setDisable(false);
     }
-
-    /** Extractrs the core of the Ai response, inbetween the tags*/
-    public static String extractCore(String raw) {
-        String startTag = "<Start>";
-        String endTag = "<Finish>";
-
-        int s = raw.indexOf(startTag);
-        if (s >= 0){
-            String after = raw.substring(s + startTag.length());
-            int f = after.indexOf(endTag);
-            if (f >= 0){
-                return after.substring(0, f).trim();
-            }else {
-                return after.trim();
-            }
-        }
-        return raw.trim();
-
-    }
-
 
 }
