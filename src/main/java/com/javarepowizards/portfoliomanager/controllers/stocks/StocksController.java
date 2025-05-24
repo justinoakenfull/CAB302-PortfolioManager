@@ -12,6 +12,7 @@ import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -90,6 +91,11 @@ public class StocksController implements Initializable {
      */
     @FXML
     private Label portfolioValueLabel;
+    /**
+     * Label for search for stock
+     */
+    @FXML
+    private TextField stockSearchField;
 
     // --- Data access objects ---
     /**
@@ -241,6 +247,15 @@ public class StocksController implements Initializable {
         try {
             // Attempt to load available stocks into the table
             loadStocks();
+            stockSearchField.textProperty().addListener((obs, oldVal, newVal) -> {
+                String lower = newVal.toLowerCase();
+                filteredStocks.setPredicate(stock -> {
+                    if (lower.isEmpty()) return true;
+                    return stock.tickerProperty().get().toLowerCase().contains(lower)
+                            || stock.companyNameProperty().get().toLowerCase().contains(lower);
+                });
+            });
+
         } catch (IOException e) {
             // Display error in feedback label if stock data cannot be loaded
             buyFeedbackLabel.setText("Error loading stock data");
@@ -389,6 +404,8 @@ public class StocksController implements Initializable {
         });
     }
 
+    private FilteredList<StockRow> filteredStocks;
+
     /**
      * Loads stock data from the repository and populates the TableView.
      *
@@ -400,14 +417,14 @@ public class StocksController implements Initializable {
         // Iterate over all available tickers
         for (String ticker : stockRepository.availableTickers()) {
             IStock stock = stockRepository.getByTicker(ticker);
-
-            // Only add rows for stocks with valid data
             if (stock != null && stock.getCurrentRecord() != null) {
                 rows.add(new StockRow(stock));
             }
         }
-        // Populate the table
-        tableView.setItems(rows);
+
+        allStocks.setAll(rows); // Keep a reference for filtering
+        filteredStocks = new FilteredList<>(allStocks, p -> true);
+        tableView.setItems(filteredStocks);
     }
 
     /**
