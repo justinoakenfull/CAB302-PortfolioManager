@@ -133,7 +133,7 @@ public class LoginController implements Initializable {
             if (userOpt.isEmpty()) {
                 String hashed = authService.hashPassword(password);
                 User newUser = new User(username, email, hashed);
-                boolean created = userDAO.createUser(newUser);
+                boolean created = userDAO.createUser(newUser, 100000.00);
                 if (!created) {
                     throw new RuntimeException("Failed to create test user");
                 }

@@ -79,7 +79,7 @@ public class UserDAO implements IUserDAO {
      * @throws SQLException if a database error occurs or no rows are affected during insertion
      */
     @Override
-    public boolean createUser(User user) throws SQLException {
+    public boolean createUser(User user, double startingBalance) throws SQLException {
         connection.setAutoCommit(false);
         try {
             final String authSql = """
@@ -96,6 +96,7 @@ public class UserDAO implements IUserDAO {
                     throw new SQLException("Creating user failed, no rows affected.");
                 }
 
+
                 try (ResultSet rs = authStmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         int userId = rs.getInt(1);
@@ -106,8 +107,9 @@ public class UserDAO implements IUserDAO {
                             userStmt.executeUpdate();
                         }
 
-                        try (PreparedStatement balanceStmt = connection.prepareStatement("INSERT INTO user_balances (user_id) VALUES (?)")) {
+                        try (PreparedStatement balanceStmt = connection.prepareStatement("INSERT INTO user_balances (user_id, balance) VALUES (?, ?)")) {
                             balanceStmt.setInt(1, userId);
+                            balanceStmt.setDouble(2, startingBalance);
                             balanceStmt.executeUpdate();
                         }
                     } else {
@@ -379,5 +381,19 @@ public class UserDAO implements IUserDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to retrieve current user from session", e);
         }
+    }
+
+   @Override
+    public double getBalance(int userId) throws SQLException {
+        String sql = "SELECT balance FROM user_balances WHERE user_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("balance");
+                }
+            }
+        }
+        return 0.0;
     }
 }
