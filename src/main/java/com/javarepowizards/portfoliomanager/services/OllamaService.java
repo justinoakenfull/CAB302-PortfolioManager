@@ -11,19 +11,40 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class OllamaService {
+    // OllamaService is a service that communicates with the Ollama API to generate responses based on a given prompt.
     private static final String TAGS_URL     = "http://localhost:11434/api/tags";
     private static final String GENERATE_URL = "http://localhost:11434/api/generate";
-
     private final String modelName;
 
+    /**
+     * Constructs an OllamaService instance and detects the default model.
+     * If no model is detected, it sets the modelName to null.
+     */
     public OllamaService() {
-        this.modelName = detectDefaultModel();
+        String detected = null;
+        try {
+            detected = detectDefaultModel();
+        } catch (IllegalStateException e) {
+            // log.warn("Ollama not reachable; AI features disabled", e);
+        }
+        this.modelName = detected;
     }
 
-
+    /**
+     * Detects the default model by sending a GET request to the Ollama API.
+     * If no model is found, it throws an IllegalStateException.
+     *
+     * @return The name of the detected model.
+     * @throws IllegalStateException if no model is found or if an error occurs during detection.
+     */
     private String detectDefaultModel() {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(TAGS_URL).openConnection();
+
+            //set timeout values (in ms?)
+            conn.setConnectTimeout(2000);
+            conn.setReadTimeout(5000);
+
             conn.setRequestMethod("GET");
 
             int status = conn.getResponseCode();
@@ -58,6 +79,12 @@ public class OllamaService {
      * Sends the given prompt to /api/generate using the detected model.
      */
     public String generateResponse(String prompt) throws IOException {
+        if (modelName == null) {
+            throw new IllegalStateException("No Ollama model detected");
+            // This shouldnt be hit cause we shouldnt call it if there is no model
+            // but we want to make sure we don't crash if no ollama model is running.
+        }
+
         HttpURLConnection conn = (HttpURLConnection) new URL(GENERATE_URL).openConnection();
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
@@ -90,5 +117,29 @@ public class OllamaService {
         }
 
         return new JSONObject(sb.toString()).getString("response");
+    }
+
+    /**
+     * Checks if the Ollama service is available by sending a GET request to /api/tags.
+     * If the modelName is null, it returns false.
+     *
+     * @return true if the service is available, false otherwise.
+     */
+    public Boolean isServiceAvailable(){
+
+        if (modelName == null) {
+            return false;
+        }
+
+        try
+        {
+            HttpURLConnection conn = (HttpURLConnection) new URL(TAGS_URL).openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(500);
+            conn.setReadTimeout(500);
+            return conn.getResponseCode() == 200;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

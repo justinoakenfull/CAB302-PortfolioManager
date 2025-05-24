@@ -72,22 +72,6 @@ public class MarketSimulator {
             double lowerBound = currentPrice * (1 - kMultiplier * volatility);
             newPrice = Math.min(upperBound, Math.max(lowerBound, newPrice));
 
-            /*
-            // Enforce dynamic boundaries.
-            if (newPrice > upperBound) {
-                newPrice = upperBound;
-            } else if (newPrice < lowerBound) {
-                newPrice = lowerBound;
-            }
-
-
-
-            if (newPrice > maxIncrease) {
-                newPrice = maxIncrease;
-            } else if (newPrice < maxDecrease) {
-                newPrice = maxDecrease;
-            }
-            */
             // Calculate today’s return.
             double todayReturn = (newPrice - currentPrice) / currentPrice;
 

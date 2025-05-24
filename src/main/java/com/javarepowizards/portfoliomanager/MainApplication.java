@@ -3,10 +3,7 @@ package com.javarepowizards.portfoliomanager;
 import com.javarepowizards.portfoliomanager.dao.*;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
-import com.javarepowizards.portfoliomanager.models.*;
-import com.javarepowizards.portfoliomanager.services.AuthService;
-import com.javarepowizards.portfoliomanager.services.IAuthService;
-import com.javarepowizards.portfoliomanager.services.PortfolioInitializer;
+import com.javarepowizards.portfoliomanager.services.*;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +30,6 @@ public class MainApplication extends Application {
         initializeStockRepository();
         initializeWatchlist();
         initializeAuthService();
-        initializePortfolio();
 
         // Load the login screen
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/login.fxml"));
@@ -51,6 +47,12 @@ public class MainApplication extends Application {
         // Initialize UserDAO since other services might depend on it
         IUserDAO userDAO = new UserDAO(dbConnection);
         AppContext.registerService(IUserDAO.class, userDAO);
+
+
+        // register the PortfolioDAO under its interface
+        PortfolioDAO portfolioDAO = new PortfolioDAO(dbConnection);
+        AppContext.registerService(IPortfolioDAO.class, portfolioDAO);
+        System.out.println("DB connection: " + dbConnection.getConnection());
     }
 
     private void initializeAuthService() {
@@ -75,26 +77,22 @@ public class MainApplication extends Application {
     }
 
     private void initializeWatchlist() throws SQLException {
-        IDatabaseConnection dbConnection = AppContext.getService(IDatabaseConnection.class);
-        IWatchlistDAO watchlistDAO = new WatchlistDAO(dbConnection); // Concrete class, but variable type is interface
-        StockRepository repo = AppContext.getService(StockRepository.class);
+        //construct & register the DAO
+        IWatchlistDAO watchlistDAO = new WatchlistDAO(AppContext.getService(IDatabaseConnection.class));
+        AppContext.registerService(IWatchlistDAO.class, watchlistDAO);
 
-        Watchlist watchlist = new Watchlist(repo, watchlistDAO, 1); // Default user ID
-        watchlist.refresh();
-
-        AppContext.registerService(IWatchlistDAO.class, watchlistDAO); // Register interface
-        AppContext.registerService(Watchlist.class, watchlist);
-
+        //construct & register the application service
+        WatchlistService watchlistService =
+                new WatchlistService(
+                        AppContext.getService(StockRepository.class),
+                        watchlistDAO,
+                        AppContext.getService(IUserDAO.class),
+                        AppContext.getService(IPortfolioDAO.class));
+        AppContext.registerService(IWatchlistService.class, watchlistService);
     }
 
-    private void initializePortfolio() {
-        StockDAO stockDAO = AppContext.getService(StockDAO.class);
 
-        LocalDate mostRecentDate = LocalDate.of(2023,12,29);
-        PortfolioDAO portfolioDAO = PortfolioInitializer.createDummyPortfolio(stockDAO, mostRecentDate);
-        AppContext.registerService(PortfolioDAO.class,portfolioDAO);
 
-    }
 
     public static void main(String[] args) {
         launch();

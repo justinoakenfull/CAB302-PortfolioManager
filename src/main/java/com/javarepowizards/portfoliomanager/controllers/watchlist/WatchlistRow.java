@@ -37,7 +37,6 @@ public class WatchlistRow {
                 ? 0
                 : ((change.get() / open.get()) * 100));
 
-        // price can represent last traded price or close
         price.set(rec.getClose());
         volume.set(rec.getVolume());
 
@@ -111,4 +110,5 @@ public class WatchlistRow {
      * @return the ObjectProperty containing the remove Button
      */
     public ObjectProperty<Button> removeProperty(){ return remove; }
+
 }

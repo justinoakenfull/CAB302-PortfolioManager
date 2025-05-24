@@ -1,6 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.stocks;
 
 import com.javarepowizards.portfoliomanager.AppContext;
+import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
@@ -8,6 +9,7 @@ import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
+import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -48,25 +50,33 @@ public class StocksController implements Initializable {
     @FXML private TableColumn<StockRow, Void> favouriteCol;
 
     // --- Data access objects ---
-    private PortfolioDAO portfolioDAO;                // DAO for managing portfolio entries
+    private IPortfolioDAO portfolioDAO;               // DAO for managing portfolio entries
     private StockRepository stockRepository;          // Repository for fetching stock data
 
     @Autowired
-    IWatchlistDAO watchlistDAO;
+    // Data access objects and current user ID
 
+    private IUserDAO userDAO;
+
+    private IWatchlistDAO watchlistDAO;
     private int currentUserId;
 
+    // Master list of all stocks for search filtering
+    private final ObservableList<StockRow> allStocks = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         watchlistDAO = AppContext.getService(IWatchlistDAO.class);
         IUserDAO userDAO = AppContext.getService(IUserDAO.class);
-        currentUserId = userDAO.getCurrentUser().isPresent() ? userDAO.getCurrentUser().get().getUserId() : 1;
 
+        // Determine the current user's ID (default to 1 if not present)
+        currentUserId = userDAO.getCurrentUser().map(u -> u.getUserId()).orElse(1);
+
+        // Clear existing columns and set up fresh ones
         tableView.getColumns().clear();
         // Retrieve application services
         stockRepository = AppContext.getService(StockRepository.class);
-        portfolioDAO    = AppContext.getService(PortfolioDAO.class);
+        portfolioDAO = AppContext.getService(IPortfolioDAO.class);
 
         // --- TableColumn setup ---
 
@@ -92,10 +102,14 @@ public class StocksController implements Initializable {
 
         // Column for percentage change
         TableColumn<StockRow, Double> changePctCol = new TableColumn<>("Change (%)");
+        TableColumn<StockRow, Long>   volumeCol    = new TableColumn<>("Volume (M)");
+
+        openCol.setCellValueFactory(cell -> cell.getValue().openProperty().asObject());
+        closeCol.setCellValueFactory(cell -> cell.getValue().closeProperty().asObject());
+        changeCol.setCellValueFactory(cell -> cell.getValue().changeProperty().asObject());
         changePctCol.setCellValueFactory(cell -> cell.getValue().changePercentProperty().asObject());
 
         // Column for trading volume
-        TableColumn<StockRow, Long> volumeCol = new TableColumn<>("Volume (M)");
         volumeCol.setCellValueFactory(cell -> cell.getValue().volumeProperty().asObject());
 
 
@@ -331,7 +345,12 @@ public class StocksController implements Initializable {
             StockName stockName = StockName.fromString(selected.tickerProperty().get());
             double price = selected.closeProperty().get();
             PortfolioEntry entry = new PortfolioEntry(stockName, price, quantity);
+
+            // Update in-memory DAO
             portfolioDAO.addToHoldings(entry);
+            // Persist to database
+            double totalValue = price * quantity;
+            portfolioDAO.upsertHolding(currentUserId, stockName, quantity, totalValue);
 
             // Success feedback
             buyFeedbackLabel.setText("Bought " + quantity + " " + stockName.getSymbol());
@@ -349,16 +368,31 @@ public class StocksController implements Initializable {
         }
     }
 
+    // Increases purchase amount by 1, defaults to 1 on invalid input
     @FXML
     private void increasePurchaseAmount() {
-
+        try {
+            int current = Integer.parseInt(stockQuantityField.getText().trim());
+            stockQuantityField.setText(String.valueOf(current + 1));
+        } catch (NumberFormatException e) {
+            stockQuantityField.setText("1");
+        }
     }
 
+    // Decreases purchase amount by 1, minimum of 1, defaults to 1 on invalid input
     @FXML
     private void decreasePurchaseAmount() {
-
+        try {
+            int current = Integer.parseInt(stockQuantityField.getText().trim());
+            if (current > 1) {
+                stockQuantityField.setText(String.valueOf(current - 1));
+            }
+        } catch (NumberFormatException e) {
+            stockQuantityField.setText("1");
+        }
     }
 
+    // Updates feedback label when a row is selected via info button
     @FXML
     private void selectStocks() {
         StockRow selected = tableView.getSelectionModel().getSelectedItem();

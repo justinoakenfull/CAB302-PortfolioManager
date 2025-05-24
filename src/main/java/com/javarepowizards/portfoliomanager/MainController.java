@@ -4,16 +4,21 @@ import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.SimulationDifficulty;
 import com.javarepowizards.portfoliomanager.services.NavigationService;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.dao.InMemoryPortfolioDAO;
+
 
 
 import com.javarepowizards.portfoliomanager.services.Session;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.effect.Glow;
 import javafx.scene.layout.StackPane;
 import java.io.IOException;
 import java.net.URL;
@@ -25,68 +30,107 @@ import java.util.ResourceBundle;
 import javafx.scene.Parent;
 
 import com.javarepowizards.portfoliomanager.dao.StockDAO;
+import javafx.util.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MainController implements Initializable {
     @FXML
     private StackPane contentArea;
 
+    @FXML private Button dashboardBtn;
+    @FXML private Button watchlistBtn;
+    @FXML private Button portfolioBtn;
+    @FXML private Button stocksBtn;
+    @FXML private Button simulationBtn;
+    @FXML private Button myAccountBtn;
+    @FXML private Button settingsBtn;
+    List<Button> menuButtons;
+
     private NavigationService nav;
 
     private final LocalDate mostRecentDate = LocalDate.of(2023, 12, 29);
 
-    @Autowired
-    private IUserDAO userDAO;
 
-    @Autowired
+    private IUserDAO userDAO;
     private IPortfolioDAO portfolioDAO;
-    @Autowired
     private StockDAO stockDAO;
 
     @FXML
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        menuButtons = List.of(
+                dashboardBtn, watchlistBtn, portfolioBtn,
+                stocksBtn, simulationBtn, myAccountBtn, settingsBtn
+        );
+
         stockDAO = stockDAO.getInstance();
-        portfolioDAO = new InMemoryPortfolioDAO();
 
         // Initialize the NavigationService with the content area
         nav = new NavigationService(contentArea);
         // Load the initial page (e.g., dashboard)
         showDashboard();
+
+        menuButtons.forEach(this::attachHoverGlow);
+        setActivePage(menuButtons.getFirst());
+    }
+
+    private void attachHoverGlow(Button btn) {
+        Glow glow = new Glow(0.0);
+        btn.setEffect(glow);
+
+        Timeline pulse = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(glow.levelProperty(), 0.0)
+                ),
+                new KeyFrame(Duration.seconds(1),
+                        new KeyValue(glow.levelProperty(), 0.2)
+                )
+        );
+        pulse.setAutoReverse(true);
+        pulse.setCycleCount(Timeline.INDEFINITE);
+
+        btn.setOnMouseEntered(e -> pulse.play());
+        btn.setOnMouseExited(e -> {
+            pulse.stop();
+            glow.setLevel(0.0);
+        });
     }
 
     @FXML
     public void showDashboard() {
+        setActivePage(menuButtons.getFirst());
         nav.loadView("dashboard/dashboard.fxml", controller ->{});
     }
 
     @FXML
     private void showWatchlist() {
+        setActivePage(menuButtons.get(1));
         nav.loadView("watchlist/watchlist.fxml", controller -> {});
     }
 
     @FXML
     private void showPortfolio() {
+        setActivePage(menuButtons.get(2));
         nav.loadView("portfolio/portfolio.fxml", controller -> {});
     }
 
     @FXML
     private void showStocks() {
+        setActivePage(menuButtons.get(3));
         nav.loadView("stockspage/stocks.fxml", controller -> {});
     }
 
     @FXML
     private void showSimulation(){
-        nav.loadView("simulation/simulation.fxml", controller -> {
-            var sim = (com.javarepowizards.portfoliomanager.controllers.simulation.SimulationController) controller;
-            sim.setPortfolioDAO(portfolioDAO);
-            sim.setStockDAO(stockDAO);
-            sim.setMostRecentDate(LocalDate.of(2023, 12, 29));
-        });
+        setActivePage(menuButtons.get(4));
+        nav.loadView("simulation/simulation.fxml", controller -> {});
     }
 
     @FXML
-    private void showMyAccount() { nav.loadView("useraccounts/userAccountsProfile.fxml", controller -> {});}
+    private void showMyAccount() {
+        setActivePage(menuButtons.get(5));
+        nav.loadView("useraccounts/userAccountsProfile.fxml", controller -> {});
+    }
 
 
     /* MUST BE LOGGED IN TO UPDATE SIMULATION DIFFICULTY*/
@@ -127,7 +171,6 @@ public class MainController implements Initializable {
         });
     }
 
-
     private void loadPage(String page) {
         try {
             Parent fxml = FXMLLoader.load(getClass().getResource("/com/javarepowizards/portfoliomanager/views/" + page));
@@ -138,6 +181,9 @@ public class MainController implements Initializable {
         }
     }
 
-
+    private void setActivePage(Button activePageButton) {
+        menuButtons.forEach(btn -> btn.getStyleClass().remove("active"));
+        activePageButton.getStyleClass().add("active");
+    }
 
 }

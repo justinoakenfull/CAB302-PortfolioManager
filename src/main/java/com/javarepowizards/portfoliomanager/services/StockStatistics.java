@@ -13,6 +13,7 @@ public class StockStatistics {
 
     private final double momentum;
 
+
     public StockStatistics(List<StockData> stockDataList){
         // ensure the list is sorted by date in ascending order.
 

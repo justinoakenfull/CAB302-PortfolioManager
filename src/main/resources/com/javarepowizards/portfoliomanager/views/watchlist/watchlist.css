@@ -80,6 +80,25 @@
     -fx-fill: white;
 }
 
+.snapshot-scrollpane {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-padding: 4;
+}
+
+.snapshot-scrollpane .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.snapshot-scrollpane .scroll-bar:vertical {
+    -fx-opacity: 0.8;
+}
+.snapshot-scrollpane .scroll-bar .thumb {
+    -fx-background-color: #3A3F44;
+    -fx-background-radius: 4px;
+}
+
 .balance-text {
     -fx-fill: white;
     -fx-text-fill: white;
@@ -180,10 +199,6 @@
     -fx-text-fill: white;
 }
 
-/* ──────────────────────────────────────────────────────────────
-   DARK WATCHLIST TABLE  (matches the second screenshot)
-   ──────────────────────────────────────────────────────────────*/
-
 /* Outer frame & body */
 .table-view.watchlist-table {
     -fx-background-color: #1e232b;          /* frame */
@@ -244,3 +259,50 @@
 }
 .button.btn:hover { -fx-background-color: #0b5ed7; }
 
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+
+}
+
+.chart-legend-item {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.chart-legend-item .label {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.chart-legend-item text {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.chart-legend {
+    -fx-font-size: 16px;
+    -fx-background-color: rgba(0, 0, 0, 0.6);  /* semi-transparent black */
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+    -fx-background-radius: 4px;
+    -fx-padding: 15px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+/* (optional) tweak the little symbol boxes */
+.chart-legend-item-symbol {
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+    -fx-background-radius: 2px;
+}
+
+.chart-pie-label {
+    -fx-fill: white;
+    -fx-font-size: 16px;
+}
