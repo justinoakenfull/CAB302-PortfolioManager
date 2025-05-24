@@ -3,6 +3,8 @@ package com.javarepowizards.portfoliomanager;
 import com.javarepowizards.portfoliomanager.dao.*;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
+import com.javarepowizards.portfoliomanager.domain.IWatchlistReadOnly;
+import com.javarepowizards.portfoliomanager.domain.IStockRepoReadOnly;
 import com.javarepowizards.portfoliomanager.services.*;
 import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
@@ -74,6 +76,8 @@ public class MainApplication extends Application {
 
         StockDAO stockDAO = StockDAO.getInstance();
         AppContext.registerService(StockDAO.class, stockDAO);
+
+        AppContext.registerService(IStockRepoReadOnly.class, repo);
     }
 
     private void initializeWatchlist() throws SQLException {
@@ -89,10 +93,9 @@ public class MainApplication extends Application {
                         AppContext.getService(IUserDAO.class),
                         AppContext.getService(IPortfolioDAO.class));
         AppContext.registerService(IWatchlistService.class, watchlistService);
+
+        AppContext.registerService(IWatchlistReadOnly.class,watchlistService);
     }
-
-
-
 
 
 

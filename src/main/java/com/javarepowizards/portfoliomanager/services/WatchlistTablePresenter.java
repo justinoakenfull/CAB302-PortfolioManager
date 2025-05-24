@@ -1,9 +1,9 @@
-package com.javarepowizards.portfoliomanager.controllers.dashboard;
+package com.javarepowizards.portfoliomanager.services;
 
 import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.domain.IStockRepoReadOnly;
+import com.javarepowizards.portfoliomanager.domain.IWatchlistReadOnly;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
-import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
-import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
 import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
 import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
@@ -18,46 +18,50 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
-/** Build watchlist-table columns and keep in sync with user actions */
-final class WatchlistTablePresenter {
+/**
+ * Presenter for the watchlist table widget.
+ * Builds the TableView columns and keeps it in sync with the service.
+ */
+public final class WatchlistTablePresenter {
 
-    private final VBox               container;
-    private final IWatchlistService  service;
-    private final StockRepository    repo;
+    private final VBox                container;
+    private final IWatchlistReadOnly  watchlist;
+    private final IStockRepoReadOnly  repo;
+    private TableView<WatchlistRow>   table;
 
-    private TableView<WatchlistRow>  table;
-
-    WatchlistTablePresenter(VBox container,
-                            IWatchlistService service,
-                            StockRepository repo)
+    /**
+     *
+     * @param container where the table is placed
+     * @param watchlist provides watchlist data and removal
+     * @param repo provides available tickers
+     */
+    public WatchlistTablePresenter(
+            VBox container,
+            IWatchlistReadOnly watchlist,
+            IStockRepoReadOnly repo)
     {
         this.container = container;
-        this.service   = service;
+        this.watchlist = watchlist;
         this.repo      = repo;
 
-        buildTable();     // define all columns and styling
-        refresh();        // populate table with current data
+        buildTable();
+        refresh();
     }
 
-    /** Re-query watchlist and update table rows */
-    void refresh() {
+    /** Re-queries the watchlist and updates the table rows */
+    public void refresh() {
         try {
             Set<String> csvTickers = repo.availableTickers();
+
             List<WatchlistRow> rows = new ArrayList<>();
+            for (IStock s : watchlist.getWatchlist()) {
+                if (!csvTickers.contains(s.getTicker()))
+                    continue;
 
-            for (IStock stock : service.getWatchlist()) {
-                if (!csvTickers.contains(stock.getTicker())) continue;
-
-                rows.add(new WatchlistRow(
-                        stock,
-                        () -> {
-                            try { service.removeStock(stock); }
-                            catch (SQLException ignored) {}
-                        }));
+                rows.add(new WatchlistRow(s, () -> {}));
             }
 
-            ObservableList<WatchlistRow> model =
-                    FXCollections.observableArrayList(rows);
+            ObservableList<WatchlistRow> model = FXCollections.observableArrayList(rows);
             table.setItems(model);
 
         } catch (IOException | SQLException ex) {
@@ -65,10 +69,9 @@ final class WatchlistTablePresenter {
         }
     }
 
-    /* build TableView */
+   /** Creates the TableView with all columns and styling */
     private void buildTable() {
 
-        /* Column definitions */
         List<ColumnConfig<WatchlistRow,?>> cols = List.of(
                 new ColumnConfig<>("Ticker",   WatchlistRow::shortNameProperty),
                 new ColumnConfig<>("Name",     WatchlistRow::displayNameProperty),
@@ -86,23 +89,15 @@ final class WatchlistTablePresenter {
                         TableCellFactories.longFactory())
         );
 
-
+        // build and style table
         table = TableViewFactory.create(cols);
-
-        /*Dark header row */
-        table.getColumns().forEach(col -> col.getStyleClass().add("column-header-background"));
-
+        table.getColumns().forEach(c -> c.getStyleClass().add("column-header-background"));
         table.getStyleClass().add("watchlist-table");
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        /* let the table grow with its parent VBox */
+        // allow it to grow within its container
         HBox.setHgrow(table, Priority.ALWAYS);
         VBox.setVgrow(table, Priority.ALWAYS);
-
         container.getChildren().setAll(table);
     }
-
-    /* ------------------------------------------------------------ */
-
-
 }
