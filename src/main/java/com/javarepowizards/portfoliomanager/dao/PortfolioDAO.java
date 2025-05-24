@@ -250,7 +250,23 @@ public class PortfolioDAO implements IPortfolioDAO {
 
 
     @Override
-    public void sellHolding(int userId, StockName stock, double marketValue) throws SQLException {
+    public void sellHolding(int userId, StockName stock) throws SQLException {
+        double marketValue = 0.0;
+
+        String selectSQL = "SELECT holding_value FROM user_holdings WHERE user_id = ? AND ticker = ?";
+        try (PreparedStatement selectStmt = conn.prepareStatement(selectSQL)) {
+            selectStmt.setInt(1, userId);
+            selectStmt.setString(2, stock.getSymbol());
+
+            try (ResultSet rs = selectStmt.executeQuery()) {
+                if (rs.next()) {
+                    marketValue = rs.getDouble("holding_value");
+                } else {
+                    throw new SQLException("Holding not found for stock: " + stock.getSymbol());
+                }
+            }
+        }
+
         String deleteSQL = "DELETE FROM user_holdings WHERE user_id = ? AND ticker = ?";
         String updateSQL = "UPDATE user_balances SET balance = balance + ? WHERE user_id = ?";
 
@@ -258,14 +274,18 @@ public class PortfolioDAO implements IPortfolioDAO {
                 PreparedStatement deleteStmt = conn.prepareStatement(deleteSQL);
                 PreparedStatement updateStmt = conn.prepareStatement(updateSQL)
         ) {
+            // Delete the holding first
             deleteStmt.setInt(1, userId);
             deleteStmt.setString(2, stock.getSymbol());
             deleteStmt.executeUpdate();
 
+            // Add back the market value
             updateStmt.setDouble(1, marketValue);
             updateStmt.setInt(2, userId);
             updateStmt.executeUpdate();
         }
     }
+
 }
+
 

@@ -70,6 +70,11 @@
             <Label fx:id="cashBalanceLabel"
                    text="Cash: $0.00"
                    style="-fx-font-size: 16px; -fx-text-fill: white;" />
+
+            <Label fx:id="portfolioValueLabel"
+                   text="Portfolio: $0.00"
+                   style="-fx-font-size: 16px; -fx-text-fill: white;" />
+
             <Separator prefWidth="200.0" styleClass="balance-text" />
             <HBox prefHeight="200.0" prefWidth="200.0">
                 <VBox.margin>

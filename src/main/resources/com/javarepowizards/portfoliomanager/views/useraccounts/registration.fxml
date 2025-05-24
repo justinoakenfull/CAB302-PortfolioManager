@@ -29,7 +29,7 @@
             <PasswordField fx:id="confirmPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <!-- Balance -->
          <Label text="Balance" GridPane.rowIndex="4" />
-         <TextField fx:id="BalanceField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+         <TextField fx:id="balanceField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
             <!-- Register Button -->
             <Button onAction="#handleRegister" text="Register" GridPane.columnIndex="2" GridPane.rowIndex="4" />

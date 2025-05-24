@@ -77,7 +77,7 @@ public class PortfolioController implements Initializable {
 
     private void handleSell(PortfolioEntry entry) {
         try {
-            portfolioDAO.sellHolding(currentUserId, entry.getStock(), entry.getMarketValue());
+            portfolioDAO.sellHolding(currentUserId, entry.getStock());
             refreshPortfolio();  // Keep this here since it's UI-related
         } catch (Exception e) {
             e.printStackTrace();
