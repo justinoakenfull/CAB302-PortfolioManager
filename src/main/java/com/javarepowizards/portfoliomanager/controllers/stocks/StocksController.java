@@ -33,9 +33,9 @@ import java.util.ResourceBundle;
 /**
  * Controller for the Stocks view.
  * Responsible for:
- *   Initializing the stocks TableView with data and custom cell formatting.
- *   Handling user interactions such as buying a stock.
- *   Binding UI elements for responsive layout.
+ * Initializing the stocks TableView with data and custom cell formatting.
+ * Handling user interactions such as buying a stock.
+ * Binding UI elements for responsive layout.
  */
 public class StocksController implements Initializable {
 
@@ -101,8 +101,10 @@ public class StocksController implements Initializable {
      */
     private StockRepository stockRepository;
 
+    /**
+     * DAO for accessing user information
+     */
     @Autowired
-    /** DAO for accessing user information */
     private IUserDAO userDAO;
     /**
      * DAO for managing watchlist data
@@ -258,11 +260,9 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Initializes the 'Favourite' column with toggleable star buttons</summary>
-     * <remarks>
+     * Initializes the 'Favourite' column with toggleable star buttons.
      * Each cell contains a button to mark or unmark a stock as favourite.
      * Uses DAO methods to check and update user watchlist.
-     * </remarks>
      */
     private void setupFavouriteColumn() {
         favouriteCol.setCellFactory(new Callback<>() {
@@ -343,11 +343,9 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Initializes the 'Info' column with buttons to select a stock row</summary>
-     * <remarks>
+     * Initializes the 'Info' column with buttons to select a stock row.
      * Each cell includes a button that, when clicked, selects the corresponding
      * stock row and updates feedback labels with details.
-     * </remarks>
      */
     private void setupInfoColumn() {
         infoCol.setCellFactory(new Callback<>() {
@@ -392,7 +390,7 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Loads stock data from the repository and populates the TableView.</summary>
+     * Loads stock data from the repository and populates the TableView.
      *
      * @throws IOException if there is a problem fetching or reading stock data
      */
@@ -413,11 +411,9 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Handles the Buy button action.</summary>
-     * <remarks>
+     * Handles the Buy button action.
      * Validates the selected stock and quantity. Creates a PortfolioEntry
      * and updates DAO and UI accordingly.
-     * </remarks>
      */
     private void handleBuyStock() {
         StockRow selected = tableView.getSelectionModel().getSelectedItem();
@@ -466,7 +462,7 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Updates the label showing the user's available cash</summary>
+     * Updates the label showing the user's available cash.
      */
     private void updateCashBalanceLabel() {
         double balance = portfolioDAO.getAvailableBalance();
@@ -474,7 +470,7 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Increases the purchase amount by one, default to 1 if invalid</summary>
+     * Increases the purchase amount by one, default to 1 if invalid.
      */
     @FXML
     private void increasePurchaseAmount() {
@@ -488,7 +484,7 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Decreases the purchase amount by one, not below 1</summary>
+     * Decreases the purchase amount by one, not below 1.
      */
     @FXML
     private void decreasePurchaseAmount() {
@@ -504,7 +500,7 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Updates UI when a stock is selected via the info button</summary>
+     * Updates UI when a stock is selected via the info button.
      */
     @FXML
     private void selectStocks() {
@@ -533,7 +529,7 @@ public class StocksController implements Initializable {
     }
 
     /**
-     * <summary>Updates the labels showing cash and holdings values</summary>
+     * Updates the labels showing cash and holdings values.
      */
     private void updateBalanceLabels() {
         double cash = portfolioDAO.getAvailableBalance();
@@ -544,3 +540,4 @@ public class StocksController implements Initializable {
         portfolioValueLabel.setText(String.format("Portfolio: $%,.2f", holdings));
     }
 }
+
