@@ -11,11 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <summary>Data Access Object for portfolio operations.</summary>
- * <remarks>
+ * Data Access Object for portfolio operations.
  * Supports both DB-backed and in-memory modes for retrieving and updating
  * user holdings and balances.
- * </remarks>
  */
 @Repository
 public class PortfolioDAO implements IPortfolioDAO {
@@ -33,7 +31,8 @@ public class PortfolioDAO implements IPortfolioDAO {
     private final double availableBalance;
 
     /**
-     * <summary>Constructs a DB-backed PortfolioDAO</summary>
+     * Constructs a DB-backed PortfolioDAO.
+     *
      * @param dbConnection The database connection provider
      */
     @Autowired
@@ -50,7 +49,8 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Constructs an in-memory PortfolioDAO for testing or simulation</summary>
+     * Constructs an in-memory PortfolioDAO for testing or simulation.
+     *
      * @param holdings Portfolio entries
      * @param availableBalance Available balance in the test context
      */
@@ -66,7 +66,8 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Checks whether the DAO is being used in a test context</summary>
+     * Checks whether the DAO is being used in a test context.
+     *
      * @return true if used in test or simulation context, false otherwise
      */
     private boolean isTestContext() {
@@ -81,7 +82,8 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Retrieves the list of portfolio holdings for the current user</summary>
+     * Retrieves the list of portfolio holdings for the current user.
+     *
      * @return List of PortfolioEntry objects
      */
     @Override
@@ -122,7 +124,8 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Gets the available cash balance for the current user</summary>
+     * Gets the available cash balance for the current user.
+     *
      * @return Available balance as a double
      */
     @Override
@@ -144,8 +147,10 @@ public class PortfolioDAO implements IPortfolioDAO {
         }
     }
 
+
     /**
-     * <summary>Deducts a specific amount from the user's balance</summary>
+     * Deducts a specific amount from the user's balance.
+     *
      * @param userId User identifier
      * @param amount Amount to deduct
      * @throws SQLException If the SQL operation fails
@@ -162,27 +167,26 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Adds a new holding or updates existing one for the user</summary>
+     * Adds a new holding or updates existing one for the user.
+     *
      * @param entry Portfolio entry to be added or updated
      */
     @Override
     public void addToHoldings(PortfolioEntry entry) {
         if (!dbMode) {
-            // in-memory: just append
             holdings.add(entry);
             return;
         }
 
-        // DB-mode: upsert into user_holdings
         int userId = Session.getCurrentUser().getUserId();
         String sql = """
-                  INSERT INTO user_holdings 
-                    (user_id, ticker, holding_amount, holding_value)
-                  VALUES (?, ?, ?, ?)
-                  ON CONFLICT(user_id, ticker) DO UPDATE
-                    SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
-                        holding_value  = user_holdings.holding_value  + excluded.holding_value
-                """;
+              INSERT INTO user_holdings 
+                (user_id, ticker, holding_amount, holding_value)
+              VALUES (?, ?, ?, ?)
+              ON CONFLICT(user_id, ticker) DO UPDATE
+                SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
+                    holding_value  = user_holdings.holding_value  + excluded.holding_value
+            """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -196,16 +200,17 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Fetches all holdings for a specific user</summary>
+     * Fetches all holdings for a specific user.
+     *
      * @param userId User identifier
      * @return List of PortfolioEntry objects
      */
     public List<PortfolioEntry> getHoldingsForUser(int userId) {
         String sql = """
-                    SELECT ticker, holding_amount, holding_value
-                      FROM user_holdings
-                     WHERE user_id = ?
-                """;
+                SELECT ticker, holding_amount, holding_value
+                  FROM user_holdings
+                 WHERE user_id = ?
+            """;
         List<PortfolioEntry> holdings = new ArrayList<>();
         try (PreparedStatement p = conn.prepareStatement(sql)) {
             p.setInt(1, userId);
@@ -228,7 +233,8 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Inserts or updates a specific holding in the database</summary>
+     * Inserts or updates a specific holding in the database.
+     *
      * @param userId User identifier
      * @param stock Stock to update
      * @param quantity Quantity of shares
@@ -236,12 +242,12 @@ public class PortfolioDAO implements IPortfolioDAO {
      */
     public void upsertHolding(int userId, StockName stock, int quantity, double totalValue) {
         String sql = """
-                    INSERT INTO user_holdings (user_id, ticker, holding_amount, holding_value)
-                    VALUES (?, ?, ?, ?)
-                    ON CONFLICT(user_id, ticker) DO UPDATE
-                      SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
-                          holding_value  = user_holdings.holding_value  + excluded.holding_value
-                """;
+                INSERT INTO user_holdings (user_id, ticker, holding_amount, holding_value)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(user_id, ticker) DO UPDATE
+                  SET holding_amount = user_holdings.holding_amount + excluded.holding_amount,
+                      holding_value  = user_holdings.holding_value  + excluded.holding_value
+            """;
         try (PreparedStatement p = conn.prepareStatement(sql)) {
             p.setInt(1, userId);
             p.setString(2, stock.getSymbol());
@@ -254,7 +260,8 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Calculates the total value of the user's portfolio</summary>
+     * Calculates the total value of the user's portfolio.
+     *
      * @return Total portfolio value including cash and holdings
      */
     @Override
@@ -283,28 +290,29 @@ public class PortfolioDAO implements IPortfolioDAO {
     }
 
     /**
-     * <summary>Creates the user_holdings table if it does not exist</summary>
+     * Creates the user_holdings table if it does not exist.
      */
     public void createTables() {
         try (Statement stmt = conn.createStatement()) {
             stmt.execute("""
-                        CREATE TABLE IF NOT EXISTS user_holdings (
-                          user_id         INTEGER     NOT NULL,
-                          ticker          VARCHAR(10) NOT NULL,
-                          holding_amount  INTEGER     NOT NULL,
-                          holding_value   DECIMAL(15,2) NOT NULL,
-                          PRIMARY KEY (user_id, ticker),
-                          FOREIGN KEY (user_id) REFERENCES user_auth(user_id) 
-                            ON DELETE CASCADE
-                        )
-                    """);
+                    CREATE TABLE IF NOT EXISTS user_holdings (
+                      user_id         INTEGER     NOT NULL,
+                      ticker          VARCHAR(10) NOT NULL,
+                      holding_amount  INTEGER     NOT NULL,
+                      holding_value   DECIMAL(15,2) NOT NULL,
+                      PRIMARY KEY (user_id, ticker),
+                      FOREIGN KEY (user_id) REFERENCES user_auth(user_id) 
+                        ON DELETE CASCADE
+                    )
+                """);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create user_holdings table", e);
         }
     }
 
     /**
-     * <summary>Sells a specific holding and updates the user's balance</summary>
+     * Sells a specific holding and updates the user's balance.
+     *
      * @param userId User identifier
      * @param stock Stock to sell
      * @throws SQLException If an error occurs during SQL operations
@@ -346,6 +354,7 @@ public class PortfolioDAO implements IPortfolioDAO {
         }
     }
 }
+
 
 
 

@@ -7,11 +7,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
 /**
- * <summary>UI data model representing a row in the stock table</summary>
- * <remarks>
+ * UI data model representing a row in the stock table.
+ *
  * Extracts and wraps properties from an IStock object and its latest PriceRecord.
  * Provides observable properties for JavaFX bindings in the TableView.
- * </remarks>
  */
 public class StockRow {
 
@@ -37,7 +36,8 @@ public class StockRow {
     private final LongProperty volume = new SimpleLongProperty();
 
     /**
-     * <summary>Constructs a StockRow using a given IStock instance</summary>
+     * Constructs a StockRow using a given IStock instance.
+     *
      * @param stock Stock data source
      */
     public StockRow(IStock stock) {
