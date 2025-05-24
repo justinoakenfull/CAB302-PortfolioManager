@@ -48,6 +48,9 @@ public class StocksController implements Initializable {
     // @FXML private Label portfolioHeading;             // Heading label for portfolio pane
     @FXML private TableColumn<StockRow, Void> infoCol;
     @FXML private TableColumn<StockRow, Void> favouriteCol;
+    @FXML private Label pricePerShareLabel;
+    @FXML private Label cashBalanceLabel;
+
 
     // --- Data access objects ---
     private IPortfolioDAO portfolioDAO;               // DAO for managing portfolio entries
@@ -77,6 +80,11 @@ public class StocksController implements Initializable {
         // Retrieve application services
         stockRepository = AppContext.getService(StockRepository.class);
         portfolioDAO = AppContext.getService(IPortfolioDAO.class);
+
+        // display cash balance
+        double balance = portfolioDAO.getAvailableBalance();
+        updateCashBalanceLabel();
+        cashBalanceLabel.setText(String.format("Cash: $%.2f", balance));
 
         // --- TableColumn setup ---
 
@@ -272,7 +280,7 @@ public class StocksController implements Initializable {
                     private final Button btn = new Button();
                     {
                         ImageView imageView = new ImageView(
-                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockInfo64x64.png")));
+                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockButtonAdd64x64.png")));
                         imageView.setFitWidth(32);
                         imageView.setFitHeight(32);
                         btn.setGraphic(imageView);
@@ -330,7 +338,6 @@ public class StocksController implements Initializable {
     private void handleBuyStock() {
         StockRow selected = tableView.getSelectionModel().getSelectedItem();
 
-        // If no stock is selected, show error
         if (selected == null) {
             buyFeedbackLabel.setText("No Stock Selected!");
             buyFeedbackLabel.setTextFill(Color.RED);
@@ -338,34 +345,44 @@ public class StocksController implements Initializable {
         }
 
         try {
-            // Parse user-entered quantity
             int quantity = Integer.parseInt(stockQuantityField.getText());
 
-            // Build a PortfolioEntry and persist it
             StockName stockName = StockName.fromString(selected.tickerProperty().get());
             double price = selected.closeProperty().get();
             PortfolioEntry entry = new PortfolioEntry(stockName, price, quantity);
 
-            // Update in-memory DAO
-            portfolioDAO.addToHoldings(entry);
-            // Persist to database
             double totalValue = price * quantity;
-            portfolioDAO.upsertHolding(currentUserId, stockName, quantity, totalValue);
+            double currentBalance = portfolioDAO.getAvailableBalance();
 
-            // Success feedback
+            if (totalValue > currentBalance) {
+                buyFeedbackLabel.setText("Insufficient balance. You need $" + String.format("%.2f", totalValue));
+                buyFeedbackLabel.setTextFill(Color.RED);
+                return;
+            }
+
+            portfolioDAO.addToHoldings(entry);
+            portfolioDAO.upsertHolding(currentUserId, stockName, quantity, totalValue);
+            portfolioDAO.deductFromBalance(currentUserId, totalValue);
+
+            //Refresh balance label
+            updateCashBalanceLabel();
+
             buyFeedbackLabel.setText("Bought " + quantity + " " + stockName.getSymbol());
             buyFeedbackLabel.setTextFill(Color.LIGHTGREEN);
 
         } catch (NumberFormatException ex) {
-            // Handle invalid number input
             buyFeedbackLabel.setText("Invalid quantity.");
             buyFeedbackLabel.setTextFill(Color.RED);
 
         } catch (Exception ex) {
-            // Handle other persistence errors
             buyFeedbackLabel.setText("Error: " + ex.getMessage());
             buyFeedbackLabel.setTextFill(Color.RED);
         }
+    }
+
+    private void updateCashBalanceLabel() {
+        double balance = portfolioDAO.getAvailableBalance();
+        cashBalanceLabel.setText(String.format("Cash: $%.2f", balance));
     }
 
     // Increases purchase amount by 1, defaults to 1 on invalid input
@@ -377,6 +394,7 @@ public class StocksController implements Initializable {
         } catch (NumberFormatException e) {
             stockQuantityField.setText("1");
         }
+        selectStocks();
     }
 
     // Decreases purchase amount by 1, minimum of 1, defaults to 1 on invalid input
@@ -390,6 +408,7 @@ public class StocksController implements Initializable {
         } catch (NumberFormatException e) {
             stockQuantityField.setText("1");
         }
+        selectStocks();
     }
 
     // Updates feedback label when a row is selected via info button
@@ -399,17 +418,25 @@ public class StocksController implements Initializable {
 
         if (selected == null) {
             buyFeedbackLabel.setText("No Stock Selected!");
-            buyFeedbackLabel.getStyleClass().add("buy-feedback-label-none");
             buyFeedbackLabel.setTextFill(Color.RED);
+            buyFeedbackLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            pricePerShareLabel.setText(""); // Clear the price label
         } else {
-            buyFeedbackLabel.setText(selected.companyNameProperty().get());
-            buyFeedbackLabel.getStyleClass().add("buy-feedback-label-selected");
-            buyFeedbackLabel.setTextFill(Color.GREEN);
+            String name = selected.companyNameProperty().get();
+            String ticker = selected.tickerProperty().get();
+            double price = selected.closeProperty().get();
+            buyFeedbackLabel.setText(name + " (" + ticker + ")");
+            buyFeedbackLabel.setTextFill(Color.web("#1f75fe"));
+            buyFeedbackLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            try {
+                int quantity = Integer.parseInt(stockQuantityField.getText().trim());
+                double total = price * quantity;
+                pricePerShareLabel.setText(String.format("Total: $%.2f", total));
+            } catch (NumberFormatException e) {
+                pricePerShareLabel.setText("Total: $0.00");
+            }
         }
     }
-
-
-
 
 
 }

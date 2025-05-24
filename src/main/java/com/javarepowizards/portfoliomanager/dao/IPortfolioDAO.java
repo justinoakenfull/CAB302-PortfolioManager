@@ -15,6 +15,7 @@ public interface IPortfolioDAO {
     void upsertHolding(int userId, StockName stock, int quantity, double totalValue);
     List<PortfolioEntry> getHoldingsForUser(int userId) throws SQLException;
     void sellHolding(int userId, StockName stock, double marketValue) throws SQLException;
+    void deductFromBalance(int userId, double amount) throws SQLException;
 
 
 }
