@@ -50,6 +50,8 @@ public class StocksController implements Initializable {
     @FXML private TableColumn<StockRow, Void> favouriteCol;
     @FXML private Label pricePerShareLabel;
     @FXML private Label cashBalanceLabel;
+    @FXML private Label portfolioValueLabel;
+
 
 
     // --- Data access objects ---
@@ -85,6 +87,7 @@ public class StocksController implements Initializable {
         double balance = portfolioDAO.getAvailableBalance();
         updateCashBalanceLabel();
         cashBalanceLabel.setText(String.format("Cash: $%.2f", balance));
+        updateBalanceLabels();
 
         // --- TableColumn setup ---
 
@@ -366,6 +369,7 @@ public class StocksController implements Initializable {
 
             //Refresh balance label
             updateCashBalanceLabel();
+            updateBalanceLabels();
 
             buyFeedbackLabel.setText("Bought " + quantity + " " + stockName.getSymbol());
             buyFeedbackLabel.setTextFill(Color.LIGHTGREEN);
@@ -436,6 +440,15 @@ public class StocksController implements Initializable {
                 pricePerShareLabel.setText("Total: $0.00");
             }
         }
+    }
+
+    private void updateBalanceLabels() {
+        double cash = portfolioDAO.getAvailableBalance();
+        double total = portfolioDAO.getTotalPortfolioValue();
+        double holdings = total - cash;
+
+        cashBalanceLabel.setText(String.format("Cash: $%,.2f", cash));
+        portfolioValueLabel.setText(String.format("Portfolio: $%,.2f", holdings));
     }
 
 
