@@ -29,6 +29,7 @@ public class RegisterController implements Initializable {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
+    @FXML private TextField balanceField;
 
     @Autowired
     private IAuthService authService;
@@ -46,6 +47,8 @@ public class RegisterController implements Initializable {
     private void handleRegister() {
         if (!validateInputs()) return;
 
+        double startingBalance = Double.parseDouble(balanceField.getText().trim());
+
         try {
             User user = new User(
                     usernameField.getText().trim(),
@@ -53,7 +56,7 @@ public class RegisterController implements Initializable {
                     authService.hashPassword(passwordField.getText())
             );
 
-            if (userDAO.createUser(user)) {
+            if (userDAO.createUser(user, startingBalance)) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully!");
                 clearForm();
                 switchToLogin();
@@ -105,6 +108,22 @@ public class RegisterController implements Initializable {
             return false;
         }
 
+        if (balanceField.getText().isBlank()) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "Balance field cannot be empty");
+            return false;
+        }
+
+        try {
+            double balance = Double.parseDouble(balanceField.getText());
+            if (balance < 0) {
+                showAlert(Alert.AlertType.WARNING, "Validation Error", "Balance cannot be negative");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "Balance must be a valid number");
+            return false;
+        }
+
         return true;
     }
 
@@ -113,6 +132,7 @@ public class RegisterController implements Initializable {
         emailField.clear();
         passwordField.clear();
         confirmPasswordField.clear();
+        balanceField.clear();
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {

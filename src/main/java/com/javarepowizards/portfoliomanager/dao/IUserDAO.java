@@ -17,7 +17,9 @@ public interface IUserDAO {
      * @return {@code true} if the user was successfully created
      * @throws SQLException if a database access error occurs
      */
-    boolean createUser(User user) throws SQLException;
+    boolean createUser(User user, double startingBalance) throws SQLException;
+
+    double getBalance(int userId) throws SQLException;
 
     /**
      * Retrieves a user by their email address.
