@@ -80,7 +80,7 @@ public class SimulationServices implements ISimulationServices{
     }
 
     /**
-     * Extracts the core content from a raw string, removing the <Start> and <Finish> tags.
+     * Extracts the core content from a raw string, removing the {@literal <Start> and <Finish>} tags.
      *
      * @param raw the raw string containing the content
      * @return the extracted core content, trimmed of whitespace
