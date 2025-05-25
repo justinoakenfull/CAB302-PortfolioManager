@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane stylesheets="@registration.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.RegisterController">
+<BorderPane stylesheets="@registration.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.RegisterController">
    <center>
         <GridPane alignment="CENTER" hgap="10" vgap="10" BorderPane.alignment="CENTER">
             <!-- Username -->
@@ -21,10 +27,13 @@
             <!-- Confirm Password -->
             <Label text="Confirm Password:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
             <PasswordField fx:id="confirmPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <!-- Balance -->
+         <Label text="Balance" GridPane.rowIndex="4" />
+         <TextField fx:id="balanceField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
             <!-- Register Button -->
-            <Button onAction="#handleRegister" text="Register" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-         <GridPane GridPane.columnIndex="1" GridPane.rowIndex="6">
+            <Button onAction="#handleRegister" text="Register" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+         <GridPane GridPane.columnIndex="1" GridPane.rowIndex="8">
            <columnConstraints>
              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -33,7 +42,7 @@
              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
            </rowConstraints>
             <children>
-
+      
                               <!-- Switch to Login Page Button -->
                   <Button onAction="#switchToLogin" prefHeight="25.0" prefWidth="60.0" text="Login" GridPane.halignment="CENTER" />
                <Button alignment="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Register" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
@@ -45,6 +54,8 @@
             <ColumnConstraints />
          </columnConstraints>
          <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
             <RowConstraints />
             <RowConstraints />
             <RowConstraints />

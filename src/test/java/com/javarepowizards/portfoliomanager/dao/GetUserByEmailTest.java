@@ -29,7 +29,7 @@ public class GetUserByEmailTest{
 
         // Insert a known user to retrieve in the tests
         User u = new User(USERNAME, EMAIL, HASHED_PASS);
-        assertTrue(userDAO.createUser(u));
+        assertTrue(userDAO.createUser(u, 10000.00));
     }
 
     @Test

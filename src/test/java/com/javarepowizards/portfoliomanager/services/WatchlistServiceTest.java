@@ -80,7 +80,7 @@ class WatchlistServiceTest {
             stmt.executeUpdate("DELETE FROM user_auth");
         }
         User u = new User("test-user", "test@example.com", "passwordHash");
-        userDAO.createUser(u);
+        userDAO.createUser(u, 10000.00);
         Session.setCurrentUser(u);
     }
 

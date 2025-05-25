@@ -171,15 +171,7 @@ public class MainController implements Initializable {
         });
     }
 
-    private void loadPage(String page) {
-        try {
-            Parent fxml = FXMLLoader.load(getClass().getResource("/com/javarepowizards/portfoliomanager/views/" + page));
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(fxml);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     private void setActivePage(Button activePageButton) {
         menuButtons.forEach(btn -> btn.getStyleClass().remove("active"));

@@ -66,72 +66,26 @@
                     <String fx:value="company-snapshot-title" />
                 </styleClass>
             </Text>
+
+            <Label fx:id="cashBalanceLabel"
+                   text="Cash: $0.00"
+                   style="-fx-font-size: 16px; -fx-text-fill: white;" />
+
+            <Label fx:id="portfolioValueLabel"
+                   text="Portfolio: $0.00"
+                   style="-fx-font-size: 16px; -fx-text-fill: white;" />
+
             <Separator prefWidth="200.0" styleClass="balance-text" />
             <HBox prefHeight="200.0" prefWidth="200.0">
                 <VBox.margin>
                     <Insets top="10.0" />
                 </VBox.margin>
-                <VBox prefHeight="200.0" prefWidth="100.0">
-                    <PieChart prefHeight="200.0" prefWidth="200.0" />
-                </VBox>
-                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="CBA">
-                            <HBox.margin>
-                                <Insets left="20.0" />
-                            </HBox.margin>
-                        </Text>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-positive" text="+2.4%">
-                            <HBox.margin>
-                                <Insets left="20.0" />
-                            </HBox.margin>
-                        </Text>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="CSL">
-                            <HBox.margin>
-                                <Insets left="20.0" />
-                            </HBox.margin>
-                        </Text>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-neutral" text="0.0%">
-                            <HBox.margin>
-                                <Insets left="20.0" />
-                            </HBox.margin>
-                        </Text>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                        <VBox.margin>
-                            <Insets />
-                        </VBox.margin>
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="BHP">
-                            <HBox.margin>
-                                <Insets left="20.0" />
-                            </HBox.margin>
-                        </Text>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-negative" text="-2.4%">
-                            <HBox.margin>
-                                <Insets left="20.0" />
-                            </HBox.margin>
-                        </Text>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                        <VBox.margin>
-                            <Insets />
-                        </VBox.margin>
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-text" text="APT">
-                            <HBox.margin>
-                                <Insets left="20.0" />
-                            </HBox.margin>
-                        </Text>
-                        <Text fill="#65a24b" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="balance-value-positive" text="+2.4%">
-                            <HBox.margin>
-                                <Insets left="20.0" />
-                            </HBox.margin>
-                        </Text>
-                    </HBox>
+                <!-- Pie Chart for visual holdings -->
+                <VBox prefHeight="200.0" prefWidth="200.0">
+                    <PieChart fx:id="portfolioPieChart" prefHeight="200.0" prefWidth="200.0" />
                 </VBox>
             </HBox>
-        </VBox>
+                </VBox>
         <Region prefHeight="64.0" prefWidth="331.0" />
         <VBox prefHeight="538.0" prefWidth="331.0">
             <VBox.margin>
@@ -193,12 +147,28 @@
                             </font>
                         </Button>
                     </HBox>
-                    <Label alignment="CENTER" fx:id="buyFeedbackLabel" contentDisplay="CENTER" prefHeight="35.0" prefWidth="205.0" text="No Stock Selected!" textAlignment="CENTER" textFill="RED">
-                        <font>
-                            <Font size="24.0" />
-                        </font>
+                    <Label fx:id="pricePerShareLabel"
+                           text="Price: $0.00"
+                           alignment="CENTER"
+                           textAlignment="CENTER"
+                           wrapText="true"
+                           maxWidth="Infinity"
+                           style="-fx-font-size: 16px; -fx-text-fill: #cccccc; -fx-font-weight: normal;">
                         <VBox.margin>
-                            <Insets left="45.0" right="32.0" />
+                            <Insets top="6.0" bottom="4.0"/>
+                        </VBox.margin>
+                    </Label>
+                    <Label fx:id="buyFeedbackLabel"
+                           alignment="CENTER"
+                           text="No Stock Selected!"
+                           wrapText="true"
+                           textAlignment="CENTER"
+                           contentDisplay="CENTER"
+                           maxWidth="Infinity"
+                           prefWidth="280.0"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f75fe;">
+                        <VBox.margin>
+                            <Insets left="24.0" right="24.0" top="10.0" bottom="10.0"/>
                         </VBox.margin>
                     </Label>
                     <Region prefHeight="203.0" prefWidth="297.0" />

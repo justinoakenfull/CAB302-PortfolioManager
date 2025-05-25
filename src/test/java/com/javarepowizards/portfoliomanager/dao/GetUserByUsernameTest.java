@@ -25,7 +25,7 @@ public class GetUserByUsernameTest {
 
         // Insert a known user into the test database
         User testUser = new User ("johnsmith", "john@gmail.com", "hashpassword123");
-        userDAO.createUser(testUser);
+        userDAO.createUser(testUser, 10000);
     }
 
     @Test

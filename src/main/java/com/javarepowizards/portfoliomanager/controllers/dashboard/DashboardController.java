@@ -1,195 +1,54 @@
 package com.javarepowizards.portfoliomanager.controllers.dashboard;
 
-
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
-import com.javarepowizards.portfoliomanager.dao.IUserDAO;
-import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
-import com.javarepowizards.portfoliomanager.dao.StockDAO;
-import com.javarepowizards.portfoliomanager.domain.stock.IStock;
-import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
-import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
-import com.javarepowizards.portfoliomanager.models.StockName;
-import com.javarepowizards.portfoliomanager.services.IWatchlistService;
-import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
-import com.javarepowizards.portfoliomanager.ui.QuickTips;
-import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
-import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
-import javafx.collections.FXCollections;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-
-import javafx.collections.ObservableList;
-import javafx.fxml.Initializable;
-import javafx.scene.chart.PieChart;
-import javafx.scene.control.Label;
+import com.javarepowizards.portfoliomanager.domain.IStockRepoReadOnly;
+import com.javarepowizards.portfoliomanager.domain.IWatchlistReadOnly;
+import com.javarepowizards.portfoliomanager.services.PortfolioChartPresenter;
+import com.javarepowizards.portfoliomanager.services.WatchlistTablePresenter;
+import com.javarepowizards.portfoliomanager.ui.QuickTips;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.Locale;
-
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
-import java.time.LocalDate;
+import javafx.scene.layout.VBox;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
- * Controller class for Dashboard view.
- * Manages the quick tips section and watchlist table display
+ * Controller for the Dashboard View.
+ * Composes the watchlist table and portfolio overview chart,
+ * and starts the QuickTips rotation.
  */
 public class DashboardController implements Initializable {
 
-    @FXML private VBox tableContainer;
-    // Label that displays rotating investment tips
-    @FXML private  Label quickTipsLabel;
-    @FXML private Pane portfolioPieContainer;
+    @FXML
+    private VBox  tableContainer;
 
-    // Tableview and columns for the watchlist section
-    @FXML private TableView<WatchlistRow> watchlistTable;
+    @FXML
+    private Label quickTipsLabel;
 
+    @FXML
+    private Pane  portfolioPieContainer;
 
-    // Watchlist Service refactor
-    private IWatchlistService watchlistService;
-    private final IPortfolioDAO portfolioDAO = AppContext.getService(IPortfolioDAO.class);
-
-    private StockRepository repo;
+    private WatchlistTablePresenter watchlistPresenter;
+    private PortfolioChartPresenter portfolioPresenter;
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.watchlistService = AppContext.getService(IWatchlistService.class);
-        this.repo = AppContext.getService(StockRepository.class);
-        IUserDAO userDAO = AppContext.getService(IUserDAO.class);
-        buildPortfolioPieChart();
-        //Start rotating investment tips
+    public void initialize(URL url, ResourceBundle rb) {
+        // Inject and build the watchlist table
+        watchlistPresenter = new WatchlistTablePresenter(
+                tableContainer,
+                AppContext.getService(IWatchlistReadOnly.class),
+                AppContext.getService(IStockRepoReadOnly.class));
+
+        // Inject and build the portfolio overview chart
+        portfolioPresenter = new PortfolioChartPresenter(
+                portfolioPieContainer,
+                AppContext.getService(IPortfolioDAO.class));
+
+        // Start the rotating QuickTips
         new QuickTips(quickTipsLabel).start();
-        try {
-            refreshTable();
-
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
     }
-
-    private void refreshTable() throws IOException, SQLException {
-
-        List<IStock> watchlistStocks = watchlistService.getWatchlistRows().stream()
-                .map(row -> {
-                    try {
-                        return watchlistService.getStock(
-                                StockName.fromString(row.shortNameProperty().get())
-                        );
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                }).toList();
-        List<WatchlistRow> rows = new ArrayList<>();
-
-        Set<String> available = repo.availableTickers();
-
-        for (IStock stock : watchlistStocks) {
-            String ticker = stock.getTicker();
-            if (!available.contains(ticker)) {
-                System.err.println("No CSV history for " + ticker + ", skipping");
-                continue;
-            }
-
-            rows.add(new WatchlistRow(stock, () -> {
-                try {
-                    watchlistService.removeStock(stock);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    refreshTable();
-                } catch (IOException | SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }));
-        }
-        ObservableList<WatchlistRow> model = FXCollections.observableArrayList(rows);
-        // 2) describe columns
-        List<ColumnConfig<WatchlistRow,?>> cols = List.of(
-                new ColumnConfig<>("Ticker",
-                        WatchlistRow::shortNameProperty),
-                new ColumnConfig<>("Name",
-                        WatchlistRow::displayNameProperty),
-                new ColumnConfig<>("Open",
-                        r -> r.openProperty().asObject(),
-                        TableCellFactories.numericFactory(2,false)),
-                new ColumnConfig<>("Close",
-                        r -> r.closeProperty().asObject(),
-                        TableCellFactories.numericFactory(2,false)),
-                new ColumnConfig<>("Change",
-                        r -> r.changeProperty().asObject(),
-                        TableCellFactories.numericFactory(2,true)),
-                new ColumnConfig<>("Change %",
-                        r -> r.changePercentProperty().asObject(),
-                        TableCellFactories.numericFactory(2,true)),
-                new ColumnConfig<>("Price",
-                        r -> r.priceProperty().asObject(),
-                        TableCellFactories.currencyFactory(new Locale("en","AU"), 2)),
-                new ColumnConfig<>("Volume",
-                        r -> r.volumeProperty().asObject(),
-                        TableCellFactories.longFactory())
-        );
-
-
-        TableView<WatchlistRow> table = TableViewFactory.create(cols);
-
-
-        table.getStyleClass().add("watchlist-table");
-
-        table.setEffect(watchlistTable.getEffect());
-
-        HBox.setHgrow(table, Priority.ALWAYS);
-        VBox.setVgrow(table, Priority.ALWAYS);
-
-        tableContainer.getChildren().setAll(table);
-        watchlistTable = table;
-        table.setItems(model);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        table.getColumns().forEach(col ->
-                col.getStyleClass().add("column-header-background")
-        );
-    }
-
-    private void buildPortfolioPieChart(){
-        StockDAO stockDAO = StockDAO.getInstance();
-        List<PortfolioEntry> entries = portfolioDAO.getHoldings();
-
-        double totalValue = entries.stream()
-                .mapToDouble(PortfolioEntry::getMarketValue)
-                .sum();
-
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-
-        for (PortfolioEntry entry : entries) {
-            double value = entry.getMarketValue();
-            pieData.add(new PieChart.Data(entry.getStock().getSymbol(),value));
-        }
-
-        // build & size a new chart
-        PieChart chart = new PieChart(pieData);
-        chart.setLegendVisible(true);
-        chart.setLabelsVisible(true);
-
-        chart.minWidthProperty().bind(portfolioPieContainer.widthProperty());
-        chart.minHeightProperty().bind(portfolioPieContainer.heightProperty());
-        chart.maxWidthProperty().bind(portfolioPieContainer.widthProperty());
-        chart.maxHeightProperty().bind(portfolioPieContainer.heightProperty());
-
-        portfolioPieContainer.getChildren().setAll(chart);
-    }
-
-
 }
-
-

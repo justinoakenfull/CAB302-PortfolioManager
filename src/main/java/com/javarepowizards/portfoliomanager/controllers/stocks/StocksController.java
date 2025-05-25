@@ -12,6 +12,7 @@ import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,39 +34,106 @@ import java.util.ResourceBundle;
 /**
  * Controller for the Stocks view.
  * Responsible for:
- *   Initializing the stocks TableView with data and custom cell formatting.
- *   Handling user interactions such as buying a stock.
- *   Binding UI elements for responsive layout.
+ * Initializing the stocks TableView with data and custom cell formatting.
+ * Handling user interactions such as buying a stock.
+ * Binding UI elements for responsive layout.
  */
 public class StocksController implements Initializable {
 
     // --- FXML-injected UI components ---
-    @FXML private TableView<StockRow> tableView;      // Main table of available stocks
-    @FXML private TextField stockQuantityField;            // User input for quantity to buy
-    @FXML private Label buyFeedbackLabel;             // Feedback label for buy actions
-    @FXML private Button buyStockButton;              // Button to trigger buy operation
-    @FXML private VBox portfolioBox;                  // Container for portfolio pie chart
-    // @FXML private Label portfolioHeading;             // Heading label for portfolio pane
-    @FXML private TableColumn<StockRow, Void> infoCol;
-    @FXML private TableColumn<StockRow, Void> favouriteCol;
+    /**
+     * Main table of available stocks
+     */
+    @FXML
+    private TableView<StockRow> tableView;
+    /**
+     * User input for quantity to buy
+     */
+    @FXML
+    private TextField stockQuantityField;
+    /**
+     * Feedback label for buy actions
+     */
+    @FXML
+    private Label buyFeedbackLabel;
+    /**
+     * Button to trigger buy operation
+     */
+    @FXML
+    private Button buyStockButton;
+    /**
+     * Container for portfolio pie chart
+     */
+    @FXML
+    private VBox portfolioBox;
+    /**
+     * Column for info buttons
+     */
+    @FXML
+    private TableColumn<StockRow, Void> infoCol;
+    /**
+     * Column for favourite toggle buttons
+     */
+    @FXML
+    private TableColumn<StockRow, Void> favouriteCol;
+    /**
+     * Label for price per share
+     */
+    @FXML
+    private Label pricePerShareLabel;
+    /**
+     * Label for available cash balance
+     */
+    @FXML
+    private Label cashBalanceLabel;
+    /**
+     * Label for overall portfolio value
+     */
+    @FXML
+    private Label portfolioValueLabel;
+    /**
+     * Label for search for stock
+     */
+    @FXML
+    private TextField stockSearchField;
 
     // --- Data access objects ---
-    private IPortfolioDAO portfolioDAO;               // DAO for managing portfolio entries
-    private StockRepository stockRepository;          // Repository for fetching stock data
+    /**
+     * DAO for managing portfolio entries
+     */
+    private IPortfolioDAO portfolioDAO;
+    /**
+     * Repository for fetching stock data
+     */
+    private StockRepository stockRepository;
 
+    /**
+     * DAO for accessing user information
+     */
     @Autowired
-    // Data access objects and current user ID
-
     private IUserDAO userDAO;
-
+    /**
+     * DAO for managing watchlist data
+     */
     private IWatchlistDAO watchlistDAO;
+    /**
+     * Current logged-in user ID
+     */
     private int currentUserId;
 
-    // Master list of all stocks for search filtering
+    /**
+     * Master list of all stocks for search filtering
+     */
     private final ObservableList<StockRow> allStocks = FXCollections.observableArrayList();
 
+    /**
+     * Initializes the controller and its UI components.
+     * Sets up DAOs, retrieves initial user and stock data,
+     * sets up table columns, and event handlers.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Retrieve services from application context
         watchlistDAO = AppContext.getService(IWatchlistDAO.class);
         IUserDAO userDAO = AppContext.getService(IUserDAO.class);
 
@@ -74,9 +142,16 @@ public class StocksController implements Initializable {
 
         // Clear existing columns and set up fresh ones
         tableView.getColumns().clear();
+
         // Retrieve application services
         stockRepository = AppContext.getService(StockRepository.class);
         portfolioDAO = AppContext.getService(IPortfolioDAO.class);
+
+        // Display initial cash balance
+        double balance = portfolioDAO.getAvailableBalance();
+        updateCashBalanceLabel();
+        cashBalanceLabel.setText(String.format("Cash: $%.2f", balance));
+        updateBalanceLabels();
 
         // --- TableColumn setup ---
 
@@ -102,16 +177,11 @@ public class StocksController implements Initializable {
 
         // Column for percentage change
         TableColumn<StockRow, Double> changePctCol = new TableColumn<>("Change (%)");
-        TableColumn<StockRow, Long>   volumeCol    = new TableColumn<>("Volume (M)");
-
-        openCol.setCellValueFactory(cell -> cell.getValue().openProperty().asObject());
-        closeCol.setCellValueFactory(cell -> cell.getValue().closeProperty().asObject());
-        changeCol.setCellValueFactory(cell -> cell.getValue().changeProperty().asObject());
         changePctCol.setCellValueFactory(cell -> cell.getValue().changePercentProperty().asObject());
 
         // Column for trading volume
+        TableColumn<StockRow, Long> volumeCol = new TableColumn<>("Volume (M)");
         volumeCol.setCellValueFactory(cell -> cell.getValue().volumeProperty().asObject());
-
 
         // --- Cell formatting ---
 
@@ -139,7 +209,7 @@ public class StocksController implements Initializable {
         closeCol.setCellFactory(twoDecimalFactory);
         changeCol.setCellFactory(twoDecimalFactory);
 
-        // Factory for Change (%) column: append “%”, color red/green
+        // Factory for Change (%) column: append "%", color red/green
         changePctCol.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Double value, boolean empty) {
@@ -152,14 +222,11 @@ public class StocksController implements Initializable {
                     return;
                 }
 
-                // Compute percentage
+                // Compute percentage and style accordingly
                 double pct = value;
                 setText(String.format("%.2f%%", pct));
-
-                // Reset any previous style classes
                 getStyleClass().removeAll("balance-value-positive", "balance-value-negative");
 
-                // Tag with CSS class for coloring
                 if (pct < 0) {
                     getStyleClass().add("balance-value-negative");
                 } else {
@@ -178,44 +245,65 @@ public class StocksController implements Initializable {
 
         // --- Data loading ---
         try {
+            // Attempt to load available stocks into the table
             loadStocks();
+            stockSearchField.textProperty().addListener((obs, oldVal, newVal) -> {
+                String lower = newVal.toLowerCase();
+                filteredStocks.setPredicate(stock -> {
+                    if (lower.isEmpty()) return true;
+                    return stock.tickerProperty().get().toLowerCase().contains(lower)
+                            || stock.companyNameProperty().get().toLowerCase().contains(lower);
+                });
+            });
+
         } catch (IOException e) {
             // Display error in feedback label if stock data cannot be loaded
             buyFeedbackLabel.setText("Error loading stock data");
             buyFeedbackLabel.setTextFill(Color.RED);
         }
 
-
         // --- Event handlers ---
+        // Set action for the Buy button to trigger stock purchase logic
         buyStockButton.setOnAction(e -> handleBuyStock());
 
+        // Initialize the info and favourite columns with custom cells
         setupInfoColumn();
         setupFavouriteColumn();
+
+        // Add interactive columns to the table
         tableView.getColumns().addAll(favouriteCol, infoCol);
-
-
     }
 
+    /**
+     * Initializes the 'Favourite' column with toggleable star buttons.
+     * Each cell contains a button to mark or unmark a stock as favourite.
+     * Uses DAO methods to check and update user watchlist.
+     */
     private void setupFavouriteColumn() {
         favouriteCol.setCellFactory(new Callback<>() {
             @Override
             public TableCell<StockRow, Void> call(final TableColumn<StockRow, Void> param) {
                 return new TableCell<>() {
+                    // Button to toggle favourite state
                     private final Button btn = new Button();
+                    // Icons for favourited and unfavourited states
                     private final ImageView unfavourited = new ImageView(
                             new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/Unfavourited32x32.png"))));
                     private final ImageView favourite = new ImageView(
                             new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/Favourited32x32.png"))));
-                    {
 
+                    {
+                        // Set icon sizes
                         unfavourited.setFitWidth(32);
                         unfavourited.setFitHeight(32);
                         favourite.setFitWidth(32);
                         favourite.setFitHeight(32);
 
+                        // Style the button to only show the graphic
                         btn.getStyleClass().add("image-button");
                         btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
+                        // Define button action to toggle favourite state
                         btn.setOnAction((ActionEvent event) -> {
                             StockRow data = getTableView().getItems().get(getIndex());
                             String ticker = data.tickerProperty().get();
@@ -224,10 +312,12 @@ public class StocksController implements Initializable {
                             try {
                                 List<StockName> favorites = watchlistDAO.listForUser(currentUserId);
                                 if (favorites.contains(stockName)) {
+                                    // Remove from favourites if already present
                                     watchlistDAO.removeForUser(currentUserId, stockName);
                                     btn.setGraphic(unfavourited);
                                     btn.setTooltip(new Tooltip("Add to favourites"));
                                 } else {
+                                    // Add to favourites
                                     watchlistDAO.addForUser(currentUserId, stockName);
                                     btn.setGraphic(favourite);
                                     btn.setTooltip(new Tooltip("Remove from favourites"));
@@ -237,12 +327,14 @@ public class StocksController implements Initializable {
                             }
                         });
                     }
+
                     @Override
                     public void updateItem(Void item, boolean empty) {
                         super.updateItem(item, empty);
                         if (empty) {
                             setGraphic(null);
                         } else {
+                            // Determine current stock and update button appearance
                             StockRow data = getTableView().getItems().get(getIndex());
                             String ticker = data.tickerProperty().get();
                             StockName stockName = StockName.fromString(ticker);
@@ -251,6 +343,7 @@ public class StocksController implements Initializable {
                                 List<StockName> favourites = watchlistDAO.listForUser(currentUserId);
                                 boolean isFavourite = favourites.contains(stockName);
 
+                                // Set appropriate graphic and tooltip
                                 btn.setGraphic(isFavourite ? favourite : unfavourited);
                                 btn.setTooltip(new Tooltip(isFavourite ? "Remove from favourites" : "Add to favourites"));
                             } catch (SQLException e) {
@@ -264,29 +357,39 @@ public class StocksController implements Initializable {
         });
     }
 
+    /**
+     * Initializes the 'Info' column with buttons to select a stock row.
+     * Each cell includes a button that, when clicked, selects the corresponding
+     * stock row and updates feedback labels with details.
+     */
     private void setupInfoColumn() {
         infoCol.setCellFactory(new Callback<>() {
             @Override
             public TableCell<StockRow, Void> call(final TableColumn<StockRow, Void> param) {
                 return new TableCell<>() {
                     private final Button btn = new Button();
+
                     {
+                        // Load and set icon for the button
                         ImageView imageView = new ImageView(
-                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockInfo64x64.png")));
+                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockButtonAdd64x64.png")));
                         imageView.setFitWidth(32);
                         imageView.setFitHeight(32);
                         btn.setGraphic(imageView);
                         btn.getStyleClass().add("image-button");
                         btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+                        // Set action to select the stock and show info
                         btn.setOnAction((ActionEvent event) -> {
                             StockRow data = getTableView().getItems().get(getIndex());
                             tableView.getSelectionModel().select(data);
                             selectStocks();
                         });
 
-                        // Tooltip for better UX
+                        // Tooltip for user guidance
                         btn.setTooltip(new Tooltip("Check this stock out"));
                     }
+
                     @Override
                     public void updateItem(Void item, boolean empty) {
                         super.updateItem(item, empty);
@@ -301,6 +404,8 @@ public class StocksController implements Initializable {
         });
     }
 
+    private FilteredList<StockRow> filteredStocks;
+
     /**
      * Loads stock data from the repository and populates the TableView.
      *
@@ -312,25 +417,24 @@ public class StocksController implements Initializable {
         // Iterate over all available tickers
         for (String ticker : stockRepository.availableTickers()) {
             IStock stock = stockRepository.getByTicker(ticker);
-
-            // Only add rows for stocks with valid data
             if (stock != null && stock.getCurrentRecord() != null) {
                 rows.add(new StockRow(stock));
             }
         }
-        // Populate the table
-        tableView.setItems(rows);
+
+        allStocks.setAll(rows); // Keep a reference for filtering
+        filteredStocks = new FilteredList<>(allStocks, p -> true);
+        tableView.setItems(filteredStocks);
     }
 
     /**
-     * Handles the “Buy” button action.
-     * Validates the selected stock and quantity, then creates a PortfolioEntry
-     * and saves it via the PortfolioDAO. Feedback is shown in the buyFeedbackLabel.
+     * Handles the Buy button action.
+     * Validates the selected stock and quantity. Creates a PortfolioEntry
+     * and updates DAO and UI accordingly.
      */
     private void handleBuyStock() {
         StockRow selected = tableView.getSelectionModel().getSelectedItem();
 
-        // If no stock is selected, show error
         if (selected == null) {
             buyFeedbackLabel.setText("No Stock Selected!");
             buyFeedbackLabel.setTextFill(Color.RED);
@@ -338,37 +442,53 @@ public class StocksController implements Initializable {
         }
 
         try {
-            // Parse user-entered quantity
             int quantity = Integer.parseInt(stockQuantityField.getText());
 
-            // Build a PortfolioEntry and persist it
             StockName stockName = StockName.fromString(selected.tickerProperty().get());
             double price = selected.closeProperty().get();
             PortfolioEntry entry = new PortfolioEntry(stockName, price, quantity);
 
-            // Update in-memory DAO
-            portfolioDAO.addToHoldings(entry);
-            // Persist to database
             double totalValue = price * quantity;
-            portfolioDAO.upsertHolding(currentUserId, stockName, quantity, totalValue);
+            double currentBalance = portfolioDAO.getAvailableBalance();
 
-            // Success feedback
+            if (totalValue > currentBalance) {
+                buyFeedbackLabel.setText("Insufficient balance. You need $" + String.format("%.2f", totalValue));
+                buyFeedbackLabel.setTextFill(Color.RED);
+                return;
+            }
+
+            portfolioDAO.addToHoldings(entry);
+            portfolioDAO.upsertHolding(currentUserId, stockName, quantity, totalValue);
+            portfolioDAO.deductFromBalance(currentUserId, totalValue);
+
+            // Refresh balance labels
+            updateCashBalanceLabel();
+            updateBalanceLabels();
+
             buyFeedbackLabel.setText("Bought " + quantity + " " + stockName.getSymbol());
             buyFeedbackLabel.setTextFill(Color.LIGHTGREEN);
 
         } catch (NumberFormatException ex) {
-            // Handle invalid number input
             buyFeedbackLabel.setText("Invalid quantity.");
             buyFeedbackLabel.setTextFill(Color.RED);
 
         } catch (Exception ex) {
-            // Handle other persistence errors
             buyFeedbackLabel.setText("Error: " + ex.getMessage());
             buyFeedbackLabel.setTextFill(Color.RED);
         }
     }
 
-    // Increases purchase amount by 1, defaults to 1 on invalid input
+    /**
+     * Updates the label showing the user's available cash.
+     */
+    private void updateCashBalanceLabel() {
+        double balance = portfolioDAO.getAvailableBalance();
+        cashBalanceLabel.setText(String.format("Cash: $%.2f", balance));
+    }
+
+    /**
+     * Increases the purchase amount by one, default to 1 if invalid.
+     */
     @FXML
     private void increasePurchaseAmount() {
         try {
@@ -377,9 +497,12 @@ public class StocksController implements Initializable {
         } catch (NumberFormatException e) {
             stockQuantityField.setText("1");
         }
+        selectStocks();
     }
 
-    // Decreases purchase amount by 1, minimum of 1, defaults to 1 on invalid input
+    /**
+     * Decreases the purchase amount by one, not below 1.
+     */
     @FXML
     private void decreasePurchaseAmount() {
         try {
@@ -390,26 +513,48 @@ public class StocksController implements Initializable {
         } catch (NumberFormatException e) {
             stockQuantityField.setText("1");
         }
+        selectStocks();
     }
 
-    // Updates feedback label when a row is selected via info button
+    /**
+     * Updates UI when a stock is selected via the info button.
+     */
     @FXML
     private void selectStocks() {
         StockRow selected = tableView.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
             buyFeedbackLabel.setText("No Stock Selected!");
-            buyFeedbackLabel.getStyleClass().add("buy-feedback-label-none");
             buyFeedbackLabel.setTextFill(Color.RED);
+            buyFeedbackLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            pricePerShareLabel.setText(""); // Clear the price label
         } else {
-            buyFeedbackLabel.setText(selected.companyNameProperty().get());
-            buyFeedbackLabel.getStyleClass().add("buy-feedback-label-selected");
-            buyFeedbackLabel.setTextFill(Color.GREEN);
+            String name = selected.companyNameProperty().get();
+            String ticker = selected.tickerProperty().get();
+            double price = selected.closeProperty().get();
+            buyFeedbackLabel.setText(name + " (" + ticker + ")");
+            buyFeedbackLabel.setTextFill(Color.web("#1f75fe"));
+            buyFeedbackLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            try {
+                int quantity = Integer.parseInt(stockQuantityField.getText().trim());
+                double total = price * quantity;
+                pricePerShareLabel.setText(String.format("Total: $%.2f", total));
+            } catch (NumberFormatException e) {
+                pricePerShareLabel.setText("Total: $0.00");
+            }
         }
     }
 
+    /**
+     * Updates the labels showing cash and holdings values.
+     */
+    private void updateBalanceLabels() {
+        double cash = portfolioDAO.getAvailableBalance();
+        double total = portfolioDAO.getTotalPortfolioValue();
+        double holdings = total - cash;
 
-
-
-
+        cashBalanceLabel.setText(String.format("Cash: $%,.2f", cash));
+        portfolioValueLabel.setText(String.format("Portfolio: $%,.2f", holdings));
+    }
 }
+

@@ -76,13 +76,17 @@ public class OllamaService {
     }
 
     /**
-     * Sends the given prompt to /api/generate using the detected model.
+     * Generates a response from the Ollama model based on the provided prompt.
+     * If no model is detected, it throws an IllegalStateException.
+     *
+     * @param prompt The input prompt for the model.
+     * @return The generated response as a String.
+     * @throws IOException if an error occurs during the HTTP request or response handling.
      */
     public String generateResponse(String prompt) throws IOException {
         if (modelName == null) {
             throw new IllegalStateException("No Ollama model detected");
-            // This shouldnt be hit cause we shouldnt call it if there is no model
-            // but we want to make sure we don't crash if no ollama model is running.
+
         }
 
         HttpURLConnection conn = (HttpURLConnection) new URL(GENERATE_URL).openConnection();

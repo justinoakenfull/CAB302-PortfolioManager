@@ -46,5 +46,6 @@ module com.javarepowizards.portfoliomanager {
 
 
     exports com.javarepowizards.portfoliomanager.domain.price;
+    exports com.javarepowizards.portfoliomanager.domain;
 
 }
