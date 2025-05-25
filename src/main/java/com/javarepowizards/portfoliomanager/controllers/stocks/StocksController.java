@@ -457,7 +457,6 @@ public class StocksController implements Initializable {
                 return;
             }
 
-            portfolioDAO.addToHoldings(entry);
             portfolioDAO.upsertHolding(currentUserId, stockName, quantity, totalValue);
             portfolioDAO.deductFromBalance(currentUserId, totalValue);
 

@@ -267,22 +267,22 @@ public class PortfolioDAO implements IPortfolioDAO {
     @Override
     public double getTotalPortfolioValue() {
         if (!dbMode) {
-            double total = availableBalance;
-            for (PortfolioEntry e : holdings) {
-                total += e.getMarketValue();
-            }
-            return total;
+            double totalHoldings = holdings.stream()
+                    .mapToDouble(PortfolioEntry::getMarketValue)
+                    .sum();
+            return availableBalance + totalHoldings;
         }
 
         int userId = Session.getCurrentUser().getUserId();
         double cash = getAvailableBalance();
+
         String sql = "SELECT SUM(holding_value) AS total FROM user_holdings WHERE user_id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
-                double sum = rs.next() ? rs.getDouble("total") : 0.0;
-                return cash + sum;
+                double holdings = rs.next() ? rs.getDouble("total") : 0.0;
+                return cash + holdings; // cash + actual stock value
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to compute total for user " + userId, e);
