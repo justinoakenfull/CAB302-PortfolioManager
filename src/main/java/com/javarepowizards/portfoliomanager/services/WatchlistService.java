@@ -4,13 +4,13 @@ import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.domain.IWatchlistReadOnly;
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.User;
-import javafx.concurrent.Task;
 import javafx.scene.chart.PieChart;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.util.*;
  * adding, and removing stocks from the watchlist.  The UI layer
  * merely calls these methods and renders the returned data.
  */
-public class WatchlistService implements IWatchlistService {
+public class WatchlistService implements IWatchlistService, IWatchlistReadOnly {
     private final StockRepository stockRepo;
     private final IWatchlistDAO watchlistDAO;
     private final IUserDAO userDAO;
