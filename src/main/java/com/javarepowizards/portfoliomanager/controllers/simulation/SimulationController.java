@@ -62,6 +62,13 @@ public class SimulationController implements Initializable {
     private SimulationServices services;
 
 
+    /**
+     * Initializes the controller with the necessary services and UI components.
+     * This method is called by the JavaFX framework when the FXML file is loaded.
+     *
+     * @param url The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param resourceBundle The resources used to localize the root object, or null if no localization is needed.
+     */
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,6 +87,12 @@ public class SimulationController implements Initializable {
         btnRunSimulation.setOnAction(e -> runSimulation());
         progressIndicator.setVisible(false);
     }
+
+    /**
+     * Initializes the UI components with default values and settings.
+     * This method sets the initial text for labels, configures the axes of the chart,
+     * and prepares the UI for displaying simulation results.
+     */
 
     private void initializeUI(){
         // Set default labels and chart settings.
@@ -153,7 +166,8 @@ public class SimulationController implements Initializable {
 // ------------------------------------------------------------------
 
 
-    /** What to do when simulation finishes without error. */
+
+    /** on simulation success. */
     private void onSimSuccess(List<Double> values, int days) {
         updateChart(values);                                   // graph
         PortfolioStatistics.Metrics m =

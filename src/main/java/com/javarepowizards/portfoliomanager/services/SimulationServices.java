@@ -6,8 +6,7 @@ import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimul
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 /**
  * SimulationServices manages the business logic for running portfolio simulations.
@@ -19,10 +18,6 @@ public class SimulationServices implements ISimulationServices{
     private final IPortfolioDAO  portfolioDAO;
     private final StockDAO       stockDAO;
     private final LocalDate      mostRecentDate;
-
-
-
-
 
     private static final String PROMPT_TEMPLATE= """
             You are an AI tutor/grader built into a student investment-simulator. After I running the simulation, you use these results:
@@ -54,6 +49,13 @@ public class SimulationServices implements ISimulationServices{
             """;
 
 
+    /**
+     * Constructor for SimulationServices.
+     *
+     * @param portfolioDAO the PortfolioDAO to access portfolio data
+     * @param stockDAO the StockDAO to access stock data
+     * @param mostRecentDate the most recent date for simulation context (e.g., 2023-12-29)
+     */
 
     public SimulationServices(IPortfolioDAO portfolioDAO,
                              StockDAO stockDAO,
