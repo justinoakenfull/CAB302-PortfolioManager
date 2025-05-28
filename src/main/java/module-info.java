@@ -17,34 +17,21 @@ module com.javarepowizards.portfoliomanager {
     requires org.json;
     requires java.compiler;
 
+    exports com.javarepowizards.portfoliomanager.dao;
+
     opens com.javarepowizards.portfoliomanager to javafx.fxml;
     exports com.javarepowizards.portfoliomanager;
-
     exports com.javarepowizards.portfoliomanager.controllers.useraccounts to javafx.fxml;
-
     opens com.javarepowizards.portfoliomanager.controllers.useraccounts to javafx.fxml;
-
     opens com.javarepowizards.portfoliomanager.controllers.portfolio to javafx.fxml;
-
     opens com.javarepowizards.portfoliomanager.controllers.dashboard to javafx.fxml;
-
     opens com.javarepowizards.portfoliomanager.controllers.stocks to javafx.fxml;
-
-
     exports com.javarepowizards.portfoliomanager.controllers.dashboard;
     exports com.javarepowizards.portfoliomanager.domain.stock;
-
     exports com.javarepowizards.portfoliomanager.controllers.stocks to javafx.fxml;
-
-
-
     // Open the controllers.simulation package for reflection by javafx.fxml
     opens com.javarepowizards.portfoliomanager.controllers.simulation to javafx.fxml;
-
     opens com.javarepowizards.portfoliomanager.controllers.watchlist to javafx.fxml;
-
-
-
     exports com.javarepowizards.portfoliomanager.domain.price;
     exports com.javarepowizards.portfoliomanager.domain;
 

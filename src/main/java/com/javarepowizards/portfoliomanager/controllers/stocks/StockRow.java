@@ -3,12 +3,9 @@ package com.javarepowizards.portfoliomanager.controllers.stocks;
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import javafx.beans.property.*;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 
 /**
  * UI data model representing a row in the stock table.
- *
  * Extracts and wraps properties from an IStock object and its latest PriceRecord.
  * Provides observable properties for JavaFX bindings in the TableView.
  */
@@ -45,13 +42,13 @@ public class StockRow {
 
         ticker.set(stock.getTicker());
         companyName.set(stock.getCompanyName());
-        open.set(rec.getOpen());
-        close.set(rec.getClose());
+        open.set(rec.open());
+        close.set(rec.close());
 
-        double diff = rec.getClose() - rec.getOpen();
+        double diff = rec.close() - rec.open();
         change.set(diff);
-        changePercent.set(rec.getOpen() == 0 ? 0 : (diff / rec.getOpen()) * 100);
-        volume.set(rec.getVolume());
+        changePercent.set(rec.open() == 0 ? 0 : (diff / rec.open()) * 100);
+        volume.set(rec.volume());
     }
 
     /** @return Observable ticker property */

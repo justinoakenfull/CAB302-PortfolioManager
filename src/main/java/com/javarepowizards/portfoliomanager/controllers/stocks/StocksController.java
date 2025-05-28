@@ -4,12 +4,10 @@ import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
-import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
-import com.javarepowizards.portfoliomanager.services.IWatchlistService;
+import com.javarepowizards.portfoliomanager.models.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -19,14 +17,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -61,11 +57,7 @@ public class StocksController implements Initializable {
      */
     @FXML
     private Button buyStockButton;
-    /**
-     * Container for portfolio pie chart
-     */
-    @FXML
-    private VBox portfolioBox;
+
     /**
      * Column for info buttons
      */
@@ -108,11 +100,6 @@ public class StocksController implements Initializable {
     private StockRepository stockRepository;
 
     /**
-     * DAO for accessing user information
-     */
-    @Autowired
-    private IUserDAO userDAO;
-    /**
      * DAO for managing watchlist data
      */
     private IWatchlistDAO watchlistDAO;
@@ -138,7 +125,7 @@ public class StocksController implements Initializable {
         IUserDAO userDAO = AppContext.getService(IUserDAO.class);
 
         // Determine the current user's ID (default to 1 if not present)
-        currentUserId = userDAO.getCurrentUser().map(u -> u.getUserId()).orElse(1);
+        currentUserId = userDAO.getCurrentUser().map(User::getUserId).orElse(1);
 
         // Clear existing columns and set up fresh ones
         tableView.getColumns().clear();
@@ -237,10 +224,12 @@ public class StocksController implements Initializable {
 
         // Attach all columns to the TableView
         tableView.getColumns().addAll(
+                Arrays.asList(
                 tickerCol, nameCol,
                 openCol, closeCol,
                 changeCol, changePctCol,
                 volumeCol
+                )
         );
 
         // --- Data loading ---
@@ -271,7 +260,7 @@ public class StocksController implements Initializable {
         setupFavouriteColumn();
 
         // Add interactive columns to the table
-        tableView.getColumns().addAll(favouriteCol, infoCol);
+        tableView.getColumns().addAll(Arrays.asList(favouriteCol, infoCol));
     }
 
     /**
@@ -372,7 +361,7 @@ public class StocksController implements Initializable {
                     {
                         // Load and set icon for the button
                         ImageView imageView = new ImageView(
-                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockButtonAdd64x64.png")));
+                                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockButtonAdd64x64.png"))));
                         imageView.setFitWidth(32);
                         imageView.setFitHeight(32);
                         btn.setGraphic(imageView);
@@ -446,7 +435,6 @@ public class StocksController implements Initializable {
 
             StockName stockName = StockName.fromString(selected.tickerProperty().get());
             double price = selected.closeProperty().get();
-            PortfolioEntry entry = new PortfolioEntry(stockName, price, quantity);
 
             double totalValue = price * quantity;
             double currentBalance = portfolioDAO.getAvailableBalance();

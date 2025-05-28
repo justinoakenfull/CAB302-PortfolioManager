@@ -5,8 +5,8 @@ package com.javarepowizards.portfoliomanager.domain.stock;
  */
 public interface IStockDescription {
     /** A short (~100-word) description of the stock. */
-    String getShortDescription();
+    String shortDescription();
 
     /** A longer (~300-word) description of the stock. */
-    String getLongDescription();
+    String longDescription();
 }

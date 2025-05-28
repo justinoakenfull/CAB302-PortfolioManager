@@ -1,7 +1,6 @@
 package com.javarepowizards.portfoliomanager.controllers.portfolio;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
@@ -18,8 +17,6 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import com.javarepowizards.portfoliomanager.services.IWatchlistService;
-
-import java.sql.PreparedStatement;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -149,7 +146,7 @@ public class PortfolioController implements Initializable {
             portfolioDAO.sellHolding(currentUserId, entry.getStock());
             refreshPortfolio();  // Keep this here since it's UI-related
         } catch (Exception e) {
-            e.printStackTrace();
+            /* Consume the exception */
         }
     }
 
@@ -204,7 +201,6 @@ public class PortfolioController implements Initializable {
         try {
             holdings = portfolioDAO.getHoldingsForUser(currentUserId);
         } catch (Exception e) {
-            e.printStackTrace();
             return;  // bail out on error
         }
 

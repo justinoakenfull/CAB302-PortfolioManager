@@ -1,21 +1,17 @@
 package com.javarepowizards.portfoliomanager.domain.stock;
+
 /**
  * Immutable implementation of IStockDescription.
  * Encapsulates a brief and detailed description for a stock.
  */
-public class StockDescription implements IStockDescription {
-    private final String shortDescription;
-    private final String longDescription;
-
+public record StockDescription(String shortDescription, String longDescription) implements IStockDescription {
     /**
      * Creates a new StockDescription with the specified text values.
      *
      * @param shortDescription a concise description of the stock
-     * @param longDescription a detailed description of the stock
+     * @param longDescription  a detailed description of the stock
      */
-    public StockDescription(String shortDescription, String longDescription) {
-        this.shortDescription = shortDescription;
-        this.longDescription  = longDescription;
+    public StockDescription {
     }
 
     /**
@@ -24,7 +20,9 @@ public class StockDescription implements IStockDescription {
      * @return the short description string
      */
     @Override
-    public String getShortDescription() { return shortDescription; }
+    public String shortDescription() {
+        return shortDescription;
+    }
 
     /**
      * Returns the detailed description of the stock.
@@ -32,5 +30,7 @@ public class StockDescription implements IStockDescription {
      * @return the long description string
      */
     @Override
-    public String getLongDescription()  { return longDescription;  }
+    public String longDescription() {
+        return longDescription;
+    }
 }

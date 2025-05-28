@@ -19,7 +19,7 @@
     -fx-padding: 15;
 
 /* Shadow effect for widgets over dark background */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0, 4), 6, 0.2, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0, 0, 2);
 }
 
 /* Title styling */
