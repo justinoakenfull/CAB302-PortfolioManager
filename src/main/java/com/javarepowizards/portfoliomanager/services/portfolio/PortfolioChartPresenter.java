@@ -35,7 +35,7 @@ public class PortfolioChartPresenter {
     }
 
     /** Rebuilds the chart or empty message whenever holdings change */
-    void refresh() {
+    public void refresh() {
         target.getChildren().clear();
 
         int userId = Session.getCurrentUser().getUserId();
