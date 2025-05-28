@@ -3,12 +3,9 @@ package com.javarepowizards.portfoliomanager.controllers.stocks;
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import javafx.beans.property.*;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 
 /**
  * UI data model representing a row in the stock table.
- *
  * Extracts and wraps properties from an IStock object and its latest PriceRecord.
  * Provides observable properties for JavaFX bindings in the TableView.
  */
