@@ -8,6 +8,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Represents a stock with its identifying information,
+ * current price data, historical price service,
+ * and both short and long descriptions.
+ */
 public interface IStock {
     /** The ticker symbol, e.g. "AAPL" or "BHP". */
     String getTicker();

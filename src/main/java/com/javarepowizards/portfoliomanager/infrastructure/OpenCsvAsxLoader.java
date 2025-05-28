@@ -4,7 +4,6 @@ import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.StockDescription;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -85,7 +84,7 @@ public class OpenCsvAsxLoader implements PriceHistoryLoader {
 
         // finally sort each ticker’s history
         data.values()
-                .forEach(list -> list.sort(Comparator.comparing(PriceRecord::getDate)));
+                .forEach(list -> list.sort(Comparator.comparing(PriceRecord::date)));
     }
 
     /**

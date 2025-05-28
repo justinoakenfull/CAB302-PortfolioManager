@@ -15,7 +15,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -28,6 +27,13 @@ import static java.util.logging.Level.INFO;
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 
+
+/**
+ * Controller for the registration view.
+ * Handles user input validation, creation of new user accounts,
+ * and navigation back to the login screen.
+ * Retrieves required services from the application context.
+ */
 @Component
 public class RegisterController implements Initializable {
 
@@ -37,16 +43,22 @@ public class RegisterController implements Initializable {
     @FXML private PasswordField confirmPasswordField;
     @FXML private TextField balanceField;
 
-    @Autowired
     private IAuthService authService;
-
-
-    @Autowired
+    private IUserDAO userDAO;
     private RegistrationService registrationService;
 
-    @Autowired
-    private IUserDAO userDAO;
 
+
+
+
+
+    /**
+     * Initializes the controller after FXML components are loaded.
+     * Obtains UserDAO and AuthService instances from the application context.
+     *
+     * @param url the location used to resolve relative paths, or null if unknown
+     * @param resourceBundle the resources used to localize the root object, or null if none
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         userDAO = AppContext.getService(IUserDAO.class);
@@ -55,10 +67,11 @@ public class RegisterController implements Initializable {
     }
 
     /**
-     * Handles the registration process when the user clicks the "Register" button.
-     * Validates input fields, hashes the password, and creates a new user account.
+     * Handles the register button action.
+     * Validates all inputs, attempts to create a new user with the specified
+     * starting balance, and shows success or error alerts.
+     * On successful registration, clears the form and switches to the login view.
      */
-
     @FXML
     private void handleRegister() {
 
@@ -99,6 +112,11 @@ public class RegisterController implements Initializable {
     }
 
 
+    /**
+     * Switches the current scene to the login view.
+     * Loads the login FXML, replaces the root of the current scene,
+     * and updates the stage title and position.
+     */
     @FXML
     private void switchToLogin() {
         try {
@@ -116,6 +134,9 @@ public class RegisterController implements Initializable {
         }
     }
 
+    /**
+     * Clears all input fields on the registration form.
+     */
     private void clearForm() {
         usernameField.clear();
         emailField.clear();
@@ -124,6 +145,13 @@ public class RegisterController implements Initializable {
         balanceField.clear();
     }
 
+    /**
+     * Displays an alert dialog with the specified type, title, and message.
+     *
+     * @param alertType the type of alert to display
+     * @param title the title of the alert dialog
+     * @param message the content message of the alert dialog
+     */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
@@ -131,7 +159,6 @@ public class RegisterController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 
 
 }
