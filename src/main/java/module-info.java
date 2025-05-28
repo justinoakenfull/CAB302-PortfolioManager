@@ -50,5 +50,4 @@ module com.javarepowizards.portfoliomanager {
     opens com.javarepowizards.portfoliomanager.controllers.simulation to javafx.fxml;
     opens com.javarepowizards.portfoliomanager.controllers.stocks to javafx.fxml;
     opens com.javarepowizards.portfoliomanager.controllers.watchlist to javafx.fxml;
-    opens com.javarepowizards.portfoliomanager.controllers.main to javafx.fxml;
 }
