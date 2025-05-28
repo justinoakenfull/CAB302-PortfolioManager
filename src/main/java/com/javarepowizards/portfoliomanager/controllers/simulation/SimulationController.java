@@ -36,6 +36,7 @@ public class SimulationController implements Initializable {
     @FXML private NumberAxis xAxis;
     @FXML private NumberAxis yAxis;
     @FXML private Label labelBalance;
+    @FXML private Label labelHoldings;
     @FXML private Label labelPortfolioValue;
     @FXML private Label labelSharpeRatio;
     @FXML private Label labelVolatility;
@@ -106,7 +107,9 @@ public class SimulationController implements Initializable {
             double preValue = portfolioDAO.getTotalPortfolioValue();
             double preBalance = portfolioDAO.getAvailableBalance();
             labelBalance.setText(String.format("Balance: $%.2f", preBalance));
+            labelHoldings.setText(String.format("Holdings $%.2f", preValue - preBalance));
             labelPortfolioValue.setText(String.format("Portfolio: $%.2f", preValue));
+
 
             List<String> rows = portfolioDAO.getHoldings().stream()
                     .map(en -> String.format("%s: %d shares @ $%,.2f = $%,.2f",
@@ -126,15 +129,16 @@ public class SimulationController implements Initializable {
      */
     private void runSimulation() {
 
+
+
         if (!ollamaService.isServiceAvailable()) {           //  guard clause
             showOllamaWarning();
             return;
         }
-
+        prepareUiForSimulation();
         int simulationDays = (int) sliderSimulationDays.getValue();
         PortfolioSimulation engine = services.buildSimEngine(simulationDays);
 
-        prepareUiForSimulation();
 
         Task<List<Double>> simTask = new Task<>() {
             @Override protected List<Double> call() {
@@ -157,22 +161,7 @@ public class SimulationController implements Initializable {
 
 
 
-    /** on simulation success. */
-    private void onSimSuccess(List<Double> values, int days) {
-        updateChart(values);                                   // graph
-        PortfolioStatistics.Metrics m =
-                PortfolioStatistics.compute(values, days);
-        updateMetricLabels(m, values.getLast());  // numbers
-        String prompt = services.buildPrompt(m, values.getLast());
-        fetchAiSummary(prompt);                                // AI call
-    }
 
-    /** on simulation failure. */
-    private void onSimFailure(Throwable ex) {
-        labelReview.setText("⚠️ Simulation failed: " + ex.getMessage());
-        btnRunSimulation.setDisable(false);
-        progressIndicator.setVisible(false);
-    }
 
     /** Disable button, show spinner, reset label. */
     private void prepareUiForSimulation() {
@@ -199,7 +188,7 @@ public class SimulationController implements Initializable {
         labelVolatility      .setText("%.2f%%".formatted(m.annualisedVolatilityPct()));
         labelSharpeRatio     .setText("%.2f".formatted(m.annualisedSharpe()));
         labelPortfolioValue  .setText("Portfolio: $%,.2f".formatted(latestValue));
-        // labelBalance        .setText("Balance: $%,.2f".formatted(portfolioDAO.getAvailableBalance())); Cash Balance need to come back
+        labelHoldings        .setText("Holdings: $%,.2f".formatted(latestValue - portfolioDAO.getAvailableBalance()));
     }
 
 
@@ -227,8 +216,27 @@ public class SimulationController implements Initializable {
         new Thread(aiTask, "Ollama-Thread").start();
     }
 
+
+    /** on simulation success. */
+    private void onSimSuccess(List<Double> values, int days) {
+        updateChart(values);                                   // graph
+        PortfolioStatistics.Metrics m =
+                PortfolioStatistics.compute(values, days);
+        updateMetricLabels(m, values.getLast());  // numbers
+        String prompt = services.buildPrompt(m, values.getLast());
+        fetchAiSummary(prompt);                                // AI call
+    }
+
+    /** on simulation failure. */
+    private void onSimFailure(Throwable ex) {
+        labelReview.setText("⚠️ Simulation failed: " + ex.getMessage());
+        btnRunSimulation.setDisable(false);
+        progressIndicator.setVisible(false);
+    }
+
     /**  when Ollama isn’t running. */
     private void showOllamaWarning() {
+
         labelReview.setText("""
         ⚠️ Ollama is not running.
         Start Ollama Desktop or `ollama serve` to receive the AI summary.

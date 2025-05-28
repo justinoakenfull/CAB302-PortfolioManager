@@ -87,6 +87,9 @@ public class StocksController implements Initializable {
      */
     @FXML
     private Label portfolioValueLabel;
+
+    @FXML
+    private Label holdingsValueLabel;
     /**
      * Label for search for stock
      */
@@ -422,7 +425,9 @@ public class StocksController implements Initializable {
         double holdings = total - cash;
 
         cashBalanceLabel.setText(String.format("Cash: $%,.2f", cash));
-        portfolioValueLabel.setText(String.format("Portfolio: $%,.2f", holdings));
+        holdingsValueLabel.setText(String.format("Holdings: $%,.2f", holdings));
+        portfolioValueLabel.setText(String.format("Portfolio: $%,.2f", total));
+
     }
 
 

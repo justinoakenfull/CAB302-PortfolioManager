@@ -37,7 +37,7 @@ public class OllamaService {
      * @return The name of the detected model.
      * @throws IllegalStateException if no model is found or if an error occurs during detection.
      */
-    private String detectDefaultModel() {
+    public String detectDefaultModel() {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(TAGS_URL).openConnection();
 
@@ -130,6 +130,8 @@ public class OllamaService {
      * @return true if the service is available, false otherwise.
      */
     public Boolean isServiceAvailable(){
+
+
 
         if (modelName == null) {
             return false;
