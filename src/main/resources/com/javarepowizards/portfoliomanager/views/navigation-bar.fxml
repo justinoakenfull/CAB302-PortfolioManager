@@ -30,8 +30,7 @@
             </styleClass></Region>
          <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" styleClass="profile">
             <children>
-               <Button fx:id="myAccountBtn" onAction="#showMyAccount" styleClass="menu-item" text="My Account" />
-            <Button fx:id="settingsBtn" onAction="#showSettings" styleClass="settings" text="⚙">
+                <Button fx:id="settingsBtn" onAction="#showMyAccount" styleClass="settings" text="⚙">
                   <HBox.margin>
                      <Insets left="16.0" />
                   </HBox.margin></Button>

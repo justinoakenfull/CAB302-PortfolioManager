@@ -36,13 +36,10 @@ public class MainController implements Initializable {
     @FXML private Button portfolioBtn;
     @FXML private Button stocksBtn;
     @FXML private Button simulationBtn;
-    @FXML private Button myAccountBtn;
     @FXML private Button settingsBtn;
     List<Button> menuButtons;
 
     private NavigationService nav;
-
-    private final LocalDate mostRecentDate = LocalDate.of(2023, 12, 29);
 
 
     private IUserDAO userDAO;
@@ -54,7 +51,7 @@ public class MainController implements Initializable {
 
         menuButtons = List.of(
                 dashboardBtn, watchlistBtn, portfolioBtn,
-                stocksBtn, simulationBtn, myAccountBtn, settingsBtn
+                stocksBtn, simulationBtn, settingsBtn
         );
 
         stockDAO = StockDAO.getInstance();
@@ -125,47 +122,6 @@ public class MainController implements Initializable {
         setActivePage(menuButtons.get(5));
         nav.loadView("useraccounts/userAccountsProfile.fxml", controller -> {});
     }
-
-
-    /* MUST BE LOGGED IN TO UPDATE SIMULATION DIFFICULTY*/
-    @FXML
-    private void showSettings() {
-        // Set the default selected difficulty (first enum value, "Easy" by default)
-        SimulationDifficulty defaultDifficulty = SimulationDifficulty.values()[0];
-
-        // Create a choice dialog with all difficulty levels as options
-        ChoiceDialog<SimulationDifficulty> dlg = new ChoiceDialog<>(defaultDifficulty,
-                List.of(SimulationDifficulty.values()));
-
-        // Set dialog window title and content
-        dlg.setTitle("User Settings");
-        dlg.setHeaderText("Select your desired Simulation Difficulty.");
-        dlg.setContentText("Difficulty:");
-
-        // Load and apply external CSS styling to the dialog
-        DialogPane pane = dlg.getDialogPane();
-        String css = getClass()
-                .getResource("/com/javarepowizards/portfoliomanager/views/useraccounts/settings.css")
-                .toExternalForm();
-        pane.getStylesheets().add(css);
-        pane.getStyleClass().add("dialog-pane");
-
-        // Show the dialog and wait for user input
-        dlg.showAndWait().ifPresent(diff -> {
-            try {
-                // Retrieve the current logged-in user's ID from the session
-                int userId = Session.getCurrentUser().getUserId();
-                userDAO = AppContext.getUserDAO();
-                // Use the injected userDAO to update the user's selected simulation difficulty
-                userDAO.updateSimulationDifficulty(userId, diff.name());
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-
 
     private void setActivePage(Button activePageButton) {
         menuButtons.forEach(btn -> btn.getStyleClass().remove("active"));
