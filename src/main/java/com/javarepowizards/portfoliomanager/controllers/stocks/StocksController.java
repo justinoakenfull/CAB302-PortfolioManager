@@ -1,6 +1,9 @@
 package com.javarepowizards.portfoliomanager.controllers.stocks;
 
+import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.User;
+import com.javarepowizards.portfoliomanager.services.portfolio.PortfolioBarPresenter;
+import com.javarepowizards.portfoliomanager.services.portfolio.PortfolioChartPresenter;
 import com.javarepowizards.portfoliomanager.ui.table.TableRow.StockRow;
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
@@ -19,7 +22,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.scene.control.TableCell;
 import java.io.IOException;
@@ -96,6 +105,12 @@ public class StocksController implements Initializable {
     @FXML
     private TextField stockSearchField;
 
+    @FXML
+    private Pane portfolioChartPane;
+    private PortfolioChartPresenter chartPresenter;
+    private PortfolioBarPresenter barPresenter;
+    @FXML private FlowPane portfolioLegendContainer;
+
     // --- Data access objects ---
     /**
      * DAO for managing portfolio entries
@@ -141,9 +156,24 @@ public class StocksController implements Initializable {
         initLabels();
         initTableColumns();
         initCellFactories();
+        try {
+            initBarGraph();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         initDataLoading();
         initEventHandlers();
         initCustomColumns();
+
+
+    }
+
+    public void initBarGraph() throws SQLException {
+        portfolioLegendContainer.prefWrapLengthProperty()
+                .bind(portfolioLegendContainer.widthProperty());
+        barPresenter = new PortfolioBarPresenter(portfolioChartPane, portfolioDAO);
+        barPresenter.configureLegendContainer(portfolioLegendContainer);
+        barPresenter.refresh();
     }
 
 
@@ -284,7 +314,7 @@ public class StocksController implements Initializable {
      *
      * @throws IOException if there is a problem fetching or reading stock data
      */
-    private void loadStocks() throws IOException {
+    private void loadStocks() throws IOException, SQLException {
         ObservableList<StockRow> rows = FXCollections.observableArrayList();
 
         // Iterate over all available tickers
@@ -298,6 +328,8 @@ public class StocksController implements Initializable {
         allStocks.setAll(rows); // Keep a reference for filtering
         filteredStocks = new FilteredList<>(allStocks, p -> true);
         tableView.setItems(filteredStocks);
+
+        barPresenter.refresh();
     }
 
     /**
@@ -338,6 +370,8 @@ public class StocksController implements Initializable {
 
             buyFeedbackLabel.setText("Bought " + quantity + " " + stockName.getSymbol());
             buyFeedbackLabel.setTextFill(Color.LIGHTGREEN);
+
+            barPresenter.refresh();
 
         } catch (NumberFormatException ex) {
             buyFeedbackLabel.setText("Invalid quantity.");
@@ -538,7 +572,7 @@ public class StocksController implements Initializable {
                                 || stock.companyNameProperty().get().toLowerCase().contains(lower);
                     })
             );
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             buyFeedbackLabel.setText("Error loading stock data");
             buyFeedbackLabel.setTextFill(Color.RED);
         }
@@ -553,7 +587,6 @@ public class StocksController implements Initializable {
         setupFavouriteColumn();
         tableView.getColumns().addAll(Arrays.asList(favouriteCol, infoCol));
     }
-
 
 }
 
