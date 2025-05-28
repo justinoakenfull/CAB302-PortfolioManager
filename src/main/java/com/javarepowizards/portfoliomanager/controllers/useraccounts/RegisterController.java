@@ -1,9 +1,6 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IUserDAO;
-import com.javarepowizards.portfoliomanager.models.User;
-import com.javarepowizards.portfoliomanager.services.IAuthService;
 import com.javarepowizards.portfoliomanager.services.RegistrationService;
 import com.javarepowizards.portfoliomanager.services.ValidationException;
 import javafx.fxml.FXML;
@@ -43,27 +40,18 @@ public class RegisterController implements Initializable {
     @FXML private PasswordField confirmPasswordField;
     @FXML private TextField balanceField;
 
-    private IAuthService authService;
-    private IUserDAO userDAO;
     private RegistrationService registrationService;
 
-
-
-
-
-
     /**
-     * Initializes the controller after FXML components are loaded.
-     * Obtains UserDAO and AuthService instances from the application context.
+     * Initializes the controller after its FXML fields have been injected.
+     * Obtains the registration service from the application context.
      *
-     * @param url the location used to resolve relative paths, or null if unknown
+     * @param url            the location used to resolve relative paths, or null if unknown
      * @param resourceBundle the resources used to localize the root object, or null if none
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        userDAO = AppContext.getService(IUserDAO.class);
-        authService = AppContext.getService(IAuthService.class);
-        registrationService = new RegistrationService(authService, userDAO);
+        registrationService = AppContext.getService(RegistrationService.class);
     }
 
     /**

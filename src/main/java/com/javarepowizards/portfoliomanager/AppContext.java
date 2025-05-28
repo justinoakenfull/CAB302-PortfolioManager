@@ -5,10 +5,7 @@ import com.javarepowizards.portfoliomanager.domain.IStockRepoReadOnly;
 import com.javarepowizards.portfoliomanager.domain.IWatchlistReadOnly;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
-import com.javarepowizards.portfoliomanager.services.AuthService;
-import com.javarepowizards.portfoliomanager.services.IAuthService;
-import com.javarepowizards.portfoliomanager.services.IWatchlistService;
-import com.javarepowizards.portfoliomanager.services.WatchlistService;
+import com.javarepowizards.portfoliomanager.services.*;
 import com.opencsv.exceptions.CsvValidationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -153,6 +150,9 @@ public final class AppContext {
         PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
         IAuthService authService = new AuthService(pwEncoder);
         AppContext.registerService(IAuthService.class, authService);
+
+        RegistrationService registrationService = new RegistrationService(authService, AppContext.getUserDAO());
+        AppContext.registerService(RegistrationService.class, registrationService);
     }
 
     /**
