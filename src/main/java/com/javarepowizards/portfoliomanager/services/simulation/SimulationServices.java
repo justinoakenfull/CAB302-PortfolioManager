@@ -1,7 +1,7 @@
 package com.javarepowizards.portfoliomanager.services.simulation;
 
 import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
+import com.javarepowizards.portfoliomanager.dao.stock.IStockDAO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 public class SimulationServices implements ISimulationServices {
 
     private final IPortfolioDAO  portfolioDAO;
-    private final StockDAO       stockDAO;
+    private final IStockDAO       stockDAO;
     private final LocalDate      mostRecentDate;
 
     private static final String PROMPT_TEMPLATE= """
@@ -57,7 +57,7 @@ public class SimulationServices implements ISimulationServices {
      */
 
     public SimulationServices(IPortfolioDAO portfolioDAO,
-                             StockDAO stockDAO,
+                             IStockDAO stockDAO,
                              LocalDate mostRecentDate) {
         this.portfolioDAO   = portfolioDAO;
         this.stockDAO       = stockDAO;

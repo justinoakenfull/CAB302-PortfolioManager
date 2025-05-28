@@ -3,6 +3,7 @@ package com.javarepowizards.portfoliomanager;
 import com.javarepowizards.portfoliomanager.dao.*;
 import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.portfolio.PortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.stock.IStockDAO;
 import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
 import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.user.UserDAO;
@@ -180,7 +181,7 @@ public final class AppContext {
      */
     private static void initializeStockRepository() throws URISyntaxException, CsvValidationException, IOException {
         URL priceCsvUrl = AppContext.class.getResource("/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv");
-        URL descUrl   = AppContext.class.getResource("/com/javarepowizards/portfoliomanager/data/descriptions.csv");
+        URL descUrl = AppContext.class.getResource("/com/javarepowizards/portfoliomanager/data/descriptions.csv");
         if (priceCsvUrl == null || descUrl == null) {
             throw new IllegalStateException("CSV file(s) not found");
         }
@@ -189,8 +190,8 @@ public final class AppContext {
         StockRepository repo = new InMemoryStockRepository(csvPath, csvDescPath);
         AppContext.initStockRepository(repo);
 
-        StockDAO stockDAO = StockDAO.getInstance();
-        AppContext.registerService(StockDAO.class, stockDAO);
+        IStockDAO stockDAO = StockDAO.getInstance();
+        AppContext.registerService(IStockDAO.class, stockDAO);
 
         AppContext.registerService(IStockRepoReadOnly.class, repo);
     }
@@ -222,7 +223,7 @@ public final class AppContext {
 
         ISimulationServices simService = new SimulationServices(
                 AppContext.getService(IPortfolioDAO.class),
-                AppContext.getService(StockDAO.class),
+                AppContext.getService(IStockDAO.class),
                 LocalDate.of(2023, 12, 29));
 
         AppContext.registerService(ISimulationServices.class, simService);
