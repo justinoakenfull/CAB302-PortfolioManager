@@ -3,7 +3,7 @@ package com.javarepowizards.portfoliomanager.services;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
-import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.ui.TableRow.WatchlistRow;
 import javafx.scene.chart.PieChart;
 
 import java.io.IOException;
