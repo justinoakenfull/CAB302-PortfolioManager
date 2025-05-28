@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * In-memory implementation of the StockRepository interface.
@@ -96,8 +95,8 @@ public class InMemoryStockRepository implements StockRepository {
                     t,
                     sn.getDisplayName(),
                     history,
-                    desc.getShortDescription(),
-                    desc.getLongDescription()
+                    desc.shortDescription(),
+                    desc.longDescription()
             );
         });
     }
@@ -112,6 +111,6 @@ public class InMemoryStockRepository implements StockRepository {
     public List<IStock> getAll() {
         return availableTickers().stream()
                 .map(this::getByTicker)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 }

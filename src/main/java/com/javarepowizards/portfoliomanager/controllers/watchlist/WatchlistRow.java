@@ -30,15 +30,15 @@ public class WatchlistRow {
         shortName.set(stock.getTicker());
         displayName.set(stock.getCompanyName());
 
-        open.set(rec.getOpen());
-        close.set(rec.getClose());
-        change.set(rec.getClose() - rec.getOpen());
+        open.set(rec.open());
+        close.set(rec.close());
+        change.set(rec.close() - rec.open());
         changePercent.set(open.get() == 0
                 ? 0
                 : ((change.get() / open.get()) * 100));
 
-        price.set(rec.getClose());
-        volume.set(rec.getVolume());
+        price.set(rec.close());
+        volume.set(rec.volume());
 
         Button btn = new Button("Remove");
         btn.getStyleClass().add("btn-danger");

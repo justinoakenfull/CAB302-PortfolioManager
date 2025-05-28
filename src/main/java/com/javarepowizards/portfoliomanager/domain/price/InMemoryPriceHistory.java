@@ -23,7 +23,7 @@ public class InMemoryPriceHistory implements PriceHistory {
      */
     public InMemoryPriceHistory(List<PriceRecord> records) {
         if (!records.stream()
-                .sorted(Comparator.comparing(PriceRecord::getDate))
+                .sorted(Comparator.comparing(PriceRecord::date))
                 .toList()
                 .equals(records)) {
             throw new IllegalArgumentException("Records must be sorted by date");
@@ -41,7 +41,7 @@ public class InMemoryPriceHistory implements PriceHistory {
     @Override
     public Optional<PriceRecord> getRecord(LocalDate date) {
         return records.stream()
-                .filter(r -> r.getDate().equals(date))
+                .filter(r -> r.date().equals(date))
                 .findFirst();
     }
 
@@ -56,8 +56,8 @@ public class InMemoryPriceHistory implements PriceHistory {
     @Override
     public List<PriceRecord> getRecords(LocalDate start, LocalDate end) {
         return records.stream()
-                .filter(r -> !r.getDate().isBefore(start) &&
-                        !r.getDate().isAfter(end))
+                .filter(r -> !r.date().isBefore(start) &&
+                             !r.date().isAfter(end))
                 .toList();
     }
 }

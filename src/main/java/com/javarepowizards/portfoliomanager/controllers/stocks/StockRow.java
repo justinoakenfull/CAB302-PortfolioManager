@@ -42,13 +42,13 @@ public class StockRow {
 
         ticker.set(stock.getTicker());
         companyName.set(stock.getCompanyName());
-        open.set(rec.getOpen());
-        close.set(rec.getClose());
+        open.set(rec.open());
+        close.set(rec.close());
 
-        double diff = rec.getClose() - rec.getOpen();
+        double diff = rec.close() - rec.open();
         change.set(diff);
-        changePercent.set(rec.getOpen() == 0 ? 0 : (diff / rec.getOpen()) * 100);
-        volume.set(rec.getVolume());
+        changePercent.set(rec.open() == 0 ? 0 : (diff / rec.open()) * 100);
+        volume.set(rec.volume());
     }
 
     /** @return Observable ticker property */

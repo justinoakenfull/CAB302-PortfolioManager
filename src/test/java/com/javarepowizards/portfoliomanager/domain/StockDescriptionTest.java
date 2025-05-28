@@ -14,9 +14,9 @@ class StockDescriptionTest {
 
         StockDescription desc = new StockDescription(shortDesc, longDesc);
 
-        assertEquals(shortDesc, desc.getShortDescription(),
+        assertEquals(shortDesc, desc.shortDescription(),
                 "getShortDescription() should return the value passed to the constructor");
-        assertEquals(longDesc, desc.getLongDescription(),
+        assertEquals(longDesc, desc.longDescription(),
                 "getLongDescription() should return the value passed to the constructor");
     }
 
@@ -24,9 +24,9 @@ class StockDescriptionTest {
     void nullValuesAreAllowed() {
         StockDescription desc = new StockDescription(null, null);
 
-        assertNull(desc.getShortDescription(),
+        assertNull(desc.shortDescription(),
                 "If null was passed as shortDescription, getter should return null");
-        assertNull(desc.getLongDescription(),
+        assertNull(desc.longDescription(),
                 "If null was passed as longDescription, getter should return null");
     }
 }

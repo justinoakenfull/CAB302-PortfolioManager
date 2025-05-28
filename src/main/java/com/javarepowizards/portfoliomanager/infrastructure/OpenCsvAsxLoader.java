@@ -85,7 +85,7 @@ public class OpenCsvAsxLoader implements PriceHistoryLoader {
 
         // finally sort each ticker’s history
         data.values()
-                .forEach(list -> list.sort(Comparator.comparing(PriceRecord::getDate)));
+                .forEach(list -> list.sort(Comparator.comparing(PriceRecord::date)));
     }
 
     /**
