@@ -7,7 +7,6 @@ import com.javarepowizards.portfoliomanager.domain.stock.StockDescription;
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.opencsv.exceptions.CsvValidationException;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -22,18 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InMemoryStockRepository implements StockRepository {
     private final PriceHistoryLoader loader;
     private final Map<String,IStock> cache = new ConcurrentHashMap<>();
-
-    /**
-     * Constructs the repository with a path to the ASX price CSV.
-     * Descriptions are not loaded in this constructor.
-     *
-     * @param csvPath path to the ASX price data CSV file
-     * @throws IOException if reading the CSV fails
-     * @throws CsvValidationException if the CSV content is invalid
-     */
-    public InMemoryStockRepository(Path csvPath) throws IOException, CsvValidationException {
-        this.loader = new OpenCsvAsxLoader(csvPath);
-    }
 
     /**
      * Constructs the repository with paths to the ASX price CSV and a descriptions CSV.

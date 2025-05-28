@@ -3,7 +3,6 @@ package com.javarepowizards.portfoliomanager.infrastructure;
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.StockDescription;
 import com.opencsv.exceptions.CsvValidationException;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;

@@ -4,7 +4,6 @@ import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.domain.stock.StockDescription;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
