@@ -16,6 +16,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,9 +42,10 @@ public final class AppContext {
             throws SQLException, IOException, URISyntaxException, CsvValidationException
     {
         initializeDatabaseServices();
+        initializeAuthService();
         initializeStockRepository();
         initializeWatchlist();
-        initializeAuthService();
+        initializeSimulation();
     }
 
     /**
@@ -201,5 +203,15 @@ public final class AppContext {
         AppContext.registerService(IWatchlistService.class, watchlistService);
 
         AppContext.registerService(IWatchlistReadOnly.class,watchlistService);
+    }
+
+    private static void initializeSimulation() {
+
+        ISimulationServices simService = new SimulationServices(
+                AppContext.getService(IPortfolioDAO.class),
+                AppContext.getService(StockDAO.class),
+                LocalDate.of(2023, 12, 29));
+
+        AppContext.registerService(ISimulationServices.class, simService);
     }
 }

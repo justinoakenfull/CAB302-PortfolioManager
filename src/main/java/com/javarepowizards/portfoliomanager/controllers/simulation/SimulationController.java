@@ -2,10 +2,9 @@ package com.javarepowizards.portfoliomanager.controllers.simulation;
 
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.dao.StockDAO;
 import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
+import com.javarepowizards.portfoliomanager.services.ISimulationServices;
 import com.javarepowizards.portfoliomanager.services.OllamaService;
-import com.javarepowizards.portfoliomanager.services.SimulationServices;
 import com.javarepowizards.portfoliomanager.services.PortfolioStatistics;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,7 +18,6 @@ import javafx.scene.control.Slider;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -51,13 +49,11 @@ public class SimulationController implements Initializable {
 
     // References that must be provided externally (from MainController, for example)
     private IPortfolioDAO portfolioDAO;
-    private StockDAO stockDAO;
-    private final LocalDate mostRecentDate = LocalDate.of(2023, 12, 29);
 
     // OllamaService instance to handle AI interactions
     private final OllamaService ollamaService = new OllamaService();
     // SimulationServices instance to handle simulation logic
-    private SimulationServices services;
+    private ISimulationServices services;
 
 
     /**
@@ -71,9 +67,8 @@ public class SimulationController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         this.portfolioDAO = AppContext.getService(IPortfolioDAO.class);
-        this.stockDAO = AppContext.getService(StockDAO.class);
 
-        this.services = new SimulationServices(portfolioDAO, stockDAO, mostRecentDate);
+        this.services = AppContext.getService(ISimulationServices.class);
 
         initializeUI();
 
