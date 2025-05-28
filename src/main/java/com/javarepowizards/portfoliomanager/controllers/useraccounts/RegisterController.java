@@ -4,6 +4,8 @@ import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
 import com.javarepowizards.portfoliomanager.services.IAuthService;
+import com.javarepowizards.portfoliomanager.services.RegistrationService;
+import com.javarepowizards.portfoliomanager.services.ValidationException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,6 +22,10 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
+
+import static java.util.logging.Level.INFO;
+import static javafx.scene.control.Alert.AlertType.ERROR;
+import static javafx.scene.control.Alert.AlertType.WARNING;
 
 
 /**
@@ -39,6 +45,12 @@ public class RegisterController implements Initializable {
 
     private IAuthService authService;
     private IUserDAO userDAO;
+    private RegistrationService registrationService;
+
+
+
+
+
 
     /**
      * Initializes the controller after FXML components are loaded.
@@ -51,6 +63,7 @@ public class RegisterController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         userDAO = AppContext.getService(IUserDAO.class);
         authService = AppContext.getService(IAuthService.class);
+        registrationService = new RegistrationService(authService, userDAO);
     }
 
     /**
@@ -61,28 +74,43 @@ public class RegisterController implements Initializable {
      */
     @FXML
     private void handleRegister() {
-        if (!validateInputs()) return;
 
-        double startingBalance = Double.parseDouble(balanceField.getText().trim());
+        String username        = usernameField.getText().trim();
+        String email           = emailField   .getText().trim();
+        String rawPassword     = passwordField.getText();
+        String rawConfirm      = confirmPasswordField.getText();
+        String rawBalance      = balanceField .getText().trim();
 
         try {
-            User user = new User(
-                    usernameField.getText().trim(),
-                    emailField.getText().trim(),
-                    authService.hashPassword(passwordField.getText())
+            registrationService.register(
+                    username,
+                    email,
+                    rawPassword,
+                    rawConfirm,
+                    rawBalance
             );
 
-            if (userDAO.createUser(user, startingBalance)) {
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully!");
-                clearForm();
-                switchToLogin();
-            }
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not create user: " + e.getMessage());
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred: " + e.getMessage());
+            showAlert(Alert.AlertType.INFORMATION,
+                    "Success",
+                    "Account created successfully!");
+            clearForm();
+            switchToLogin();
+
+        } catch (ValidationException ve) {
+            showAlert(Alert.AlertType.WARNING,
+                    "Validation Error",
+                    ve.getMessage());
+        } catch (SQLException se) {
+            showAlert(Alert.AlertType.ERROR,
+                    "Database Error",
+                    se.getMessage());
+        } catch (Exception ex) {
+            showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "An unexpected error occurred: " + ex.getMessage());
         }
     }
+
 
     /**
      * Switches the current scene to the login view.
@@ -102,57 +130,8 @@ public class RegisterController implements Initializable {
             stage.setTitle("Login");
             stage.centerOnScreen();
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not load login page");
+            showAlert(ERROR, "Navigation Error", "Could not load login page");
         }
-    }
-
-    /**
-     * Validates user input fields.
-     * Checks for non-empty fields, matching passwords, minimum password length,
-     * valid email format, and a non-negative numeric balance.
-     *
-     * @return true if all inputs are valid; false otherwise
-     */
-    private boolean validateInputs() {
-        if (usernameField.getText().isBlank() || emailField.getText().isBlank()
-                || passwordField.getText().isBlank() || confirmPasswordField.getText().isBlank()) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "All fields are required");
-            return false;
-        }
-
-        if (!passwordField.getText().equals(confirmPasswordField.getText())) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Passwords do not match");
-            return false;
-        }
-
-        if (passwordField.getText().length() < 8) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Password must be at least 8 characters");
-            return false;
-        }
-
-        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
-        if (!Pattern.compile(emailRegex).matcher(emailField.getText()).matches()) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Invalid email format");
-            return false;
-        }
-
-        if (balanceField.getText().isBlank()) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Balance field cannot be empty");
-            return false;
-        }
-
-        try {
-            double balance = Double.parseDouble(balanceField.getText());
-            if (balance < 0) {
-                showAlert(Alert.AlertType.WARNING, "Validation Error", "Balance cannot be negative");
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Balance must be a valid number");
-            return false;
-        }
-
-        return true;
     }
 
     /**
