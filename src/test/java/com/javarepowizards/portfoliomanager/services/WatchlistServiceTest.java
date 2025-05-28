@@ -2,11 +2,20 @@ package com.javarepowizards.portfoliomanager.services;
 
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.*;
+import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.portfolio.PortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.user.UserDAO;
+import com.javarepowizards.portfoliomanager.dao.watchlist.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.dao.watchlist.WatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.User;
+import com.javarepowizards.portfoliomanager.services.session.Session;
+import com.javarepowizards.portfoliomanager.services.watchlist.IWatchlistService;
+import com.javarepowizards.portfoliomanager.services.watchlist.WatchlistService;
 import com.opencsv.exceptions.CsvValidationException;
 import org.junit.jupiter.api.*;
 
@@ -29,9 +38,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class WatchlistServiceTest {
 
     private IWatchlistService watchlistService;
-    private IWatchlistDAO     watchlistDAO;
-    private IUserDAO          userDAO;
-    private IPortfolioDAO     portfolioDAO;
+    private IWatchlistDAO watchlistDAO;
+    private IUserDAO userDAO;
+    private IPortfolioDAO portfolioDAO;
     private Connection        connection;
     private StockRepository   stockRepo;
 

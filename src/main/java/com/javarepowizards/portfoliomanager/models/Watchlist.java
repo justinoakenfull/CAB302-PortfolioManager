@@ -1,7 +1,7 @@
 package com.javarepowizards.portfoliomanager.models;
 
-import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
-import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.ui.table.TableRow.WatchlistRow;
+import com.javarepowizards.portfoliomanager.dao.watchlist.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import javafx.collections.FXCollections;

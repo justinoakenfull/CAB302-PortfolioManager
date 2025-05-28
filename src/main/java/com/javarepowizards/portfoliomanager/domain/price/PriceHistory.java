@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Defines retrieval operations for a series of historical price records.
+ */
 public interface PriceHistory {
     /**
      * Get the record for exactly this date, if it exists.

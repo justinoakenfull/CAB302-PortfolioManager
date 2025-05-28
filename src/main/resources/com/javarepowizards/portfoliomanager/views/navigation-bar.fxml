@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane stylesheets="@menu.css" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.MainController">
+
+  <top>
+    <HBox alignment="CENTER_LEFT" spacing="15" styleClass="topbar">
+      <Button fx:id="dashboardBtn" onAction="#showDashboard" styleClass="menu-item" text="Dashboard" HBox.hgrow="ALWAYS" />
+      <Button fx:id="watchlistBtn" onAction="#showWatchlist" styleClass="menu-item" text="Watchlist" />
+      <Button fx:id="portfolioBtn" onAction="#showPortfolio" styleClass="menu-item" text="Portfolio" />
+      <Button fx:id="stocksBtn" onAction="#showStocks" styleClass="menu-item" text="Stocks" />
+      <Button fx:id="simulationBtn" onAction="#showSimulation" text="Simulation">
+            <styleClass>
+               <String fx:value="menu-item" />
+               <String fx:value="active" />
+            </styleClass></Button>
+
+      <!-- Push the settings button to the right -->
+      <Region fx:id="spacer" HBox.hgrow="ALWAYS">
+            <styleClass>
+               <String fx:value="menu" />
+               <String fx:value="topbar" />
+            </styleClass></Region>
+         <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" styleClass="profile">
+            <children>
+                <Button fx:id="settingsBtn" onAction="#showMyAccount" styleClass="settings" text="⚙">
+                  <HBox.margin>
+                     <Insets left="16.0" />
+                  </HBox.margin></Button>
+            </children>
+         </HBox>
+    </HBox>
+  </top>
+
+  <center>
+    <!-- StackPane where dynamic content will be loaded -->
+    <StackPane fx:id="contentArea" />
+  </center>
+</BorderPane>

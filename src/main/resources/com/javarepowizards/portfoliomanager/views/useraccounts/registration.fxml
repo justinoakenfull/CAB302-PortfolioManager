@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane stylesheets="@registration.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.RegisterController">
+<BorderPane stylesheets="@registration.css" xmlns:fx="http://javafx.com/fxml" fx:controller="com.javarepowizards.portfoliomanager.controllers.useraccounts.RegisterController">
    <center>
         <GridPane alignment="CENTER" hgap="10" vgap="10" BorderPane.alignment="CENTER">
             <!-- Username -->

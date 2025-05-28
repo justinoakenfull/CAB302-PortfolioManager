@@ -1,6 +1,6 @@
 package com.javarepowizards.portfoliomanager.services;
 import com.javarepowizards.portfoliomanager.models.StockData;
-import com.javarepowizards.portfoliomanager.services.StockDataFilter;
+import com.javarepowizards.portfoliomanager.services.utility.StockDataFilter;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

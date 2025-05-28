@@ -1,13 +1,11 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
-import com.javarepowizards.portfoliomanager.services.IAuthService;
-import com.javarepowizards.portfoliomanager.services.Session;
-import com.javarepowizards.portfoliomanager.services.NavigationService;
-
-
+import com.javarepowizards.portfoliomanager.services.Auth.IAuthService;
+import com.javarepowizards.portfoliomanager.services.session.Session;
+import com.javarepowizards.portfoliomanager.services.session.NavigationService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,9 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -28,7 +23,13 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
-@Component
+/**
+ * Controller for the login view.
+ * Handles user authentication, transitions to registration,
+ * and provides a shortcut for a dummy login to a test account.
+ * Retrieves required services from the application context.
+ */
+
 public class LoginController implements Initializable {
 
     @FXML private TextField emailField;
@@ -36,20 +37,28 @@ public class LoginController implements Initializable {
     @FXML private Button loginButton;
     @FXML private Button dummyLogin;
 
-    @Autowired
     private IAuthService authService;
-
-    @Autowired
     private IUserDAO userDAO;
 
+    /**
+     * Initializes the controller after FXML components are loaded.
+     * Obtains UserDAO and AuthService instances from the application context.
+     *
+     * @param location  the location used to resolve relative paths, or null if unknown
+     * @param resources the resources used to localize the root object, or null if none
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         userDAO = AppContext.getUserDAO();
         authService = AppContext.getService(IAuthService.class);
     }
 
-
-
+    /**
+     * Handles the login button action.
+     * Validates input, retrieves the user by email or username,
+     * verifies the password, and navigates to the dashboard on success.
+     * Shows an error alert on failure or database issues.
+     */
     @FXML
     private void handleLogin() {
 
@@ -70,7 +79,7 @@ public class LoginController implements Initializable {
                 // —— swap in the “shell” with nav bar ——
                 NavigationService.loadScene(
                         /* source node */   loginButton,
-                        /* fxml path */     "hello-view.fxml",
+                        /* fxml path */     "navigation-bar.fxml",
                         /* controller init */ ctrl -> {
                             // no extra setup: MainController.initialize()
                             // will automatically fire and load the dashboard
@@ -87,6 +96,11 @@ public class LoginController implements Initializable {
         }
     }
 
+    /**
+     * Switches the current scene to the registration view.
+     * Loads the registration FXML, replaces the root of the current scene,
+     * and updates the stage title.
+     */
     @FXML
     private void switchToRegister() {
         try {
@@ -104,6 +118,12 @@ public class LoginController implements Initializable {
         }
     }
 
+    /**
+     * Displays an error alert with the given title and message.
+     *
+     * @param title   the title of the alert dialog
+     * @param message the content message of the alert dialog
+     */
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -112,12 +132,22 @@ public class LoginController implements Initializable {
         alert.showAndWait();
     }
 
+    /**
+     * Determines if the given input string matches an email pattern.
+     *
+     * @param input the string to test
+     * @return true if the input is a valid email format, false otherwise
+     */
     private boolean isEmail(String input) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return Pattern.compile(emailRegex).matcher(input).matches();
     }
 
-    // Skip button brings us here, auto logs into the default account test test1234
+    /**
+     * Performs a dummy login to a default test account.
+     * Creates the account if it does not exist, then
+     * navigates to the dashboard view.
+     */
     @FXML
     private void skipLogin() {
 
@@ -146,7 +176,7 @@ public class LoginController implements Initializable {
             // —— swap in the “shell” with nav bar ——
             NavigationService.loadScene(
                     /* source node */   dummyLogin,
-                    /* fxml path */     "hello-view.fxml",
+                    /* fxml path */     "navigation-bar.fxml",
                     /* controller init */ ctrl -> {
                         // no extra setup: MainController.initialize()
                         // will automatically fire and load the dashboard

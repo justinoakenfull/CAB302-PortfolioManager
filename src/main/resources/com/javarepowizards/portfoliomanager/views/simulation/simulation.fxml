@@ -138,8 +138,10 @@
             <Label text="Holdings:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
             <ListView fx:id="listHoldings" prefHeight="200"
                       style="-fx-background-color: #656565; -fx-control-inner-background: #656565; -fx-text-fill: #FFFFFF;"/>
-            <Label text="Balance:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+            <Label text="Cash Balance:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
             <Label fx:id="labelBalance" style="-fx-text-fill: #FFFFFF;"/>
+            <Label text="Holdings:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+            <Label fx:id="labelHoldings" style="-fx-text-fill: #FFFFFF;"/>
             <Label text="Portfolio:" style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
             <Label fx:id="labelPortfolioValue" style="-fx-text-fill: #FFFFFF;"/>
         </VBox>
