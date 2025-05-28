@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Simulator for generating synthetic stock price paths using a
+ * geometric Brownian motion model with dynamic momentum and bounds.
+ */
 public class MarketSimulator {
 
     private final double initialPrice;
@@ -18,6 +22,17 @@ public class MarketSimulator {
 
     private final Random random; // for generating random shocks
 
+    /**
+     * Constructs a MarketSimulator with the given parameters.
+     *
+     * @param initialPrice     the starting price for the simulation
+     * @param drift            the expected daily return component
+     * @param volatility       the daily return volatility (standard deviation)
+     * @param momentum         the baseline momentum factor for dynamic drift
+     * @param kMultiplier      multiplier for dynamic upper/lower volatility bounds
+     * @param maxDailyMovement the maximum fractional change allowed in one day
+     * @param smoothingFactor  the factor (α) for smoothing momentum updates
+     */
     public MarketSimulator(double initialPrice, double drift, double volatility, double momentum, double kMultiplier, double maxDailyMovement, double smoothingFactor) {
         this.initialPrice = initialPrice;
         this.drift = drift;

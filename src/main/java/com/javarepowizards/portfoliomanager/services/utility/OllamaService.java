@@ -10,6 +10,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Service for communicating with a local Ollama API instance.
+ * Detects available models, sends prompts, and retrieves generated responses.
+ */
 public class OllamaService {
     // OllamaService is a service that communicates with the Ollama API to generate responses based on a given prompt.
     private static final String TAGS_URL     = "http://localhost:11434/api/tags";

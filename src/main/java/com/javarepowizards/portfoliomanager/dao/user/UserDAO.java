@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+/**
+ * Data Access Object for user authentication, profile, and balance.
+ * Manages user creation and retrieval as well as updates to user data.
+ */
 public class UserDAO implements IUserDAO {
     private final Connection connection;
 
