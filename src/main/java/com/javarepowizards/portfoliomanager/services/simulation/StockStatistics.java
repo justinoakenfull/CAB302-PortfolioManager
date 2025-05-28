@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Computes historical statistics for a single stock series.
+ * Calculates average daily return, volatility, and baseline momentum.
+ */
 public class StockStatistics {
 
     private final double averageDailyReturn;
@@ -13,7 +17,14 @@ public class StockStatistics {
 
     private final double momentum;
 
-
+    /**
+     * Constructs statistics from a list of StockData.
+     * Sorts the data by date, computes daily returns,
+     * then calculates mean return, standard deviation, and momentum.
+     *
+     * @param stockDataList list of StockData entries, must contain at least two records
+     * @throws IllegalArgumentException if fewer than two data points are provided
+     */
     public StockStatistics(List<StockData> stockDataList){
         // ensure the list is sorted by date in ascending order.
 
@@ -61,14 +72,31 @@ public class StockStatistics {
         }
     }
 
+    /**
+     * Returns the average daily return of the stock series.
+     *
+     * @return mean of daily returns
+     */
     public double getAverageDailyReturn(){
         return averageDailyReturn;
     }
 
+    /**
+     * Returns the volatility (standard deviation) of daily returns.
+     *
+     * @return standard deviation of daily returns
+     */
     public double getVolatility(){
         return volatility;
     }
 
+
+    /**
+     * Returns the baseline momentum, calculated as the average of
+     * the most recent returns or the overall mean if data is limited.
+     *
+     * @return baseline momentum for simulation drift adjustment
+     */
     public double getMomentum(){
         return momentum;
     }

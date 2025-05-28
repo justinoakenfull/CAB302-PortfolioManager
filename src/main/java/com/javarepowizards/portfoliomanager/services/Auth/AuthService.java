@@ -1,9 +1,11 @@
 package com.javarepowizards.portfoliomanager.services.Auth;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-@Service
+/**
+ * Service responsible for hashing and verifying user passwords.
+ * Uses the provided PasswordEncoder implementation for all cryptographic operations.
+ */
 public class AuthService implements IAuthService {
 
     private final PasswordEncoder passwordEncoder;

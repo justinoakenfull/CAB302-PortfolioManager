@@ -5,6 +5,10 @@ package com.javarepowizards.portfoliomanager.services.simulation;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Utility class for computing key portfolio performance metrics
+ * from a series of simulated portfolio values.
+ */
 public class PortfolioStatistics {
 
     /** Immutable container for the three key metrics. */

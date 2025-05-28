@@ -2,8 +2,6 @@ package com.javarepowizards.portfoliomanager.dao.watchlist;
 
 import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
 import com.javarepowizards.portfoliomanager.models.StockName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,7 +12,7 @@ import java.util.List;
  * Uses JDBC to create the watchlist table if necessary and perform CRUD operations.
  * Notifies registered listeners when the watchlist is modified.
  */
-@Repository
+
 public class WatchlistDAO implements IWatchlistDAO {
     // SQL for table creation + CRUD
     private static final String CREATE_SQL = """
@@ -62,7 +60,6 @@ public class WatchlistDAO implements IWatchlistDAO {
      * @param databaseConnection provider of the JDBC connection
      * @throws SQLException if an error occurs creating the table or obtaining the connection
      */
-    @Autowired
     public WatchlistDAO(IDatabaseConnection databaseConnection) throws SQLException {
         this.conn = databaseConnection.getConnection();
         // ensure table exists

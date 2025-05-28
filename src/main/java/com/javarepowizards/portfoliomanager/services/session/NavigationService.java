@@ -12,7 +12,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.function.Consumer;
 
-
+/**
+ * Service for navigating between views and scenes in the JavaFX application.
+ * Supports loading FXML into a designated content area or replacing the entire scene.
+ */
 public class NavigationService {
     private final StackPane contentArea;
     private static final String basePath = "/com/javarepowizards/portfoliomanager/views/";

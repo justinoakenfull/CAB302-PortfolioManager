@@ -17,16 +17,17 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.effect.Glow;
 import javafx.scene.layout.StackPane;
-
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
-
-
 import javafx.util.Duration;
 
+/**
+ * Controller for the main application window.
+ * Manages navigation between views and UI animations for menu buttons.
+ */
 public class MainController implements Initializable {
     @FXML
     private StackPane contentArea;
@@ -46,6 +47,14 @@ public class MainController implements Initializable {
     private IPortfolioDAO portfolioDAO;
     private IStockDAO stockDAO;
 
+
+    /**
+     * Initializes the controller after its FXML components have been injected.
+     * Sets up menu buttons, navigation service, and loads the default view.
+     *
+     * @param url            the location used to resolve relative paths, or null if unknown
+     * @param resourceBundle the resources used to localize the root object, or null if none
+     */
     @FXML
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -65,6 +74,12 @@ public class MainController implements Initializable {
         setActivePage(menuButtons.getFirst());
     }
 
+
+    /**
+     * Attaches a continuous glow effect when hovering over the button.
+     *
+     * @param btn the button to decorate with hover animation
+     */
     private void attachHoverGlow(Button btn) {
         Glow glow = new Glow(0.0);
         btn.setEffect(glow);
@@ -87,42 +102,65 @@ public class MainController implements Initializable {
         });
     }
 
+    /**
+     * Displays the dashboard view.
+     */
     @FXML
     public void showDashboard() {
         setActivePage(menuButtons.getFirst());
         nav.loadView("dashboard/dashboard.fxml", controller ->{});
     }
 
+    /**
+     * Displays the watchlist view.
+     */
     @FXML
     private void showWatchlist() {
         setActivePage(menuButtons.get(1));
         nav.loadView("watchlist/watchlist.fxml", controller -> {});
     }
 
+    /**
+     * Displays the portfolio view.
+     */
     @FXML
     private void showPortfolio() {
         setActivePage(menuButtons.get(2));
         nav.loadView("portfolio/portfolio.fxml", controller -> {});
     }
 
+    /**
+     * Displays the stocks listing view.
+     */
     @FXML
     private void showStocks() {
         setActivePage(menuButtons.get(3));
         nav.loadView("stockspage/stocks.fxml", controller -> {});
     }
 
+    /**
+     * Displays the simulation view.
+     */
     @FXML
     private void showSimulation(){
         setActivePage(menuButtons.get(4));
         nav.loadView("simulation/simulation.fxml", controller -> {});
     }
 
+    /**
+     * Displays the user account profile view.
+     */
     @FXML
     private void showMyAccount() {
         setActivePage(menuButtons.get(5));
         nav.loadView("useraccounts/userAccountsProfile.fxml", controller -> {});
     }
 
+    /**
+     * Updates the visual state to mark the given button as active.
+     *
+     * @param activePageButton the button to mark as active
+     */
     private void setActivePage(Button activePageButton) {
         menuButtons.forEach(btn -> btn.getStyleClass().remove("active"));
         activePageButton.getStyleClass().add("active");

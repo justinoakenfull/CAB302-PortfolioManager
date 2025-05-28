@@ -11,6 +11,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service interface for managing the user’s watchlist and related portfolio data.
+ * Provides methods to list, add, and remove stocks from the watchlist,
+ * retrieve available symbols, generate descriptions, and produce UI data.
+ */
 public interface IWatchlistService {
 
     List<IStock> getWatchlist() throws SQLException, IOException;

@@ -12,7 +12,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
@@ -28,7 +27,6 @@ import static javafx.scene.control.Alert.AlertType.ERROR;
  * and navigation back to the login screen.
  * Retrieves required services from the application context.
  */
-@Component
 public class RegisterController implements Initializable {
 
     @FXML private TextField usernameField;

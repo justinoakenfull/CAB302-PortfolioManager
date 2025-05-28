@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ * Utility for filtering historical stock data.
+ * Provides methods to extract subsets of StockData based on date criteria.
+ */
 public class StockDataFilter {
 
 
@@ -14,8 +17,6 @@ public class StockDataFilter {
      * @param mostRecentDate the most recent date
      * @return a list of stockData that have dates within our one year before most recent date
      */
-
-
     public List<StockData> getDataFromLastYear(List<StockData> stockData, LocalDate mostRecentDate){
         // compute lower bound date (one year before the most recent date)
         LocalDate lowerLimit = mostRecentDate.minusYears(1);
