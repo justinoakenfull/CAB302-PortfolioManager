@@ -1,12 +1,8 @@
-// The DAO package, indicating that this class is responsible for data access operations.
 package com.javarepowizards.portfoliomanager.dao;
 
-// Import the StockName enum which defines the allowed stock symbols.
 import com.javarepowizards.portfoliomanager.MainApplication;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.StockData;
-
-// Import necessary classes for I/O, date handling, and collections.
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
