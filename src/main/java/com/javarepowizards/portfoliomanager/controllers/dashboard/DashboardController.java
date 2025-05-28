@@ -32,19 +32,24 @@ public class DashboardController implements Initializable {
     @FXML
     private Pane  portfolioPieContainer;
 
-    private WatchlistTablePresenter watchlistPresenter;
-    private PortfolioChartPresenter portfolioPresenter;
-
+    /**
+     * Called to initialize the controller after its root element has been completely processed.
+     * Sets up the watchlist table presenter, the portfolio chart presenter,
+     * and starts the quick tips rotation.
+     *
+     * @param url the location used to resolve relative paths for the root object, or null if unknown
+     * @param rb  the resources used to localize the root object, or null if not specified
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Inject and build the watchlist table
-        watchlistPresenter = new WatchlistTablePresenter(
+        new WatchlistTablePresenter(
                 tableContainer,
                 AppContext.getService(IWatchlistReadOnly.class),
                 AppContext.getService(IStockRepoReadOnly.class));
 
         // Inject and build the portfolio overview chart
-        portfolioPresenter = new PortfolioChartPresenter(
+        new PortfolioChartPresenter(
                 portfolioPieContainer,
                 AppContext.getService(IPortfolioDAO.class));
 

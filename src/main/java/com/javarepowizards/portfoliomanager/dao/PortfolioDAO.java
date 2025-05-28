@@ -25,7 +25,7 @@ public class PortfolioDAO implements IPortfolioDAO {
     private final boolean dbMode;
 
     /** In-memory list of portfolio holdings (used only in testing) */
-    private List<PortfolioEntry> holdings;
+    private final List<PortfolioEntry> holdings;
 
     /** Available balance (only meaningful in in-memory mode) */
     private final double availableBalance;
@@ -162,7 +162,7 @@ public class PortfolioDAO implements IPortfolioDAO {
             stmt.setInt(2, userId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException(e);
         }
     }
 
@@ -319,7 +319,7 @@ public class PortfolioDAO implements IPortfolioDAO {
      */
     @Override
     public void sellHolding(int userId, StockName stock) throws SQLException {
-        double marketValue = 0.0;
+        double marketValue;
 
         // Fetch current market value of the holding
         String selectSQL = "SELECT holding_value FROM user_holdings WHERE user_id = ? AND ticker = ?";

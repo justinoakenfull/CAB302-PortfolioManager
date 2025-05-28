@@ -64,9 +64,9 @@ public class InMemoryPriceHistoryTest {
         InMemoryPriceHistory hist = new InMemoryPriceHistory(List.of(r1, r2));
 
         // present cases
-        assertTrue(hist.getRecord(r1.getDate()).isPresent());
-        assertEquals(r1, hist.getRecord(r1.getDate()).get());
-        assertEquals(r2, hist.getRecord(r2.getDate()).orElseThrow());
+        assertTrue(hist.getRecord(r1.date()).isPresent());
+        assertEquals(r1, hist.getRecord(r1.date()).get());
+        assertEquals(r2, hist.getRecord(r2.date()).orElseThrow());
 
         // missing date
         assertTrue(
@@ -80,11 +80,11 @@ public class InMemoryPriceHistoryTest {
         InMemoryPriceHistory hist = new InMemoryPriceHistory(List.of(r1, r2, r3));
 
         // full range includes all three
-        List<PriceRecord> all = hist.getRecords(r1.getDate(), r3.getDate());
+        List<PriceRecord> all = hist.getRecords(r1.date(), r3.date());
         assertEquals(List.of(r1, r2, r3), all);
 
         // sub-range from r2 to r3
-        List<PriceRecord> sub = hist.getRecords(r2.getDate(), r3.getDate());
+        List<PriceRecord> sub = hist.getRecords(r2.date(), r3.date());
         assertEquals(List.of(r2, r3), sub);
 
         // range with no hits

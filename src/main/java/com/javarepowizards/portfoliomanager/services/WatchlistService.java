@@ -150,7 +150,7 @@ public class WatchlistService implements IWatchlistService, IWatchlistReadOnly {
             watchlistDAO.removeForUser(userId, sym);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            /* Consume exception */
         }
     }
 
@@ -340,8 +340,8 @@ public class WatchlistService implements IWatchlistService, IWatchlistReadOnly {
             throw new RuntimeException(e);
         }
         PriceRecord rec = stock.getCurrentRecord();
-        double open  = rec.getOpen();
-        double close = rec.getClose();
+        double open  = rec.open();
+        double close = rec.close();
         return ((close - open) / open) * 100.0;
     }
 
@@ -380,10 +380,9 @@ public class WatchlistService implements IWatchlistService, IWatchlistReadOnly {
      * Generates pie chart data for the user's portfolio holdings.
      *
      * @return list of PieChart.Data elements with symbol and market value
-     * @throws SQLException if there is an error retrieving holdings
      */
     @Override
-    public List<PieChart.Data> getPortfolioPieData() throws SQLException {
+    public List<PieChart.Data> getPortfolioPieData() {
         List<PortfolioEntry> entries = portfolioDAO.getHoldings();
         return entries.stream()
                 .map(e -> new PieChart.Data(e.getStock().getSymbol(), e.getMarketValue()))
@@ -395,10 +394,9 @@ public class WatchlistService implements IWatchlistService, IWatchlistReadOnly {
      * highest gain, closest to zero, smallest non-zero change, and largest loss.
      *
      * @return list of up to four Optional entries in priority order
-     * @throws SQLException if there is an error retrieving holdings
      */
     @Override
-    public List<Optional<PortfolioEntry>> getBalancePicks() throws SQLException {
+    public List<Optional<PortfolioEntry>> getBalancePicks() {
         List<PortfolioEntry> remaining = new ArrayList<>(portfolioDAO.getHoldings());
         List<Optional<PortfolioEntry>> picks = new ArrayList<>(4);
 

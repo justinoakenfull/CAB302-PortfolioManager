@@ -8,7 +8,6 @@ import java.util.List;
 
 /**
  * Interface for portfolio data access operations.
- *
  * Defines methods to manipulate user portfolio holdings and balances.
  * Supports both reading and updating data in persistent or in-memory storage.
  */

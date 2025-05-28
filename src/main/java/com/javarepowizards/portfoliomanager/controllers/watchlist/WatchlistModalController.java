@@ -51,13 +51,13 @@ public class WatchlistModalController implements Initializable {
         stockTitle.setText(stock.getCompanyName() + " (" + stock.getTicker() + ")");
         PriceRecord rec = stock.getCurrentRecord();
 
-        openLabel.setText(String.format("%.2f", rec.getOpen()));
+        openLabel.setText(String.format("%.2f", rec.open()));
         openLabel.getStyleClass().add("balance-text");
 
-        closeLabel.setText(String.format("%.2f", rec.getClose()));
+        closeLabel.setText(String.format("%.2f", rec.close()));
         closeLabel.getStyleClass().add("balance-text");
 
-        double change = rec.getClose() - rec.getOpen();
+        double change = rec.close() - rec.open();
         changeLabel.setText(String.format("%.2f", change));
         String changeStyle = change > 0
                 ? "balance-value-positive"
@@ -66,9 +66,9 @@ public class WatchlistModalController implements Initializable {
                 : "balance-value-neutral";
         changeLabel.getStyleClass().add(changeStyle);
 
-        double pct = rec.getOpen() == 0
+        double pct = rec.open() == 0
                 ? 0
-                : (change / rec.getOpen()) * 100;
+                : (change / rec.open()) * 100;
         changePercentLabel.setText(String.format("%.2f%%", pct));
         String pctStyle = pct > 0
                 ? "balance-value-positive"
@@ -77,7 +77,7 @@ public class WatchlistModalController implements Initializable {
                 : "balance-value-neutral";
         changePercentLabel.getStyleClass().add(pctStyle);
 
-        volumeLabel.setText(String.valueOf(rec.getVolume()));
+        volumeLabel.setText(String.valueOf(rec.volume()));
         volumeLabel.getStyleClass().add("balance-text");
 
         longDescArea.setText("Loading full description…");

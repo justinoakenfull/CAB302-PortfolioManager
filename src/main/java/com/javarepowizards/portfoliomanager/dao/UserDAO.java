@@ -3,7 +3,6 @@ package com.javarepowizards.portfoliomanager.dao;
 import com.javarepowizards.portfoliomanager.models.User;
 import com.javarepowizards.portfoliomanager.services.Session;
 import org.springframework.stereotype.Repository;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,13 +188,13 @@ public class UserDAO implements IUserDAO {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    User u = new User(
+                    User user = new User(
                             rs.getString("username"),
                             rs.getString("email"),
                             rs.getString("password_hash")
                     );
-                    u.setId(rs.getInt("user_id"));
-                    return Optional.of(u);
+                    user.setId(rs.getInt("user_id"));
+                    return Optional.of(user);
                 }
             }
         }
@@ -215,7 +214,6 @@ public class UserDAO implements IUserDAO {
      *         or {@link Optional#empty()} if no matching user exists
      * @throws SQLException if a database access error occurs
      */
-
     @Override
     public Optional<User> getUserById(int userId) throws SQLException {
         String sql = "SELECT user_id, username, email, password_hash FROM user_auth WHERE user_id = ?";
@@ -223,13 +221,13 @@ public class UserDAO implements IUserDAO {
             stmt.setInt(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    User u = new User(
+                    User user = new User(
                             rs.getString("username"),
                             rs.getString("email"),
                             rs.getString("password_hash")
                     );
-                    u.setId(rs.getInt("user_id"));
-                    return Optional.of(u);
+                    user.setId(rs.getInt("user_id"));
+                    return Optional.of(user);
                 }
             }
         }
@@ -246,7 +244,6 @@ public class UserDAO implements IUserDAO {
      * @param difficulty the new simulation difficulty value to set
      * @throws SQLException if a database access error occurs or the update fails
      */
-
     @Override
     public void updateSimulationDifficulty(int userId, String difficulty) throws SQLException {
         try (PreparedStatement p = connection.prepareStatement(

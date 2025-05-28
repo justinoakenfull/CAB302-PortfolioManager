@@ -4,11 +4,10 @@ import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
-import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
+
 import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -20,17 +19,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.util.Callback;
 import javafx.scene.control.TableCell;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -66,11 +63,7 @@ public class StocksController implements Initializable {
      */
     @FXML
     private Button buyStockButton;
-    /**
-     * Container for portfolio pie chart
-     */
-    @FXML
-    private VBox portfolioBox;
+
     /**
      * Column for info buttons
      */
@@ -113,11 +106,6 @@ public class StocksController implements Initializable {
     private StockRepository stockRepository;
 
     /**
-     * DAO for accessing user information
-     */
-    @Autowired
-    private IUserDAO userDAO;
-    /**
      * DAO for managing watchlist data
      */
     private IWatchlistDAO watchlistDAO;
@@ -131,12 +119,9 @@ public class StocksController implements Initializable {
      */
     private final ObservableList<StockRow> allStocks = FXCollections.observableArrayList();
 
-
-
     private TableColumn<StockRow,String>  tickerCol, nameCol;
     private TableColumn<StockRow,Double>  openCol, closeCol, changeCol, changePctCol;
     private TableColumn<StockRow,Long>    volumeCol;
-
 
     /**
      * Initializes the controller with necessary services and data.
@@ -259,7 +244,7 @@ public class StocksController implements Initializable {
                     {
                         // Load and set icon for the button
                         ImageView imageView = new ImageView(
-                                new Image(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockButtonAdd64x64.png")));
+                                new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/javarepowizards/portfoliomanager/images/StockButtonAdd64x64.png"))));
                         imageView.setFitWidth(32);
                         imageView.setFitHeight(32);
                         btn.setGraphic(imageView);
@@ -333,7 +318,6 @@ public class StocksController implements Initializable {
 
             StockName stockName = StockName.fromString(selected.tickerProperty().get());
             double price = selected.closeProperty().get();
-            PortfolioEntry entry = new PortfolioEntry(stockName, price, quantity);
 
             double totalValue = price * quantity;
             double currentBalance = portfolioDAO.getAvailableBalance();

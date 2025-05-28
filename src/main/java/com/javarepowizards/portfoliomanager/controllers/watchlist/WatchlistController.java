@@ -393,5 +393,4 @@ public class WatchlistController implements Initializable {
         }
     }
 
-
 }

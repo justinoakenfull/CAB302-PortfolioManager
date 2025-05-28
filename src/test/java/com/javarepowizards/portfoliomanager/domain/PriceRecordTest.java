@@ -20,11 +20,11 @@ class PriceRecordTest {
 
         PriceRecord rec = new PriceRecord(date, open, high, low, close, volume);
 
-        assertEquals(date,   rec.getDate());
-        assertEquals(open,   rec.getOpen());
-        assertEquals(high,   rec.getHigh());
-        assertEquals(low,    rec.getLow());
-        assertEquals(close,  rec.getClose());
-        assertEquals(volume, rec.getVolume());
+        assertEquals(date,   rec.date());
+        assertEquals(open,   rec.open());
+        assertEquals(high,   rec.high());
+        assertEquals(low,    rec.low());
+        assertEquals(close,  rec.close());
+        assertEquals(volume, rec.volume());
     }
 }
