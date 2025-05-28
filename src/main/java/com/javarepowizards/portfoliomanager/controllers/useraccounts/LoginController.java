@@ -80,7 +80,7 @@ public class LoginController implements Initializable {
                 // —— swap in the “shell” with nav bar ——
                 NavigationService.loadScene(
                         /* source node */   loginButton,
-                        /* fxml path */     "hello-view.fxml",
+                        /* fxml path */     "navigation-bar.fxml",
                         /* controller init */ ctrl -> {
                             // no extra setup: MainController.initialize()
                             // will automatically fire and load the dashboard
@@ -177,7 +177,7 @@ public class LoginController implements Initializable {
             // —— swap in the “shell” with nav bar ——
             NavigationService.loadScene(
                     /* source node */   dummyLogin,
-                    /* fxml path */     "hello-view.fxml",
+                    /* fxml path */     "navigation-bar.fxml",
                     /* controller init */ ctrl -> {
                         // no extra setup: MainController.initialize()
                         // will automatically fire and load the dashboard
