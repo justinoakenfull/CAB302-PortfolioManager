@@ -40,7 +40,7 @@ public class SimulationServices implements ISimulationServices{
             - {Bullet-point insights}
             
             Tips for Improvement:
-            - {Actionable, portfolio-specific advice}
+            - {Actionable, portfolio-specific advice, not generic, directly related to the portfolio and its metrics}
             
             Rating:
             /10 with a brief comment

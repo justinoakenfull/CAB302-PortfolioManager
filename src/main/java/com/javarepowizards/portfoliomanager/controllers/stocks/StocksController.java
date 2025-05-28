@@ -10,6 +10,7 @@ import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.services.IWatchlistService;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -24,12 +25,16 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javafx.util.Callback;
+import javafx.scene.control.TableCell;
+
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 
 /**
  * Controller for the Stocks view.
@@ -126,153 +131,35 @@ public class StocksController implements Initializable {
      */
     private final ObservableList<StockRow> allStocks = FXCollections.observableArrayList();
 
+
+
+    private TableColumn<StockRow,String>  tickerCol, nameCol;
+    private TableColumn<StockRow,Double>  openCol, closeCol, changeCol, changePctCol;
+    private TableColumn<StockRow,Long>    volumeCol;
+
+
     /**
-     * Initializes the controller and its UI components.
-     * Sets up DAOs, retrieves initial user and stock data,
-     * sets up table columns, and event handlers.
+     * Initializes the controller with necessary services and data.
+     * Sets up the TableView columns, cell factories, and event handlers.
+     * Loads stock data and applies filtering based on user input.
+     *
+     * @param url  the location used to resolve relative paths for the root object,
+     *             or null if the location is not known
+     * @param rb   the resources used to localize the root object,
+     *             or null if the root object does not need localization
      */
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Retrieve services from application context
-        watchlistDAO = AppContext.getService(IWatchlistDAO.class);
-        IUserDAO userDAO = AppContext.getService(IUserDAO.class);
-
-        // Determine the current user's ID (default to 1 if not present)
-        currentUserId = userDAO.getCurrentUser().map(u -> u.getUserId()).orElse(1);
-
-        // Clear existing columns and set up fresh ones
-        tableView.getColumns().clear();
-
-        // Retrieve application services
-        stockRepository = AppContext.getService(StockRepository.class);
-        portfolioDAO = AppContext.getService(IPortfolioDAO.class);
-
-        // Display initial cash balance
-        double balance = portfolioDAO.getAvailableBalance();
-        updateCashBalanceLabel();
-        cashBalanceLabel.setText(String.format("Cash: $%.2f", balance));
-        updateBalanceLabels();
-
-        // --- TableColumn setup ---
-
-        // Column for stock ticker symbol
-        TableColumn<StockRow, String> tickerCol = new TableColumn<>("Ticker");
-        tickerCol.setCellValueFactory(cell -> cell.getValue().tickerProperty());
-
-        // Column for company name
-        TableColumn<StockRow, String> nameCol = new TableColumn<>("Stock");
-        nameCol.setCellValueFactory(cell -> cell.getValue().companyNameProperty());
-
-        // Column for opening price
-        TableColumn<StockRow, Double> openCol = new TableColumn<>("Open");
-        openCol.setCellValueFactory(cell -> cell.getValue().openProperty().asObject());
-
-        // Column for closing price
-        TableColumn<StockRow, Double> closeCol = new TableColumn<>("Close");
-        closeCol.setCellValueFactory(cell -> cell.getValue().closeProperty().asObject());
-
-        // Column for absolute change in price
-        TableColumn<StockRow, Double> changeCol = new TableColumn<>("Change");
-        changeCol.setCellValueFactory(cell -> cell.getValue().changeProperty().asObject());
-
-        // Column for percentage change
-        TableColumn<StockRow, Double> changePctCol = new TableColumn<>("Change (%)");
-        changePctCol.setCellValueFactory(cell -> cell.getValue().changePercentProperty().asObject());
-
-        // Column for trading volume
-        TableColumn<StockRow, Long> volumeCol = new TableColumn<>("Volume (M)");
-        volumeCol.setCellValueFactory(cell -> cell.getValue().volumeProperty().asObject());
-
-        // --- Cell formatting ---
-
-        // Factory to format numbers to two decimal places, default white text
-        Callback<TableColumn<StockRow, Double>, TableCell<StockRow, Double>> twoDecimalFactory =
-                col -> new TableCell<>() {
-                    @Override
-                    protected void updateItem(Double value, boolean empty) {
-                        super.updateItem(value, empty);
-
-                        if (empty || value == null) {
-                            // Clear text when row is empty
-                            setText(null);
-                            setTextFill(null);
-                        } else {
-                            // Format to two decimals
-                            setText(String.format("%.2f", value));
-                            setTextFill(Color.WHITE);
-                        }
-                    }
-                };
-
-        // Apply two-decimal formatting to Open, Close, and Change columns
-        openCol.setCellFactory(twoDecimalFactory);
-        closeCol.setCellFactory(twoDecimalFactory);
-        changeCol.setCellFactory(twoDecimalFactory);
-
-        // Factory for Change (%) column: append "%", color red/green
-        changePctCol.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(Double value, boolean empty) {
-                super.updateItem(value, empty);
-
-                if (empty || value == null) {
-                    // Clear on empty rows
-                    setText(null);
-                    getStyleClass().removeAll("balance-value-positive", "balance-value-negative");
-                    return;
-                }
-
-                // Compute percentage and style accordingly
-                double pct = value;
-                setText(String.format("%.2f%%", pct));
-                getStyleClass().removeAll("balance-value-positive", "balance-value-negative");
-
-                if (pct < 0) {
-                    getStyleClass().add("balance-value-negative");
-                } else {
-                    getStyleClass().add("balance-value-positive");
-                }
-            }
-        });
-
-        // Attach all columns to the TableView
-        tableView.getColumns().addAll(
-                tickerCol, nameCol,
-                openCol, closeCol,
-                changeCol, changePctCol,
-                volumeCol
-        );
-
-        // --- Data loading ---
-        try {
-            // Attempt to load available stocks into the table
-            loadStocks();
-            stockSearchField.textProperty().addListener((obs, oldVal, newVal) -> {
-                String lower = newVal.toLowerCase();
-                filteredStocks.setPredicate(stock -> {
-                    if (lower.isEmpty()) return true;
-                    return stock.tickerProperty().get().toLowerCase().contains(lower)
-                            || stock.companyNameProperty().get().toLowerCase().contains(lower);
-                });
-            });
-
-        } catch (IOException e) {
-            // Display error in feedback label if stock data cannot be loaded
-            buyFeedbackLabel.setText("Error loading stock data");
-            buyFeedbackLabel.setTextFill(Color.RED);
-        }
-
-        // --- Event handlers ---
-        // Set action for the Buy button to trigger stock purchase logic
-        buyStockButton.setOnAction(e -> handleBuyStock());
-
-        // Initialize the info and favourite columns with custom cells
-        setupInfoColumn();
-        setupFavouriteColumn();
-
-        // Add interactive columns to the table
-        tableView.getColumns().addAll(favouriteCol, infoCol);
+    public void initialize(URL url, ResourceBundle rb) {
+        initServices();
+        initCurrentUser();
+        initLabels();
+        initTableColumns();
+        initCellFactories();
+        initDataLoading();
+        initEventHandlers();
+        initCustomColumns();
     }
+
 
     /**
      * Initializes the 'Favourite' column with toggleable star buttons.
@@ -555,5 +442,130 @@ public class StocksController implements Initializable {
         cashBalanceLabel.setText(String.format("Cash: $%,.2f", cash));
         portfolioValueLabel.setText(String.format("Portfolio: $%,.2f", holdings));
     }
+
+
+    private void initServices(){
+        watchlistDAO = AppContext.getService(IWatchlistDAO.class);
+
+        stockRepository = AppContext.getService(StockRepository.class);
+        portfolioDAO = AppContext.getService(IPortfolioDAO.class);
+    }
+
+    private void initCurrentUser() {
+        IUserDAO userDAO = AppContext.getService(IUserDAO.class);
+        currentUserId = userDAO.getCurrentUser()
+                .map(u -> u.getUserId())
+                .orElse(1);
+    }
+
+    private void initLabels(){
+        // Display initial cash balance
+        double balance = portfolioDAO.getAvailableBalance();
+        updateCashBalanceLabel();
+        cashBalanceLabel.setText(String.format("Cash: $%.2f", balance));
+        updateBalanceLabels();
+    }
+
+    private void initTableColumns() {
+        // Clear existing columns and set up fresh ones
+        tableView.getColumns().clear();
+
+        tickerCol    = createColumn("Ticker", StockRow::tickerProperty);
+        nameCol      = createColumn("Stock",  StockRow::companyNameProperty);
+        openCol      = createColumn("Open",   row -> row.openProperty().asObject());
+        closeCol     = createColumn("Close",  row -> row.closeProperty().asObject());
+        changeCol    = createColumn("Change", row -> row.changeProperty().asObject());
+        changePctCol = createColumn("Change (%)", row -> row.changePercentProperty().asObject());
+        volumeCol    = createColumn("Volume (M)", row -> row.volumeProperty().asObject());
+
+
+        // Attach all columns to the TableView
+        tableView.getColumns().addAll(
+                tickerCol, nameCol,
+                openCol, closeCol,
+                changeCol, changePctCol,
+                volumeCol
+        );
+    }
+
+    private <S,T> TableColumn<S,T> createColumn(
+            String title,
+            Function<S, ObservableValue<T>> propExtractor)
+    {
+        TableColumn<S,T> col = new TableColumn<>(title);
+        // this lambda signature is important so Java knows you’re implementing
+        // Callback<CellDataFeatures<S,T>, ObservableValue<T>>
+        col.setCellValueFactory((TableColumn.CellDataFeatures<S,T> cell) ->
+                propExtractor.apply(cell.getValue())
+        );
+        return col;
+    }
+
+
+    private void initCellFactories() {
+        // two‐decimal factory
+        Callback<TableColumn<StockRow,Double>,TableCell<StockRow,Double>> twoDec =
+                col -> new TableCell<>() {
+                    @Override protected void updateItem(Double v, boolean empty) {
+                        super.updateItem(v, empty);
+                        if (empty||v==null) {
+                            setText(null); setTextFill(null);
+                        } else {
+                            setText(String.format("%.2f",v));
+                            setTextFill(Color.WHITE);
+                        }
+                    }
+                };
+
+        openCol.setCellFactory(twoDec);
+        closeCol.setCellFactory(twoDec);
+        changeCol.setCellFactory(twoDec);
+
+        // percent‐change factory
+        changePctCol.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Double pct, boolean empty) {
+                super.updateItem(pct, empty);
+                if (empty||pct==null) {
+                    setText(null);
+                    getStyleClass().removeAll("balance-value-positive","balance-value-negative");
+                } else {
+                    setText(String.format("%.2f%%",pct));
+                    getStyleClass().removeAll("balance-value-positive","balance-value-negative");
+                    getStyleClass().add(pct<0
+                            ? "balance-value-negative"
+                            : "balance-value-positive");
+                }
+            }
+        });
+    }
+
+    private void initDataLoading() {
+        try {
+            loadStocks();
+            stockSearchField.textProperty().addListener((obs,o,n) ->
+                    filteredStocks.setPredicate(stock -> {
+                        String lower = n.toLowerCase();
+                        if (lower.isEmpty()) return true;
+                        return stock.tickerProperty().get().toLowerCase().contains(lower)
+                                || stock.companyNameProperty().get().toLowerCase().contains(lower);
+                    })
+            );
+        } catch (IOException e) {
+            buyFeedbackLabel.setText("Error loading stock data");
+            buyFeedbackLabel.setTextFill(Color.RED);
+        }
+    }
+
+    private void initEventHandlers() {
+        buyStockButton.setOnAction(e -> handleBuyStock());
+    }
+
+    private void initCustomColumns() {
+        setupInfoColumn();
+        setupFavouriteColumn();
+        tableView.getColumns().addAll(favouriteCol, infoCol);
+    }
+
+
 }
 
