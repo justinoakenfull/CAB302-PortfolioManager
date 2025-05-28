@@ -1,5 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.stocks;
 
+import com.javarepowizards.portfoliomanager.models.User;
+import com.javarepowizards.portfoliomanager.ui.TableRow.StockRow;
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
@@ -7,8 +9,6 @@ import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.StockName;
-
-import com.javarepowizards.portfoliomanager.services.IWatchlistService;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,8 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
-import org.springframework.beans.factory.annotation.Autowired;
 import javafx.util.Callback;
 import javafx.scene.control.TableCell;
 import java.io.IOException;
@@ -119,9 +117,9 @@ public class StocksController implements Initializable {
      */
     private final ObservableList<StockRow> allStocks = FXCollections.observableArrayList();
 
-    private TableColumn<StockRow,String>  tickerCol, nameCol;
-    private TableColumn<StockRow,Double>  openCol, closeCol, changeCol, changePctCol;
-    private TableColumn<StockRow,Long>    volumeCol;
+    private TableColumn<StockRow,String> tickerCol, nameCol;
+    private TableColumn<StockRow,Double> openCol, closeCol, changeCol, changePctCol;
+    private TableColumn<StockRow,Long> volumeCol;
 
     /**
      * Initializes the controller with necessary services and data.
@@ -438,7 +436,7 @@ public class StocksController implements Initializable {
     private void initCurrentUser() {
         IUserDAO userDAO = AppContext.getService(IUserDAO.class);
         currentUserId = userDAO.getCurrentUser()
-                .map(u -> u.getUserId())
+                .map(User::getUserId)
                 .orElse(1);
     }
 
@@ -465,10 +463,11 @@ public class StocksController implements Initializable {
 
         // Attach all columns to the TableView
         tableView.getColumns().addAll(
+                Arrays.asList(
                 tickerCol, nameCol,
                 openCol, closeCol,
                 changeCol, changePctCol,
-                volumeCol
+                volumeCol)
         );
     }
 
@@ -547,7 +546,7 @@ public class StocksController implements Initializable {
     private void initCustomColumns() {
         setupInfoColumn();
         setupFavouriteColumn();
-        tableView.getColumns().addAll(favouriteCol, infoCol);
+        tableView.getColumns().addAll(Arrays.asList(favouriteCol, infoCol));
     }
 
 

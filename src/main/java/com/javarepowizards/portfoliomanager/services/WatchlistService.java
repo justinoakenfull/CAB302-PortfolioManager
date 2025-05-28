@@ -1,6 +1,6 @@
 package com.javarepowizards.portfoliomanager.services;
 
-import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.ui.TableRow.WatchlistRow;
 import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.dao.IUserDAO;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
@@ -350,8 +350,8 @@ public class WatchlistService implements IWatchlistService, IWatchlistReadOnly {
      * Stocks without available data are skipped.
      *
      * @return list of WatchlistRow elements
-     * @throws IOException   if there is an error loading stock data
-     * @throws SQLException  if there is an error querying the watchlist
+     * @throws IOException  if there is an error loading stock data
+     * @throws SQLException if there is an error querying the watchlist
      */
     @Override
     public List<WatchlistRow> getWatchlistRows() throws IOException, SQLException {

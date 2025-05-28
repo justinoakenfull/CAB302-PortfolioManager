@@ -1,6 +1,6 @@
 package com.javarepowizards.portfoliomanager.models;
 
-import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.ui.TableRow.WatchlistRow;
 import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;

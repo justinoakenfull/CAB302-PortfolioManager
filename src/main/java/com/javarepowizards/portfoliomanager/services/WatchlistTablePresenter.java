@@ -1,6 +1,6 @@
 package com.javarepowizards.portfoliomanager.services;
 
-import com.javarepowizards.portfoliomanager.controllers.watchlist.WatchlistRow;
+import com.javarepowizards.portfoliomanager.ui.TableRow.WatchlistRow;
 import com.javarepowizards.portfoliomanager.domain.IStockRepoReadOnly;
 import com.javarepowizards.portfoliomanager.domain.IWatchlistReadOnly;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
@@ -65,7 +65,7 @@ public final class WatchlistTablePresenter {
             table.setItems(model);
 
         } catch (IOException | SQLException ex) {
-            ex.printStackTrace();
+            /* Consume exception */
         }
     }
 
@@ -73,8 +73,8 @@ public final class WatchlistTablePresenter {
     private void buildTable() {
 
         List<ColumnConfig<WatchlistRow,?>> cols = List.of(
-                new ColumnConfig<>("Ticker",   WatchlistRow::shortNameProperty),
-                new ColumnConfig<>("Name",     WatchlistRow::displayNameProperty),
+                new ColumnConfig<>("Ticker",   WatchlistRow::tickerProperty),
+                new ColumnConfig<>("Name",     WatchlistRow::companyNameProperty),
                 new ColumnConfig<>("Open",     r -> r.openProperty().asObject(),
                         TableCellFactories.numericFactory(2,false)),
                 new ColumnConfig<>("Close",    r -> r.closeProperty().asObject(),

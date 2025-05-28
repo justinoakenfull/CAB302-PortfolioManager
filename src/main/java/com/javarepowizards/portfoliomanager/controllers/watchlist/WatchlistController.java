@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
+import com.javarepowizards.portfoliomanager.ui.TableRow.WatchlistRow;
 
 /**
  * Controller for the Watchlist view.
@@ -80,8 +81,8 @@ public class WatchlistController implements Initializable {
      */
     private void setupTable() {
         List<ColumnConfig<WatchlistRow,?>> cols = List.of(
-                new ColumnConfig<>("Ticker",    WatchlistRow::shortNameProperty),
-                new ColumnConfig<>("Name",      WatchlistRow::displayNameProperty),
+                new ColumnConfig<>("Ticker",    WatchlistRow::tickerProperty),
+                new ColumnConfig<>("Name",      WatchlistRow::companyNameProperty),
                 new ColumnConfig<>("Open",      r -> r.openProperty().asObject(),
                         TableCellFactories.numericFactory(2, false)),
                 new ColumnConfig<>("Close",     r -> r.closeProperty().asObject(),
@@ -124,7 +125,7 @@ public class WatchlistController implements Initializable {
         if (row == null) {
             snapshotText.setText("No stock selected.");
         } else {
-            StockName sym = StockName.fromString(row.shortNameProperty().get());
+            StockName sym = StockName.fromString(row.tickerProperty().get());
             toggleProgress();
             snapshotText.setText("Loading description…");
 
@@ -184,7 +185,7 @@ public class WatchlistController implements Initializable {
                 removeBtn.setOnAction(e -> {
                     try {
                         watchlistService.removeStock(
-                                StockName.fromString(row.shortNameProperty().get())
+                                StockName.fromString(row.tickerProperty().get())
                         );
                         loadAll();
                     } catch (SQLException ex) {
@@ -315,7 +316,7 @@ public class WatchlistController implements Initializable {
             Parent root = loader.load();
             WatchlistModalController modal = loader.getController();
 
-            StockName ticker = StockName.fromString(selected.shortNameProperty().get());
+            StockName ticker = StockName.fromString(selected.tickerProperty().get());
 
             modal.initData(ticker);
 
