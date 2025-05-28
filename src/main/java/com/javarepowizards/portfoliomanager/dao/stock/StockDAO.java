@@ -19,7 +19,7 @@ import java.util.Map;
  * Uses an EnumMap to store a list of StockData entries for each StockName.
  * The CSV file must follow a specific three-header format before data rows.
  */
-public class StockDAO {
+public class StockDAO implements IStockDAO {
 
     private static final String DEFAULT_CSV_PATH = "/com/javarepowizards/portfoliomanager/data/asx_data_with_index2.csv";
 
@@ -63,6 +63,7 @@ public class StockDAO {
      * @param filePath path to the CSV file
      * @throws IOException if reading the file fails
      */
+    @Override
     public void loadCSV(String filePath) throws IOException {
         // Open the file using a BufferedReader wrapped around a FileReader.
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -185,6 +186,7 @@ public class StockDAO {
      * @param stockName the stock symbol enum
      * @return list of StockData for that symbol, or an empty list if none
      */
+    @Override
     public List<StockData> getStockData(StockName stockName) {
         // Use getOrDefault to return an empty list if no data is found.
         return stockDataMap.getOrDefault(stockName, Collections.emptyList());
@@ -199,6 +201,7 @@ public class StockDAO {
      * @param date the specific LocalDate for which data is requested.
      * @return the StockData entry if found, or null if no matching entry exists.
      */
+    @Override
     public StockData getStockData(StockName stockName, LocalDate date) {
         // Loop over the list of StockData objects for the given stock.
         for (StockData sd : getStockData(stockName)) {

@@ -1,7 +1,7 @@
 package com.javarepowizards.portfoliomanager.services.simulation;
 
 
-import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
+import com.javarepowizards.portfoliomanager.dao.stock.IStockDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockData;
 import com.javarepowizards.portfoliomanager.services.utility.StockDataFilter;
@@ -25,7 +25,7 @@ import java.util.List;
 public class PortfolioSimulation {
 
     private final IPortfolioDAO portfolio;
-    private final StockDAO stockDAO;          // Needed to fetch historical data for each stock
+    private final IStockDAO stockDAO;          // Needed to fetch historical data for each stock
     private final LocalDate mostRecentDate;   // e.g., 2023-12-29
     private final int simulationDays;         // Number of simulation days to run
     private final double kMultiplier;         // Multiplier for dynamic boundaries (e.g., 2.0)
@@ -43,7 +43,7 @@ public class PortfolioSimulation {
      * @param maxDailyMovement maximum daily movement as a decimal.
      * @param smoothingFactor smoothing factor (α) for dynamic momentum updates.
      */
-    public PortfolioSimulation(IPortfolioDAO portfolio, StockDAO stockDAO, LocalDate mostRecentDate,
+    public PortfolioSimulation(IPortfolioDAO portfolio, IStockDAO stockDAO, LocalDate mostRecentDate,
                                      int simulationDays, double kMultiplier, double maxDailyMovement,
                                      double smoothingFactor) {
         this.portfolio = portfolio;

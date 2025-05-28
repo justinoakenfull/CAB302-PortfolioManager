@@ -1,12 +1,11 @@
 package com.javarepowizards.portfoliomanager;
 
+import com.javarepowizards.portfoliomanager.dao.stock.IStockDAO;
+import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
 import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.SimulationDifficulty;
 import com.javarepowizards.portfoliomanager.services.session.NavigationService;
 import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
-
-
-
 import com.javarepowizards.portfoliomanager.services.session.Session;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -25,7 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
+
 import javafx.util.Duration;
 
 public class MainController implements Initializable {
@@ -48,7 +47,7 @@ public class MainController implements Initializable {
 
     private IUserDAO userDAO;
     private IPortfolioDAO portfolioDAO;
-    private StockDAO stockDAO;
+    private IStockDAO stockDAO;
 
     @FXML
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -58,7 +57,7 @@ public class MainController implements Initializable {
                 stocksBtn, simulationBtn, myAccountBtn, settingsBtn
         );
 
-        stockDAO = stockDAO.getInstance();
+        stockDAO = StockDAO.getInstance();
 
         // Initialize the NavigationService with the content area
         nav = new NavigationService(contentArea);
