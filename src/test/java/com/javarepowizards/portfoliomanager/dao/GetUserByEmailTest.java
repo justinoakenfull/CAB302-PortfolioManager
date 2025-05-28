@@ -1,5 +1,6 @@
 package com.javarepowizards.portfoliomanager.dao;
 
+import com.javarepowizards.portfoliomanager.dao.user.UserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ public class GetUserByEmailTest{
     private static final String EMAIL = "john@smith.com";
     private static final String HASHED_PASS = "passwordhash123";
 
-    private  UserDAO userDAO;
+    private UserDAO userDAO;
 
     @BeforeEach
     public void setUp() throws SQLException{

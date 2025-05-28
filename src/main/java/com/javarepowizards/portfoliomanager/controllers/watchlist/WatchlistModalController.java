@@ -4,7 +4,7 @@ import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.price.PriceRecord;
 import com.javarepowizards.portfoliomanager.models.StockName;
-import com.javarepowizards.portfoliomanager.services.IWatchlistService;
+import com.javarepowizards.portfoliomanager.services.watchlist.IWatchlistService;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

@@ -1,12 +1,12 @@
 package com.javarepowizards.portfoliomanager.controllers.dashboard;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.domain.IStockRepoReadOnly;
+import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
+import com.javarepowizards.portfoliomanager.domain.stock.IStockRepoReadOnly;
 import com.javarepowizards.portfoliomanager.domain.IWatchlistReadOnly;
-import com.javarepowizards.portfoliomanager.services.PortfolioChartPresenter;
-import com.javarepowizards.portfoliomanager.services.WatchlistTablePresenter;
-import com.javarepowizards.portfoliomanager.ui.QuickTips;
+import com.javarepowizards.portfoliomanager.services.portfolio.PortfolioChartPresenter;
+import com.javarepowizards.portfoliomanager.services.watchlist.WatchlistTablePresenter;
+import com.javarepowizards.portfoliomanager.ui.componants.QuickTips;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;

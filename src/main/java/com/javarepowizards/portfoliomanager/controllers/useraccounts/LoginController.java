@@ -1,11 +1,11 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
-import com.javarepowizards.portfoliomanager.services.IAuthService;
-import com.javarepowizards.portfoliomanager.services.Session;
-import com.javarepowizards.portfoliomanager.services.NavigationService;
+import com.javarepowizards.portfoliomanager.services.Auth.IAuthService;
+import com.javarepowizards.portfoliomanager.services.session.Session;
+import com.javarepowizards.portfoliomanager.services.session.NavigationService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;

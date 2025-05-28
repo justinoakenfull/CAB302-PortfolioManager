@@ -1,5 +1,6 @@
 package com.javarepowizards.portfoliomanager.dao;
 
+import com.javarepowizards.portfoliomanager.dao.user.UserDAO;
 import com.javarepowizards.portfoliomanager.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

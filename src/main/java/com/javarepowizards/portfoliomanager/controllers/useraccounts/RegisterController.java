@@ -1,8 +1,8 @@
 package com.javarepowizards.portfoliomanager.controllers.useraccounts;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.services.RegistrationService;
-import com.javarepowizards.portfoliomanager.services.ValidationException;
+import com.javarepowizards.portfoliomanager.services.Auth.RegistrationService;
+import com.javarepowizards.portfoliomanager.services.utility.ValidationException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,11 +18,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-import java.util.regex.Pattern;
 
-import static java.util.logging.Level.INFO;
 import static javafx.scene.control.Alert.AlertType.ERROR;
-import static javafx.scene.control.Alert.AlertType.WARNING;
 
 
 /**

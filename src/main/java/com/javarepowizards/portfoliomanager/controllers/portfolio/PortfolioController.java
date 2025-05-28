@@ -1,10 +1,10 @@
 package com.javarepowizards.portfoliomanager.controllers.portfolio;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
-import com.javarepowizards.portfoliomanager.services.Session;
+import com.javarepowizards.portfoliomanager.services.session.Session;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,7 +16,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
-import com.javarepowizards.portfoliomanager.services.IWatchlistService;
+import com.javarepowizards.portfoliomanager.services.watchlist.IWatchlistService;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;

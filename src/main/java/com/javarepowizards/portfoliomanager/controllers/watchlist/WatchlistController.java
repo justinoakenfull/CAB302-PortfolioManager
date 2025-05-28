@@ -2,10 +2,10 @@ package com.javarepowizards.portfoliomanager.controllers.watchlist;
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
-import com.javarepowizards.portfoliomanager.services.IWatchlistService;
-import com.javarepowizards.portfoliomanager.ui.ColumnConfig;
-import com.javarepowizards.portfoliomanager.ui.TableCellFactories;
-import com.javarepowizards.portfoliomanager.ui.TableViewFactory;
+import com.javarepowizards.portfoliomanager.services.watchlist.IWatchlistService;
+import com.javarepowizards.portfoliomanager.ui.table.ColumnConfig;
+import com.javarepowizards.portfoliomanager.ui.table.TableCellFactories;
+import com.javarepowizards.portfoliomanager.ui.table.TableViewFactory;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
-import com.javarepowizards.portfoliomanager.ui.TableRow.WatchlistRow;
+import com.javarepowizards.portfoliomanager.ui.table.TableRow.WatchlistRow;
 
 /**
  * Controller for the Watchlist view.

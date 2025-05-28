@@ -1,11 +1,24 @@
 package com.javarepowizards.portfoliomanager;
 
 import com.javarepowizards.portfoliomanager.dao.*;
-import com.javarepowizards.portfoliomanager.domain.IStockRepoReadOnly;
+import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.portfolio.PortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
+import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.user.UserDAO;
+import com.javarepowizards.portfoliomanager.dao.watchlist.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.dao.watchlist.WatchlistDAO;
+import com.javarepowizards.portfoliomanager.domain.stock.IStockRepoReadOnly;
 import com.javarepowizards.portfoliomanager.domain.IWatchlistReadOnly;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.infrastructure.InMemoryStockRepository;
-import com.javarepowizards.portfoliomanager.services.*;
+import com.javarepowizards.portfoliomanager.services.Auth.AuthService;
+import com.javarepowizards.portfoliomanager.services.Auth.IAuthService;
+import com.javarepowizards.portfoliomanager.services.Auth.RegistrationService;
+import com.javarepowizards.portfoliomanager.services.simulation.ISimulationServices;
+import com.javarepowizards.portfoliomanager.services.simulation.SimulationServices;
+import com.javarepowizards.portfoliomanager.services.watchlist.IWatchlistService;
+import com.javarepowizards.portfoliomanager.services.watchlist.WatchlistService;
 import com.opencsv.exceptions.CsvValidationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -214,4 +227,6 @@ public final class AppContext {
 
         AppContext.registerService(ISimulationServices.class, simService);
     }
+
+
 }

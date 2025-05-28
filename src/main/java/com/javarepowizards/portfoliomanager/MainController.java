@@ -1,37 +1,32 @@
 package com.javarepowizards.portfoliomanager;
 
-import com.javarepowizards.portfoliomanager.dao.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
 import com.javarepowizards.portfoliomanager.models.SimulationDifficulty;
-import com.javarepowizards.portfoliomanager.services.NavigationService;
-import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
+import com.javarepowizards.portfoliomanager.services.session.NavigationService;
+import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
 
 
 
-import com.javarepowizards.portfoliomanager.services.Session;
+import com.javarepowizards.portfoliomanager.services.session.Session;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.effect.Glow;
 import javafx.scene.layout.StackPane;
-import java.io.IOException;
+
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javafx.scene.Parent;
-
-import com.javarepowizards.portfoliomanager.dao.StockDAO;
+import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
 import javafx.util.Duration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class MainController implements Initializable {
     @FXML
