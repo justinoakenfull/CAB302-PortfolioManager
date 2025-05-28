@@ -48,6 +48,8 @@ public class SimulationController implements Initializable {
     @FXML private ProgressIndicator progressIndicator;
     @FXML private ListView<String> listHoldings;
 
+    private int buttonCount = 0;
+
     // References that must be provided externally (from MainController, for example)
     private IPortfolioDAO portfolioDAO;
 
@@ -153,6 +155,8 @@ public class SimulationController implements Initializable {
                 onSimFailure(simTask.getException()));
 
         new Thread(simTask, "Sim-Thread").start();
+
+        buttonCount = 0;
     }
 
 // ------------------------------------------------------------------
@@ -240,7 +244,7 @@ public class SimulationController implements Initializable {
         labelReview.setText("""
         ⚠️ Ollama is not running.
         Start Ollama Desktop or `ollama serve` to receive the AI summary.
-    """);
+        Please try again. Failed Attempts:\s""" + ++buttonCount + ".");
         labelReview.setStyle("-fx-text-fill:#FFFFFF;");
         progressIndicator.setVisible(false);
         btnRunSimulation.setDisable(false);

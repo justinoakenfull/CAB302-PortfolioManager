@@ -14,20 +14,28 @@ public class OllamaService {
     // OllamaService is a service that communicates with the Ollama API to generate responses based on a given prompt.
     private static final String TAGS_URL     = "http://localhost:11434/api/tags";
     private static final String GENERATE_URL = "http://localhost:11434/api/generate";
-    private final String modelName;
+    private String modelName;
 
     /**
      * Constructs an OllamaService instance and detects the default model.
      * If no model is detected, it sets the modelName to null.
      */
     public OllamaService() {
-        String detected = null;
+        refreshModelName();
+    }
+
+    /**
+     * Attempts to detect the default model from the Ollama API
+     * and stores it in {@code modelName}.  If detection fails,
+     * {@code modelName} will be set to null.
+     */
+    public void refreshModelName() {
         try {
-            detected = detectDefaultModel();
+            this.modelName = detectDefaultModel();
         } catch (IllegalStateException e) {
-            // log.warn("Ollama not reachable; AI features disabled", e);
+            // Ollama not reachable or no models installed
+            this.modelName = null;
         }
-        this.modelName = detected;
     }
 
     /**
@@ -84,6 +92,8 @@ public class OllamaService {
      * @throws IOException if an error occurs during the HTTP request or response handling.
      */
     public String generateResponse(String prompt) throws IOException {
+        refreshModelName();
+
         if (modelName == null) {
             throw new IllegalStateException("No Ollama model detected");
 
@@ -131,7 +141,7 @@ public class OllamaService {
      */
     public Boolean isServiceAvailable(){
 
-
+        refreshModelName();
 
         if (modelName == null) {
             return false;
