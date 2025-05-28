@@ -1,11 +1,11 @@
 package com.javarepowizards.portfoliomanager.controllers.simulation;
 
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.operations.simulation.PortfolioSimulation;
-import com.javarepowizards.portfoliomanager.services.ISimulationServices;
-import com.javarepowizards.portfoliomanager.services.OllamaService;
-import com.javarepowizards.portfoliomanager.services.PortfolioStatistics;
+import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
+import com.javarepowizards.portfoliomanager.services.simulation.PortfolioSimulation;
+import com.javarepowizards.portfoliomanager.services.simulation.ISimulationServices;
+import com.javarepowizards.portfoliomanager.services.utility.OllamaService;
+import com.javarepowizards.portfoliomanager.services.simulation.PortfolioStatistics;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;

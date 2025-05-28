@@ -1,11 +1,11 @@
 package com.javarepowizards.portfoliomanager.controllers.stocks;
 
 import com.javarepowizards.portfoliomanager.models.User;
-import com.javarepowizards.portfoliomanager.ui.TableRow.StockRow;
+import com.javarepowizards.portfoliomanager.ui.table.TableRow.StockRow;
 import com.javarepowizards.portfoliomanager.AppContext;
-import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.dao.IUserDAO;
-import com.javarepowizards.portfoliomanager.dao.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.watchlist.IWatchlistDAO;
 import com.javarepowizards.portfoliomanager.domain.stock.IStock;
 import com.javarepowizards.portfoliomanager.domain.stock.StockRepository;
 import com.javarepowizards.portfoliomanager.models.StockName;

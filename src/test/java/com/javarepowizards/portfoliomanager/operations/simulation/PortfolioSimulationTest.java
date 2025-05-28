@@ -1,9 +1,8 @@
 package com.javarepowizards.portfoliomanager.operations.simulation;
 
-import com.javarepowizards.portfoliomanager.dao.IPortfolioDAO;
-import com.javarepowizards.portfoliomanager.dao.PortfolioDAO;
-import com.javarepowizards.portfoliomanager.dao.StockDAO;
-import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
+import com.javarepowizards.portfoliomanager.dao.portfolio.PortfolioDAO;
+import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
+import com.javarepowizards.portfoliomanager.services.simulation.PortfolioSimulation;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

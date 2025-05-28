@@ -4,6 +4,11 @@ package com.javarepowizards.portfoliomanager.services;
 
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.*;
+import com.javarepowizards.portfoliomanager.dao.user.IUserDAO;
+import com.javarepowizards.portfoliomanager.dao.user.UserDAO;
+import com.javarepowizards.portfoliomanager.dao.watchlist.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.dao.watchlist.WatchlistDAO;
+import com.javarepowizards.portfoliomanager.services.Auth.AuthService;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;

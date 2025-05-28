@@ -1,5 +1,7 @@
 package com.javarepowizards.portfoliomanager.dao;
 
+import com.javarepowizards.portfoliomanager.dao.watchlist.IWatchlistDAO;
+import com.javarepowizards.portfoliomanager.dao.watchlist.WatchlistDAO;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import org.junit.jupiter.api.*;
 

@@ -1,6 +1,6 @@
 package com.javarepowizards.portfoliomanager.dao;
 
-import com.javarepowizards.portfoliomanager.domain.stock.Stock;
+import com.javarepowizards.portfoliomanager.dao.stock.StockDAO;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.models.StockData;
 import org.junit.jupiter.api.BeforeEach;
