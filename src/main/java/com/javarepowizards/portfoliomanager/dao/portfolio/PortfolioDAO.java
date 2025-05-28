@@ -4,8 +4,6 @@ import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
 import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.StockName;
 import com.javarepowizards.portfoliomanager.services.session.Session;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,7 +14,6 @@ import java.util.List;
  * Supports both DB-backed and in-memory modes for retrieving and updating
  * user holdings and balances.
  */
-@Repository
 public class PortfolioDAO implements IPortfolioDAO {
 
     /** Connection to the SQL database (null if in-memory mode) */
@@ -36,7 +33,6 @@ public class PortfolioDAO implements IPortfolioDAO {
      *
      * @param dbConnection The database connection provider
      */
-    @Autowired
     public PortfolioDAO(IDatabaseConnection dbConnection) {
         try {
             this.conn = dbConnection.getConnection();

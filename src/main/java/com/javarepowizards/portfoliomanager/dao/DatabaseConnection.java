@@ -1,7 +1,5 @@
 package com.javarepowizards.portfoliomanager.dao;
 
-import org.springframework.stereotype.Component;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,7 +9,7 @@ import java.sql.SQLException;
  * Initializes a single JDBC connection on construction
  * and exposes it via the IDatabaseConnection interface.
  */
-@Component
+
 public class DatabaseConnection implements IDatabaseConnection {
 
     private final Connection connection;

@@ -1,9 +1,7 @@
 package com.javarepowizards.portfoliomanager.services.Auth;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-@Service
 public class AuthService implements IAuthService {
 
     private final PasswordEncoder passwordEncoder;

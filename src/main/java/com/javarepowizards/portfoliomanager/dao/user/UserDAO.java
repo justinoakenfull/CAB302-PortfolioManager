@@ -3,13 +3,12 @@ package com.javarepowizards.portfoliomanager.dao.user;
 import com.javarepowizards.portfoliomanager.dao.IDatabaseConnection;
 import com.javarepowizards.portfoliomanager.models.User;
 import com.javarepowizards.portfoliomanager.services.session.Session;
-import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+
 public class UserDAO implements IUserDAO {
     private final Connection connection;
 

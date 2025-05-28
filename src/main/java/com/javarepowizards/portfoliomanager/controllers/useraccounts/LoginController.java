@@ -16,7 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -30,7 +29,7 @@ import java.util.regex.Pattern;
  * and provides a shortcut for a dummy login to a test account.
  * Retrieves required services from the application context.
  */
-@Component
+
 public class LoginController implements Initializable {
 
     @FXML private TextField emailField;
