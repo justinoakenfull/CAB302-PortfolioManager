@@ -35,6 +35,7 @@
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/dao/watchlist/IWatchlistDAO.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/dao/watchlist/WatchlistDAO.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/dao/stock/StockDAO.java'
+'/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/dao/stock/IStockDAO.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/dao/user/IUserDAO.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/dao/user/UserDAO.java'
 '/home/runner/work/CAB302-PortfolioManager/CAB302-PortfolioManager/src/main/java/com/javarepowizards/portfoliomanager/models/PortfolioEntry.java'
