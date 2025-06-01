@@ -35,7 +35,6 @@ public class LoginController implements Initializable {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
-    @FXML private Button dummyLogin;
 
     private IAuthService authService;
     private IUserDAO userDAO;
@@ -141,56 +140,5 @@ public class LoginController implements Initializable {
     private boolean isEmail(String input) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return Pattern.compile(emailRegex).matcher(input).matches();
-    }
-
-    /**
-     * Performs a dummy login to a default test account.
-     * Creates the account if it does not exist, then
-     * navigates to the dashboard view.
-     */
-    @FXML
-    private void skipLogin() {
-
-        final String username = "test";
-        final String email    = "test";
-        final String password = "test1234";
-
-        try{
-            Optional<User> userOpt = isEmail(username)
-                    ? userDAO.getUserByEmail(username)
-                    : userDAO.getUserByUsername(username);
-
-            if (userOpt.isEmpty()) {
-                String hashed = authService.hashPassword(password);
-                User newUser = new User(username, email, hashed);
-                boolean created = userDAO.createUser(newUser, 100000.00);
-                if (!created) {
-                    throw new RuntimeException("Failed to create test user");
-                }
-                userOpt = Optional.of(newUser);
-            }
-
-            Session.setCurrentUser(userOpt.get());
-
-
-            // —— swap in the “shell” with nav bar ——
-            NavigationService.loadScene(
-                    /* source node */   dummyLogin,
-                    /* fxml path */     "navigation-bar.fxml",
-                    /* controller init */ ctrl -> {
-                        // no extra setup: MainController.initialize()
-                        // will automatically fire and load the dashboard
-                    },
-                    /* title */         "Dashboard",
-                    /* width */         1200,
-                    /* height */        800
-            );
-
-        }catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-
-
     }
 }
