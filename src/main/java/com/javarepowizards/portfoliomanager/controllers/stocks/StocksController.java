@@ -1,9 +1,7 @@
 package com.javarepowizards.portfoliomanager.controllers.stocks;
 
-import com.javarepowizards.portfoliomanager.models.PortfolioEntry;
 import com.javarepowizards.portfoliomanager.models.User;
 import com.javarepowizards.portfoliomanager.services.portfolio.PortfolioBarPresenter;
-import com.javarepowizards.portfoliomanager.services.portfolio.PortfolioChartPresenter;
 import com.javarepowizards.portfoliomanager.ui.table.TableRow.StockRow;
 import com.javarepowizards.portfoliomanager.AppContext;
 import com.javarepowizards.portfoliomanager.dao.portfolio.IPortfolioDAO;
@@ -23,12 +21,8 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.scene.control.TableCell;
 import java.io.IOException;
@@ -107,7 +101,7 @@ public class StocksController implements Initializable {
 
     @FXML
     private Pane portfolioChartPane;
-    private PortfolioChartPresenter chartPresenter;
+
     private PortfolioBarPresenter barPresenter;
     @FXML private FlowPane portfolioLegendContainer;
 

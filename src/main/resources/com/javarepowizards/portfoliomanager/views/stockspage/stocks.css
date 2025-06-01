@@ -176,7 +176,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0.1, 0, 2);
 }
 
-.purchase-swapper {
+.contracts-label {
     -fx-background-color: transparent;
     -fx-text-fill: #0d89d1;
 }
