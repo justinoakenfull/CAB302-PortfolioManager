@@ -306,3 +306,8 @@
     -fx-fill: white;
     -fx-font-size: 16px;
 }
+
+.placeholder {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+}

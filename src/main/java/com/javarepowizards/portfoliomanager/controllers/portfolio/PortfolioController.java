@@ -85,6 +85,14 @@ public class PortfolioController implements Initializable {
                 stockInfoText.setText("No stock selected.");
             }
         });
+
+        setupPlaceholderText(portfolioTable);
+    }
+
+    private static void setupPlaceholderText(TableView<PortfolioEntry> portfolioTable) {
+        var placeholder = new Label("Go to Stocks Page to Begin Building Your Portfolio.");
+        placeholder.getStyleClass().add("placeholder");
+        portfolioTable.setPlaceholder(placeholder);
     }
 
     /**

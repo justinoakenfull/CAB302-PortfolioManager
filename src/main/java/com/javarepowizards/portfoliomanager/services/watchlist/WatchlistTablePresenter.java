@@ -9,6 +9,7 @@ import com.javarepowizards.portfoliomanager.ui.table.TableCellFactories;
 import com.javarepowizards.portfoliomanager.ui.table.TableViewFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -94,6 +95,10 @@ public final class WatchlistTablePresenter {
         table.getColumns().forEach(c -> c.getStyleClass().add("column-header-background"));
         table.getStyleClass().add("watchlist-table");
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+
+        var placeholder = new Label("Go to Watchlist Page to Begin Building Your Watchlist.");
+        placeholder.getStyleClass().add("placeholder");
+        table.setPlaceholder(placeholder);
 
         // allow it to grow within its container
         HBox.setHgrow(table, Priority.ALWAYS);
