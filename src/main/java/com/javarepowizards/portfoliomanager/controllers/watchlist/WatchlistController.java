@@ -107,6 +107,7 @@ public class WatchlistController implements Initializable {
         tv.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldRow, newRow) -> onRowSelected(newRow)
         );
+        tv.setPlaceholder(new Label("Click the Add Stock button to begin building your watch list."));
 
         HBox.setHgrow(tv, Priority.ALWAYS);
         VBox.setVgrow(tv, Priority.ALWAYS);
